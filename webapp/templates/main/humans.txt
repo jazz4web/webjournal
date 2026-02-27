@@ -1,0 +1,15 @@
+/* TEAM */
+Idea: Jazz aka jazz4web
+Creator: Jazz aka jazz4web
+Development: Jazz aka jazz4web
+Mail: webcodej@mail.ru
+Location: Chelyabinsk, Russia
+
+/* THANKS */
+Thanks to Gods, I am still alive...
+
+/* SITE */
+Standards: HTML5, CSS3, GNU GPLv.3
+Components: Python3x, Starlette, PostgreSQL, Redis, jQuery, Mustache.js etc.
+Software: Debian sid, Vim, Git
+Server: Debian forky, Nginx, Hypercorn

@@ -1,0 +1,6 @@
+DEBUG=True
+ASSETS_DEBUG=False
+SNAME='Сфинкс'
+SDESC='Сайт для ведения текстовых блогов.'
+ITITLE=' Записки Сфинкса'
+FILE_MAX_AGE=3600

@@ -1,0 +1,11 @@
+*.pyc
+*.swp
+.env
+__pycache__
+venv
+vendor
+.webassets-cache
+generic
+fonts
+tuning.py
+*.old.txt
