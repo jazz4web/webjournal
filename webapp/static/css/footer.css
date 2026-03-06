@@ -1,0 +1,39 @@
+footer {
+  background-color: silver;
+  background-image: linear-gradient(to bottom, gray, dimgray);
+  box-shadow: 0 0 4px darkgray;
+  height: 100px;
+}
+
+.footer-content {
+  display: flex;
+  margin: 38px 10px;
+}
+
+.footer-left {
+  text-align: left;
+  width: min-content;
+}
+
+.footer-right {
+  text-align: right;
+  width: min-content;
+}
+
+.footer-center {
+  text-align: center;
+  width: 100%;
+}
+
+#footer-link {
+  color: ivory;
+  font-style: italic;
+  text-decoration: none;
+  text-shadow: 0 0 2px wheat;
+}
+
+#footer-link:hover {
+  cursor: pointer;
+  color: white;
+  text-shadow: 0 0 0 ivory;
+}

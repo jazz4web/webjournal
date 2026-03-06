@@ -21,12 +21,240 @@
   </head>
   <body>
     <main>
+      <nav id="navigation">
+        <div id="brand-logo">
+          <a class="navbar-brand"
+             href="{{ url_for('index') }}">
+            <img alt="logo"
+                 src="{{ url_for('static', path='images/logo.png') }}"
+                 width="28"
+                 height="28">
+          </a>
+        </div>
+        <div class="menu-button">
+          <button type="button"
+                  title="menu"
+                  class="navbar-toggle">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+        </div>
+        <div class="menu-box">
+          <div class="navbar-menu">
+            <div class="menu-item">
+              <a href="#" class="menu-item-link">
+                Контент <b class="caret"></b>
+              </a>
+              <div class="items-box">
+                <div class="menu-list-item">
+                  <a href="" class="item-link">
+                    Авторы
+                  </a>
+                </div>
+                <div class="menu-list-item">
+                  <a href="" class="item-link">
+                    Паблик
+                  </a>
+                </div>
+                <div role="separator" class="divider"></div>
+                <div class="menu-list-item">
+                  <a href="" class="item-link">
+                    Люди
+                  </a>
+                </div>
+                <div class="menu-list-item">
+                  <a href="" class="item-link">
+                    Своё
+                  </a>
+                </div>
+                <div class="menu-list-item">
+                  <a href="" class="item-link">
+                    В ленте
+                  </a>
+                </div>
+                <div role="separator" class="divider"></div>
+                <div class="menu-list-item">
+                  <a href="" class="item-link">
+                    Закрытое
+                  </a>
+                </div>
+                <div class="menu-list-item">
+                  <a href="" class="item-link">
+                    Комментарии
+                  </a>
+                </div>
+              </div>
+            </div>
+            <div class="menu-item">
+              <a href="#" class="menu-item-link">
+                Инструменты <b class="caret"></b>
+              </a>
+              <div class="items-box">
+                <div class="menu-list-item">
+                  <a href="" class="item-link">
+                    Ссылки
+                  </a>
+                </div>
+                <div class="menu-list-item">
+                  <a href="" class="item-link">
+                    Черновики
+                  </a>
+                </div>
+                <div role="separator" class="divider"></div>
+                <div class="menu-list-item">
+                  <a href="" class="item-link">
+                    Картинки
+                  </a>
+                </div>
+                <div class="menu-list-item">
+                  <a href="" class="item-link">
+                    Объявления
+                  </a>
+                </div>
+              </div>
+            </div>
+            <div class="menu-item">
+              <a href="#" class="menu-item-link">
+                Webmaster <b class="caret"></b>
+              </a>
+              <div class="items-box">
+                <div class="menu-list-item">
+                  <a href="" class="item-link">
+                    Инструменты
+                  </a>
+                </div>
+                <div role="separator" class="divider"></div>
+                <div class="menu-list-item">
+                  <a href="" class="item-link">
+                    Ссылки
+                  </a>
+                </div>
+                <div class="menu-list-item">
+                  <a href="" class="item-link">
+                    Картинки
+                  </a>
+                </div>
+                <div role="separator" class="divider"></div>
+                <div class="menu-list-item">
+                  <a href="" class="item-link">
+                    Текущий лог
+                  </a>
+                </div>
+                <div class="menu-list-item">
+                  <a href="" class="item-link">
+                    Предыдущий лог
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="navbar-menu-right">
+            {%- if cu -%}
+              <div class="menu-item-a">
+                <div class="menu-user-ava"
+                     style="background: url({{ url_for(
+                            'ava', username=cu, size=22) }})"></div>
+                <div class="menu-user-link">
+                  <a href="#"
+                     {%- if cu | length > 10 -%}title="{{ cu }}"{%- endif %}
+                     class="menu-item-link">
+                    {%- if cu | length > 10 -%}
+                    {{ cu[:10] }}... <b class="caret"></b>
+                    {%- else -%}
+                    {{ cu }} <b class="caret"></b>
+                    {%- endif -%}
+                  </a>
+                  <div class="items-box">
+                    <div class="menu-list-item">
+                      <a href="" class="item-link">
+                        Профиль
+                      </a>
+                    </div>
+                    <div class="menu-list-item">
+                      <a href="" class="item-link">
+                        Приваты
+                      </a>
+                    </div>
+                    <div role="separator" class="divider"></div>
+                    <div class="menu-list-item">
+                      <a href="" class="item-link">
+                        Выйти
+                      </a>
+                    </div>
+                    <div class="menu-list-item">
+                      <a href="" class="item-link">
+                        Выйти везде
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            {%- else -%}
+              <div class="menu-item">
+                <a href="#" class="menu-item-link">
+                  Действия <b class="caret"></b>
+                </a>
+                <div class="items-box">
+                  <div class="menu-list-item">
+                    <a href="" class="item-link">
+                      Логин
+                    </a>
+                  </div>
+                  <div class="menu-list-item">
+                    <a href="" class="item-link">
+                      Забыли пароль?
+                    </a>
+                  </div>
+                  <div class="menu-list-item">
+                    <a href="" class="item-link">
+                      Регистрация
+                    </a>
+                  </div>
+                </div>
+              </div>
+            {%- endif -%}
+          </div>
+        </div>
+      </nav>
       <div id="page-content">
         <div id="mc">{%- block page_body -%}{%- endblock page_body -%}</div>
       </div>
     </main>
+    <footer>
+      <div class="footer-content">
+        <div class="footer-left">
+          <img alt="right-finger"
+               src="{{ url_for('static', path='images/footer-left.png') }}"
+               width="24"
+               height="24">
+        </div>
+        <div class="footer-center">
+          <a id="footer-link"
+             data-date={{ config.get('SDATE') }}
+             data-name="{{ config.get('SNAME') }}"
+             href="{{ url_for('index') }}">
+            &copy; {{ config.get('SNAME') }}, {{ config.get('SDATE') }} г.
+          </a>
+        </div>
+        <div class="footer-right">
+          <img alt="left-finger"
+               src="{{ url_for('static', path='images/footer-right.png') }}"
+               width="24"
+               height="24">
+        </div>
+      </div>
+    </footer>
     {%- block scripts -%}
-    <!-- сайт в стадии разработки -->
+    {%- assets filters='rjsmin', output='generic/js/vendor-pub.js',
+               'vendor/clipboard.js',
+               'vendor/jquery.js',
+               'vendor/luxon.js',
+               'vendor/mustache.js',
+               'vendor/spark-md5.js',
+               'js/custom.js' -%}
+      <script src="{{ ASSET_URL }}"></script>
+    {%- endassets -%}
     {%- endblock scripts -%}
   </body>
 </html>

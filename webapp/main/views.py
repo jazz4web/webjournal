@@ -1,8 +1,44 @@
+import asyncio
+import functools
 import os
 
-from starlette.responses import FileResponse, PlainTextResponse
+from starlette.exceptions import HTTPException
+from starlette.responses import FileResponse, PlainTextResponse, Response
 
 from ..dirs import images
+from ..errors import E404
+
+from ..common.pg import get_conn
+from .tools import resize
+
+
+async def show_avatar(request):
+    size = request.path_params.get('size')
+    if size < 22 or size > 160:
+        raise HTTPException(status_code=404, detail=E404)
+    conn = await get_conn(request.app.config)
+    res = await conn.fetchrow(
+        'SELECT id, username FROM users WHERE username = $1',
+        request.path_params.get('username'))
+    if res is None:
+        await conn.close()
+        raise HTTPException(status_code=404, detail=E404)
+    ava = await conn.fetchval(
+        'SELECT picture FROM avatars WHERE user_id = $1', res.get('id'))
+    await conn.close()
+    loop = asyncio.get_running_loop()
+    image = await loop.run_in_executor(
+        None, functools.partial(resize, size, ava))
+    response = Response(image, media_type='image/png')
+    if ava is None:
+        response.headers.append('cache-control', 'public, max-age=0')
+    else:
+        response.headers.append(
+            'cache-control',
+            'public, max-age={0}'.format(
+                request.app.config.get(
+                    'FILE_MAX_AGE', cast=int, default=0)))
+    return response
 
 
 async def show_humans(request):

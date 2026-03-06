@@ -17,7 +17,9 @@
 {{- super() -}}
 <link rel="author" href="/humans.txt">
 {%- assets filters='cssmin', output='generic/css/main/index.css',
-           'css/base.css' -%}
+           'css/base.css',
+           'css/menu.css',
+           'css/footer.css' -%}
   <link rel="stylesheet" href="{{ ASSET_URL }}">
 {%- endassets -%}
 {%- endblock styles -%}
@@ -25,6 +27,8 @@
 {%- block scripts -%}
 {{- super() -}}
 {%- assets filters='rjsmin', output='generic/js/main/index.js',
+           'js/render-menu.js',
+           'js/render-footer.js',
            'js/main/index.js' -%}
   <script src="{{ ASSET_URL }}"></script>
 {%- endassets -%}

@@ -10,7 +10,7 @@ from webassets.ext.jinja2 import assets
 
 from .dirs import settings, static, templates
 
-from .main.views import show_favicon, show_humans, show_index
+from .main.views import show_avatar, show_favicon, show_humans, show_index
 
 
 class StApp(Starlette):
@@ -36,6 +36,7 @@ app = StApp(
         Route('/', show_index, name='index'),
         Route('/favicon.ico', show_favicon, name='favicon'),
         Route('/humans.txt', show_humans, name='humans.txt'),
+        Route('/ava/{username}/{size:int}', show_avatar, name='ava'),
         Mount('/static', app=StaticFiles(directory=static), name='static')
         ])
 
