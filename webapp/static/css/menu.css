@@ -19,7 +19,7 @@
   margin-left: 2px;
   vertical-align: middle;
   border-top: 4px dashed;
-  border-top: 4px solid \9;
+  border-top: 4px solid;
   border-right: 4px solid transparent;
   border-left: 4px solid transparent;
 }
@@ -100,14 +100,14 @@
     position: absolute;
     z-index:1;
     top: 55px;
-    right: 12px;
+    right: 16px;
     margin: 0;
     width: 220px;
     padding: 5px 0 4px 0;
     background-color: white;
-    border: thin solid whitesmoke;
-    border-radius: 2px;
-    box-shadow: 0 0 6px lightgray;
+    border: thin solid burlywood;
+    border-radius: 4px;
+    box-shadow: 0 0 8px dimgray;
   }
 
   .menu-item {
@@ -177,10 +177,6 @@
     color: dimgray;
   }
 
-  .items-box {
-    display: none;
-  }
-
   .menu-list-item {
     padding: 6px 12px;
     text-align: left;
@@ -205,15 +201,21 @@
   }
 
   .items-box {
+    display: none;
     position: absolute;
     z-index:1;
     top: 55px;
+    min-width: 150px;
     margin: 0;
     padding: 5px 0;
     background-color: white;
-    border: thin solid whitesmoke;
-    border-radius: 2px;
-    box-shadow: 0 0 6px lightgray;
+    border: thin solid burlywood;
+    border-radius: 4px;
+    box-shadow: 0 0 8px dimgray;
+  }
+
+  .items-box-a {
+    right: 16px;
   }
 
   .menu-button {

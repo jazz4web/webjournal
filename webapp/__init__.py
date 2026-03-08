@@ -1,6 +1,8 @@
 import jinja2
 
 from starlette.applications import Starlette
+from starlette.middleware import Middleware
+from starlette.middleware.sessions import SessionMiddleware
 from starlette.routing import Mount, Route
 from starlette.staticfiles import StaticFiles
 from starlette.templating import Jinja2Templates
@@ -11,6 +13,21 @@ from webassets.ext.jinja2 import assets
 from .dirs import settings, static, templates
 
 from .main.views import show_avatar, show_favicon, show_humans, show_index
+
+try:
+    from .tuning import SECRET_KEY, SDESC
+    if SECRET_KEY:
+        settings.file_values['SECRET_KEY'] = SECRET_KEY
+    if SDESC:
+        settings.file_values['SDESC'] = SDESC
+except ModuleNotFoundError:
+    pass
+
+middleware = [
+    Middleware(
+        SessionMiddleware,
+        secret_key=settings('SECRET_KEY'),
+        max_age=settings.get('SESSION_LIFETIME', cast=int))]
 
 
 class StApp(Starlette):
@@ -37,6 +54,6 @@ app = StApp(
         Route('/favicon.ico', show_favicon, name='favicon'),
         Route('/humans.txt', show_humans, name='humans.txt'),
         Route('/ava/{username}/{size:int}', show_avatar, name='ava'),
-        Mount('/static', app=StaticFiles(directory=static), name='static')
-        ])
+        Mount('/static', app=StaticFiles(directory=static), name='static')],
+    middleware=middleware)
 

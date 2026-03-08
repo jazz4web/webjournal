@@ -15,6 +15,7 @@ $ pip install -r requirements.txt
 $ tar xvaf deployment/vendor.tar.gz -C webapp/static
 $ cp env_template .env
 $ mkdir webapp/static/generic
+$ python create_root.py
 $ python runserver.py
 ```
 

@@ -57,6 +57,7 @@
                     Паблик
                   </a>
                 </div>
+                {%- if cu -%}
                 <div role="separator" class="divider"></div>
                 <div class="menu-list-item">
                   <a href="" class="item-link">
@@ -73,6 +74,8 @@
                     В ленте
                   </a>
                 </div>
+                {%- endif -%}
+                {%- if cu and cu['weight'] >= 250 -%}
                 <div role="separator" class="divider"></div>
                 <div class="menu-list-item">
                   <a href="" class="item-link">
@@ -84,8 +87,10 @@
                     Комментарии
                   </a>
                 </div>
+                {%- endif -%}
               </div>
             </div>
+          {%- if cu and cu['weight'] >= 50 -%}
             <div class="menu-item">
               <a href="#" class="menu-item-link">
                 Инструменты <b class="caret"></b>
@@ -102,29 +107,37 @@
                   </a>
                 </div>
                 <div role="separator" class="divider"></div>
-                <div class="menu-list-item">
-                  <a href="" class="item-link">
-                    Картинки
-                  </a>
-                </div>
-                <div class="menu-list-item">
-                  <a href="" class="item-link">
-                    Объявления
-                  </a>
-                </div>
+                {%- if cu['weight'] >= 150 -%}
+                  <div class="menu-list-item">
+                    <a href="" class="item-link">
+                      Картинки
+                    </a>
+                  </div>
+                {%- endif -%}
+                {%- if cu['weight'] >= 100 -%}
+                  <div class="menu-list-item">
+                    <a href="" class="item-link">
+                      Объявления
+                    </a>
+                  </div>
+                {%- endif -%}
               </div>
             </div>
+          {%- endif -%}
+          {%- if cu and cu['weight'] >= 250 -%}
             <div class="menu-item">
               <a href="#" class="menu-item-link">
                 Webmaster <b class="caret"></b>
               </a>
               <div class="items-box">
+                {%- if cu['weight'] == 255 -%}
                 <div class="menu-list-item">
                   <a href="" class="item-link">
                     Инструменты
                   </a>
                 </div>
                 <div role="separator" class="divider"></div>
+                {%- endif -%}
                 <div class="menu-list-item">
                   <a href="" class="item-link">
                     Ссылки
@@ -148,6 +161,7 @@
                 </div>
               </div>
             </div>
+          {%- endif -%}
           </div>
           <div class="navbar-menu-right">
             {%- if cu -%}
@@ -157,15 +171,17 @@
                             'ava', username=cu, size=22) }})"></div>
                 <div class="menu-user-link">
                   <a href="#"
-                     {%- if cu | length > 10 -%}title="{{ cu }}"{%- endif %}
+                     {%- if cu.get('username') | length > 10 -%}
+                       title="{{ cu.get('username') }}"
+                     {%- endif %}
                      class="menu-item-link">
-                    {%- if cu | length > 10 -%}
-                    {{ cu[:10] }}... <b class="caret"></b>
+                    {%- if cu.get('username') | length > 10 -%}
+                    {{ cu.get('username')[:10] }}... <b class="caret"></b>
                     {%- else -%}
-                    {{ cu }} <b class="caret"></b>
+                    {{ cu.get('username') }} <b class="caret"></b>
                     {%- endif -%}
                   </a>
-                  <div class="items-box">
+                  <div class="items-box items-box-a">
                     <div class="menu-list-item">
                       <a href="" class="item-link">
                         Профиль
@@ -195,7 +211,7 @@
                 <a href="#" class="menu-item-link">
                   Действия <b class="caret"></b>
                 </a>
-                <div class="items-box">
+                <div class="items-box items-box-a">
                   <div class="menu-list-item">
                     <a href="" class="item-link">
                       Логин
