@@ -1,6 +1,6 @@
 DEBUG=True
 ASSETS_DEBUG=False
-SNAME='Сфинкс'
+SNAME='Архив Сфинкса'
 SDESC='Сайт для ведения текстовых блогов.'
 ITITLE=' Записки Сфинкса'
 SDATE=2024

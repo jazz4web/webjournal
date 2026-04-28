@@ -37,4 +37,8 @@ function renderMenu() {
       menu.slideUp('slow', function() {menu.removeAttr('style');});
     }
   });
+  $(window).on('resize', function() {
+    $('.menu-box').removeAttr('style');
+    $('.items-box').removeAttr('style');
+  });
 }

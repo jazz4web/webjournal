@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, UTC
 
 from passlib.hash import pbkdf2_sha256
 
@@ -20,8 +20,10 @@ async def check_address(config, address):
     conn = await get_conn(config)
     account = await conn.fetchrow(
         'SELECT address, user_id FROM accounts WHERE address = $1', address)
+    now = datetime.now(UTC)
     swap = await conn.fetchrow(
-        'SELECT swap FROM accounts WHERE swap = $1', address)
+        '''SELECT swap FROM accounts
+             WHERE swap = $1 AND swexpire > $2''', address, now)
     await conn.close()
     if (account and account.get('user_id')) or swap:
         res = True
@@ -38,8 +40,8 @@ async def update_account(conn, address, uid, now):
             uid, now, address)
     else:
         await conn.execute(
-            '''INSERT INTO accounts (address, requested, user_id)
-                 VALUES ($1, $2, $3)''', address, now, uid)
+            '''INSERT INTO accounts (address, swexpire, requested, user_id)
+                 VALUES ($1, $2, $2, $3)''', address, now, uid)
 
 
 async def create_user_record(conn, username, passwd, group, now):
@@ -54,7 +56,7 @@ async def create_user_record(conn, username, passwd, group, now):
 
 
 async def create_user(config, username, address, passwd, group):
-    now = datetime.utcnow()
+    now = datetime.now(UTC)
     conn = await get_conn(config)
     user_id = await create_user_record(conn, username, passwd, group, now)
     await update_account(conn, address, user_id, now)
