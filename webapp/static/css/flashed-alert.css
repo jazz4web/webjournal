@@ -1,0 +1,27 @@
+.flashed-alert {
+  border: 1px solid navajowhite;
+  border-radius: 4px;
+  padding: 12px;
+  background-color: cornsilk;
+  background-image: linear-gradient(to bottom, cornsilk, blanchedalmond);
+  box-shadow: 0 0 5px burlywood;
+  text-shadow: 0 0 2px bisque;
+  text-align: justify;
+  color: gray;
+  margin: 0 0 4px;
+}
+
+.closeable:hover {
+  cursor: pointer;
+  box-shadow: 0 0 3px darkkhaki;
+}
+
+.flashed-alert a {
+  color: royalblue;
+  text-decoration: none;
+}
+
+.flashed-alert a:hover {
+  text-shadow: 0 0 3px skyblue;
+  text-decoration: underline;
+}

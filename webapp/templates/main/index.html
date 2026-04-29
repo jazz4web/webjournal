@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% from "macros/_common.html" import show_empty %}
 
 {%- block title_part -%}
 {{ config.get('ITITLE') }}
@@ -10,7 +11,7 @@
 {%- endblock metas -%}
 
 {%- block page_body -%}
-  Сайт в стадии разработки, попробуйте зайти позже...
+  {{-show_empty('Сайт в стадии разработки, попробуйте зайти позже...') -}}
 {%- endblock page_body -%}
 
 {%- block styles -%}
@@ -19,6 +20,10 @@
 {%- assets filters='cssmin', output='generic/css/main/index.css',
            'css/base.css',
            'css/menu.css',
+           'css/page-content.css',
+           'css/flashed-alert.css',
+           'css/empty-message.css',
+           'css/today-field.css',
            'css/footer.css' -%}
   <link rel="stylesheet" href="{{ ASSET_URL }}">
 {%- endassets -%}
@@ -28,6 +33,9 @@
 {{- super() -}}
 {%- assets filters='rjsmin', output='generic/js/main/index.js',
            'js/render-menu.js',
+           'js/render-tf.js',
+           'js/check-pc.js',
+           'js/close-topflashed.js',
            'js/render-footer.js',
            'js/main/index.js' -%}
   <script src="{{ ASSET_URL }}"></script>

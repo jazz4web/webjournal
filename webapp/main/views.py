@@ -9,6 +9,7 @@ from ..dirs import images
 from ..errors import E404
 
 from ..auth.cu import getcu
+from ..common.flashed import get_flashed, set_flashed
 from ..common.pg import get_conn
 from .tools import resize
 
@@ -64,5 +65,11 @@ async def show_index(request):
     conn = await get_conn(request.app.config)
     cu = await getcu(request, conn)
     await conn.close()
+    await set_flashed(
+        request,
+        'This is the message between requests. Click it...')
     return request.app.jinja.TemplateResponse(
-        request, 'main/index.html', {'cu': cu})
+        request, 'main/index.html',
+        {'listed': True,
+         'cu': cu,
+         'flashed': await get_flashed(request)})

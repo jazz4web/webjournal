@@ -234,7 +234,22 @@
         </div>
       </nav>
       <div id="page-content">
-        <div id="mc">{%- block page_body -%}{%- endblock page_body -%}</div>
+        {%- if flashed -%}
+          <div class="top-flashed-block">
+            {%- for message in flashed -%}
+              <div class="flashed-message">
+                <div class="flashed-alert closeable"
+                     title="Close this message">
+                  {{ message|safe }}
+                </div>
+              </div>
+            {%- endfor -%}
+          </div>
+        {%- endif -%}
+        <div id="mc"
+             class="{% if listed %}listed{% else %}nonlisted{% endif %}">
+          {%- block page_body -%}{%- endblock page_body -%}
+        </div>
       </div>
     </main>
     <footer>
