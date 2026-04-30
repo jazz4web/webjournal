@@ -11,7 +11,9 @@ from webassets import Environment as AssetsEnvironment
 from webassets.ext.jinja2 import assets
 
 from .dirs import settings, static, templates
+from .errors import show_error
 
+from .api.main import Captcha
 from .captcha.views import show_captcha
 from .main.views import show_avatar, show_favicon, show_humans, show_index
 
@@ -23,6 +25,10 @@ try:
         settings.file_values['SDESC'] = SDESC
 except ModuleNotFoundError:
     pass
+
+errs = {403: show_error,
+        404: show_error,
+        405: show_error}
 
 middleware = [
     Middleware(
@@ -56,6 +62,8 @@ app = StApp(
         Route('/humans.txt', show_humans, name='humans.txt'),
         Route('/ava/{username}/{size:int}', show_avatar, name='ava'),
         Route('/captcha/{suffix}', show_captcha, name='captcha'),
+        Mount('/api', name='api', routes=[
+            Route('/captcha', Captcha, name='acaptcha')]),
         Mount('/static', app=StaticFiles(directory=static), name='static')],
-    middleware=middleware)
-
+    middleware=middleware,
+    exception_handlers=errs)

@@ -1,0 +1,17 @@
+#mc {
+  padding: 8px;
+  border-radius: 4px;
+  border: 1px solid lemonchiffon;
+  background-image: linear-gradient(to bottom, ivory, seashell);
+  box-shadow: 0 0 3px salmon;
+  color: darkred;
+}
+
+h1 {
+  margin: 0;
+}
+
+p {
+  font-style: italic;
+  margin: 0;
+}

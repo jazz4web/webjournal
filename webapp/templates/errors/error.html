@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{%- block title -%}
+  <title>{{ error }}</title>
+{%- endblock title -%}
+
+{%- block styles -%}
+  {{- super() -}}
+  {%- assets filters='cssmin', output='generic/css/errors/error.css',
+             'css/base.css',
+             'css/menu.css',
+             'css/page-content.css',
+             'css/flashed-alert.css',
+             'css/error.css',
+             'css/footer.css' -%}
+    <link rel="stylesheet" href="{{ ASSET_URL }}">
+  {%- endassets -%}
+{%- endblock styles -%}
+
+{%- block page_body -%}
+  <h1>{{ error }}</h1>
+  <img alt="error"
+       src="{{ url_for('static', path='images/error.png') }}"
+       width="96"
+       height="96">
+  <p>{{ reason }}</p>
+{%- endblock page_body -%}
+
+{%- block scripts -%}
+  {{- super() -}}
+  {%- assets filters='rjsmin', output='generic/js/errors/error.js',
+             'js/check-pc.js',
+             'js/render-menu.js',
+             'js/close-topflashed.js',
+             'js/errors/error.js' -%}
+    <script src="{{ ASSET_URL }}"></script>
+  {%- endassets -%}
+{%- endblock scripts -%}
