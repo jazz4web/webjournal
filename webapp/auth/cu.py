@@ -23,8 +23,7 @@ async def getcu(request, conn):
                 ping_user(request.app.config, query.get('id')))
             return {'id': query.get('id'),
                     'username': query.get('username'),
-                    'lp': '{0}Z'.format(query.get("last_published"))
-                    if query.get('last_published') else None,
+                    'lp': query.get("last_published"),
                     'weight': query.get('weight'),
                     'ava': request.url_for(
                         'ava', username=query.get('username'), size=22)._url,

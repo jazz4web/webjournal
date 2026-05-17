@@ -1,6 +1,7 @@
 import asyncio
 import functools
 import os
+import random
 
 from starlette.exceptions import HTTPException
 from starlette.responses import FileResponse, PlainTextResponse, Response
@@ -11,6 +12,7 @@ from ..errors import E404
 from ..auth.cu import getcu
 from ..common.flashed import get_flashed
 from ..common.pg import get_conn
+from ..common.random import randomize, samples
 from .tools import resize
 
 
@@ -64,6 +66,15 @@ async def show_favicon(request):
 async def show_index(request):
     conn = await get_conn(request.app.config)
     cu = await getcu(request, conn)
+    realm = request.query_params.get('realm')
+    if cu is None:
+        if realm == 'login':
+            await conn.close()
+            return request.app.jinja.TemplateResponse(
+                request, 'main/login.html',
+                {'item': random.choice(samples),
+                 'value': await randomize(7),
+                 'listed': False})
     await conn.close()
     return request.app.jinja.TemplateResponse(
         request, 'main/index.html',

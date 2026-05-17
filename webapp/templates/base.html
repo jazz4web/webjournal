@@ -17,7 +17,29 @@
           href="{{ url_for('favicon') }}"
           type="image/vnd.microsoft.icon">
     {%- endblock styles -%}
-    {%- block templates -%}{%- endblock templates -%}
+    {%- block templates -%}
+      <script id="cookiesalertt" type="text/template">
+        <div id="cookies-alert">
+          <div id="cookies-message">
+            Для правильной работы сайта
+            мы используем <i>cookies</i>, без них авторизация будет
+            невозможна. Отказаться от приёма <i>cookies</i> можно в настройках
+            браузера. Скрыть это сообщение можно голубой кнопкой. Желаем вам
+            приятного web-сёрфинга...
+          </div>
+          <div id="cookies-options">
+            <button type="button"
+                    class="btn-sm btn-info ok-button">
+              OK
+            </button>
+            <button type="button"
+                    class="btn-sm btn-danger deny-button">
+              Отказаться
+            </button>
+          </div>
+        </div>
+      </script>
+    {%- endblock templates -%}
   </head>
   <body>
     <main>
@@ -213,7 +235,7 @@
                 </a>
                 <div class="items-box items-box-a">
                   <div class="menu-list-item">
-                    <a href="" class="item-link">
+                    <a href="/?realm=login" class="item-link">
                       Логин
                     </a>
                   </div>

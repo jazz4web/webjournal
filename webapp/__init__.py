@@ -1,4 +1,5 @@
 import jinja2
+import redis.asyncio as redis
 
 from starlette.applications import Starlette
 from starlette.middleware import Middleware
@@ -49,6 +50,13 @@ class StApp(Starlette):
         env.assets_environment = assets_env
         env.globals['config'] = settings
         self.jinja = Jinja2Templates(env=env)
+        self.rp = redis.ConnectionPool.from_url(
+            settings.get('REDI'),
+            health_check_interval=30,
+            socket_connect_timeout=15,
+            socket_keepalive=True,
+            retry_on_timeout=True,
+            decode_responses=True)
         if self.middleware_stack is None:
             self.middleware_stack = self.build_middleware_stack()
         await self.middleware_stack(scope, receive, send)

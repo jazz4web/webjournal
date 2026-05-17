@@ -1,0 +1,21 @@
+#cookies-alert {
+  position: fixed;
+  bottom: 112px;
+  right: 20px;
+  width: 70%;
+  border: thin solid lightcoral;
+  box-shadow: 0 0 12px tan;
+  border-radius: 4px;
+  padding: 8px;
+  z-index: 2;
+  background-color: moccasin;
+}
+
+#cookies-message {
+  text-align: justify;
+  margin: 0 0 4px;
+}
+
+#cookies-options {
+  text-align: right;
+}

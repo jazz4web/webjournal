@@ -1,7 +1,18 @@
 from starlette.endpoints import HTTPEndpoint
-from starlette.exceptions import HTTPException
+from starlette.responses import JSONResponse
+
+from ..common.pg import get_conn
+from .redi import assign_cache
 
 
 class Captcha(HTTPEndpoint):
-    async def post(self, request):
-        raise HTTPException(403, 'Доступ ограничен, недостаточно прав.')
+    async def get(self, request):
+        conn = await get_conn(request.app.config)
+        captcha = await conn.fetchrow(
+            'SELECT val, suffix FROM captchas ORDER BY random() LIMIT 1')
+        res = await assign_cache(
+            request, 'captcha:',
+            captcha.get('suffix'), captcha.get('val'), 180)
+        url = request.url_for('captcha', suffix=captcha.get('suffix'))._url
+        await conn.close()
+        return JSONResponse({'captcha': res, 'url': url})

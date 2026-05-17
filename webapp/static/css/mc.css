@@ -1,0 +1,7 @@
+.nonlisted {
+  padding: 8px;
+  border-radius: 4px;
+  border: 1px solid gainsboro;
+  background-color: snow;
+  box-shadow: 0 0 5px silver;
+}

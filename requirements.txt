@@ -13,6 +13,7 @@ pillow==12.2.0
 python-dotenv==1.2.1
 python-multipart==0.0.22
 PyYAML==6.0.3
+redis==7.4.0
 rjsmin==1.2.5
 setuptools==82.0.0
 starlette==1.0.0
