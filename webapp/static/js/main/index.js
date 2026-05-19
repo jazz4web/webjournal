@@ -1,5 +1,6 @@
 $(function() {
   "use strict";
+  checkAuth(ses);
   renderMenu();
   renderFooter();
   let dt = luxon.DateTime.now();

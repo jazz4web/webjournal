@@ -20,6 +20,17 @@ samples = (
     'albano')
 
 
+async def get_unique_s(conn, table, num, ext=None):
+    while True:
+        s = await randomize(num)
+        if ext:
+            s += ext
+        if await conn.fetchval(
+                f'SELECT suffix FROM {table} WHERE suffix = $1', s):
+            continue
+        return s
+
+
 async def randomize(n):
     return ''.join(choice(ascii_letters + digits) for _ in range(n))
 

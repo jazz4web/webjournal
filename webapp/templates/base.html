@@ -18,6 +18,11 @@
           type="image/vnd.microsoft.icon">
     {%- endblock styles -%}
     {%- block templates -%}
+      <script id="ealertt" type="text/template">
+        <div id="ealert" class="flashed-error hidden">
+          <%{ message }%>
+        </div>
+      </script>
       <script id="cookiesalertt" type="text/template">
         <div id="cookies-alert">
           <div id="cookies-message">
@@ -189,8 +194,7 @@
             {%- if cu -%}
               <div class="menu-item-a">
                 <div class="menu-user-ava"
-                     style="background: url({{ url_for(
-                            'ava', username=cu, size=22) }})"></div>
+                     style="background: url({{ cu.get('ava') }})"></div>
                 <div class="menu-user-link">
                   <a href="#"
                      {%- if cu.get('username') | length > 10 -%}

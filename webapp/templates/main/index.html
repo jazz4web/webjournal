@@ -33,11 +33,14 @@
 
 {%- block scripts -%}
 {{- super() -}}
+<script>let ses="{{ cu.ses }}";</script>
 {%- assets filters='rjsmin', output='generic/js/main/index.js',
            'js/render-menu.js',
            'js/render-tf.js',
            'js/check-pc.js',
            'js/close-topflashed.js',
+           'js/ping.js',
+           'js/check-auth.js',
            'js/render-footer.js',
            'js/set-cookies.js',
            'js/main/index.js' -%}
