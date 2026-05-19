@@ -1,5 +1,7 @@
 import asyncio
 
+from datetime import datetime, UTC
+
 from ..api.tasks import ping_user
 from ..api.tokens import check_token
 from ..common.flashed import set_flashed
@@ -7,7 +9,7 @@ from ..common.flashed import set_flashed
 session = '''SELECT u.id, u.username, u.registered, u.last_published,
                     u.ugroup, u.weight, s.brkey, s.suffix
                FROM users AS u, sessions AS s
-               WHERE u.id = s.user_id AND s.suffix = $1'''
+               WHERE u.id = s.user_id AND s.suffix = $1 AND s.expire > $2'''
 old = 'DELETE FROM sessions WHERE suffix = $1'
 
 
@@ -15,7 +17,7 @@ async def checkcu(request, conn, token):
     cache = await check_token(request.app.config, token)
     if cache:
         cache = cache.get('cache')
-        query = await conn.fetchrow(session, cache)
+        query = await conn.fetchrow(session, cache, datetime.now(UTC))
         if query and not query.get('weight'):
             if request.session.get('_uid'):
                 request.sesstion.pop('_uid')
@@ -44,7 +46,7 @@ async def checkcu(request, conn, token):
 
 async def getcu(request, conn):
     if cache := request.session.get('_uid'):
-        query = await conn.fetchrow(session, cache)
+        query = await conn.fetchrow(session, cache, datetime.now(UTC))
         if query and not query.get('weight'):
             request.session.pop('_uid')
             await conn.execute(old, cache)
@@ -61,5 +63,6 @@ async def getcu(request, conn):
                         'ava', username=query.get('username'), size=22)._url,
                     'ses': query.get('suffix')}
         else:
-            request.session.pop('_uid')
+            if s := request.session.pop('_uid'):
+                await conn.execute(old, s)
     return None
