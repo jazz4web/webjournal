@@ -1,6 +1,8 @@
 $(function() {
   "use strict";
   checkAuth(ses);
+  if (out) logout('/api/logout', ses);
+  if (oute) logout('/api/logoutall', ses);
   renderMenu();
   renderFooter();
   let dt = luxon.DateTime.now();

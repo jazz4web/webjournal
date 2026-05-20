@@ -11,3 +11,4 @@ DBUSER=jazz
 DB=webjournal
 DSN='postgres://jazz:aa@localhost:5432/webjournal'
 REDI='redis://localhost:6379/0'
+SECURE=True

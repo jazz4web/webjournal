@@ -33,7 +33,7 @@
 
 {%- block scripts -%}
 {{- super() -}}
-<script>let ses="{{ cu.ses }}";</script>
+<script>let ses="{{ cu.ses }}",out={{ out }},oute={{ oute }};</script>
 {%- assets filters='rjsmin', output='generic/js/main/index.js',
            'js/render-menu.js',
            'js/render-tf.js',
@@ -41,6 +41,8 @@
            'js/close-topflashed.js',
            'js/ping.js',
            'js/check-auth.js',
+           'js/logout.js',
+           'js/check-br.js',
            'js/render-footer.js',
            'js/set-cookies.js',
            'js/main/index.js' -%}

@@ -75,9 +75,16 @@ async def show_index(request):
                 {'item': random.choice(samples),
                  'value': await randomize(7),
                  'listed': False})
+    out, oute = 0, 0
+    if cu and realm == 'logout':
+        out = 1
+    if cu and realm == 'logoute':
+        oute = 1
     await conn.close()
     return request.app.jinja.TemplateResponse(
         request, 'main/index.html',
         {'listed': True,
          'cu': cu,
+         'out': out,
+         'oute': oute,
          'flashed': await get_flashed(request)})
