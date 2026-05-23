@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{%- block styles -%}
+  {{- super() -}}
+  {%- assets filters='cssmin', output='generic/css/auth/base.css',
+             'css/base.css',
+             'css/menu.css',
+             'css/page-content.css',
+             'css/flashed-alert.css',
+             'css/flashed-error.css',
+             'css/empty-message.css',
+             'css/today-field.css',
+             'css/content-block.css',
+             'css/mc.css',
+             'css/form-help.css',
+             'css/form-control.css',
+             'css/form-labeled.css',
+             'css/footer.css' -%}
+    <link rel="stylesheet" href="{{ ASSET_URL }}">
+  {%- endassets -%}
+{%- endblock styles -%}
+
+{%- block page_body -%}
+  {%- if cu -%}
+    <div class="flashed-alert">
+      <div class="today-field"></div>
+      <div class="empty-message">
+        {%- block message -%}{%- endblock message -%}
+      </div>
+    </div>
+  {%- endif -%}
+{%- endblock page_body -%}
+
+{%- block scripts -%}
+  {{- super() -}}
+  <script>
+    {%- if cu -%}let ses="{{ cu.ses }}";{%- else -%}
+    let ses=null,key="{{ key }}";{%- endif -%}
+  </script>
+  {%- assets filters='rjsmin', output='generic/js/auth/base.js',
+             'js/render-menu.js',
+             'js/render-footer.js',
+             'js/render-tf.js',
+             'js/check-pc.js',
+             'js/check-auth.js',
+             'js/ping.js',
+             'js/send-auth.js',
+             'js/slide-page.js',
+             'js/show-error.js',
+             'js/scroll-panel.js' -%}
+    <script src="{{ ASSET_URL }}"></script>
+  {%- endassets -%}
+{%- endblock scripts -%}

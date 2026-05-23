@@ -56,4 +56,5 @@ $(function() {
     }
   });
   setTimeout(setCookies, 900);
+  checkPC(860);
 });

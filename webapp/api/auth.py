@@ -1,18 +1,121 @@
 import asyncio
 
+from datetime import datetime, UTC
+
 from passlib.hash import pbkdf2_sha256
 from starlette.endpoints import HTTPEndpoint
 from starlette.responses import JSONResponse
+from validate_email import validate_email
 
 from ..common.flashed import set_flashed
 from ..common.pg import get_conn
 from .redi import extract_cache
-from .pg import create_session, filter_user
-from .tasks import change_pattern, rem_old_session
+from .pg import check_acc, create_session, filter_user
+from .tasks import change_pattern, rem_old_session, send_rfp_mail
 from .tokens import check_token, create_login_token
-from .tools import check_secure
+from .tools import check_secure, fix_bad_token
 
 BADCAPTCHA = 'Неверный код, повторите попытку.'
+
+
+class ResetFP(HTTPEndpoint):
+    async def get(self, request):
+        res = {'aid': None}
+        token = request.headers.get('x-rfp-token')
+        acc = await check_token(request.app.config, token)
+        if acc is None:
+            res['message'] = await fix_bad_token(request.app.config)
+            return JSONResponse(res)
+        conn = await get_conn(request.app.config)
+        acc = await conn.fetchrow(
+            '''SELECT a.id, a.user_id, a.requested,
+                      a.swap, a.swexpire, u.username, u.last_visit
+                 FROM accounts AS a, users AS u
+                 WHERE a.id = $1 AND a.user_id = u.id''', acc.get('aid'))
+        await conn.close()
+        if acc is None or acc.get('user_id') is None \
+                or acc.get('last_visit') > acc.get('requested') \
+                or (acc.get('swap')
+                    and acc.get('swexpire') > datetime.now(UTC)):
+            res['message'] = 'Действие невозможно, брелок под сомнением.'
+            return JSONResponse(res)
+        res['aid'] = True
+        res['username'] = acc.get('username')
+        return JSONResponse(res)
+
+    async def post(self, request):
+        res = {'done': False}
+        d = await request.form()
+        address, cache, captcha = (
+            d.get('address'), d.get('cache'), d.get('captcha'))
+        if not all((address, cache, captcha)):
+            res['message'] = 'Данные не соответствуют запросу.'
+            return JSONResponse(res)
+        suffix, val = await extract_cache(request, cache)
+        if captcha != val:
+            res['message'] = BADCAPTCHA
+            asyncio.ensure_future(
+                change_pattern(request.app.config, suffix))
+            return JSONResponse(res)
+        if not validate_email(address):
+            res['message'] = 'Нужно ввести адрес электронной почты.'
+            return JSONResponse(res)
+        conn = await get_conn(request.app.config)
+        message, acc = await check_acc(request, conn, address)
+        if message:
+            res['message'] = message
+            asyncio.ensure_future(
+                change_pattern(request.app.config, suffix))
+            await conn.close()
+            return JSONResponse(res)
+        res['done'] = True
+        asyncio.ensure_future(
+            change_pattern(request.app.config, suffix))
+        if acc:
+            await conn.execute(
+                '''UPDATE accounts SET requested = $1, swap = null
+                     WHERE id = $2''', datetime.now(UTC), acc.get('id'))
+            asyncio.ensure_future(
+                send_rfp_mail(request, acc))
+            await set_flashed(
+                request, 'Вам выслано письмо с инструкциями, следуйте им...')
+        await conn.close()
+        return JSONResponse(res)
+
+    async def put(self, request):
+        res = {'done': None}
+        d = await request.form()
+        address, passwd, confirma = (
+            d.get('address'), d.get('passwd'), d.get('confirma'))
+        if not all((address, passwd, confirma)):
+            res['message'] = 'Нужно заполнить все поля формы.'
+            return JSONResponse(res)
+        if passwd != confirma:
+            res['message'] = 'Пароли не совпадают.'
+            return JSONResponse(res)
+        acc = await check_token(request.app.config, d.get('key'))
+        if acc is None:
+            res['message'] = 'Брелок недействителен.'
+            return JSONResponse(res)
+        conn = await get_conn(request.app.config)
+        acc = await conn.fetchrow(
+            '''SELECT a.id, a.address, a.user_id, u.username
+                 FROM accounts AS a, users AS u
+                 WHERE a.user_id = u.id AND a.id = $1''', acc.get('aid'))
+        if acc is None or acc.get('address') != address or \
+                acc.get('user_id') is None:
+            res['message'] = 'Действие невозможно, неверный запрос.'
+            await conn.close()
+            return JSONResponse(res)
+        await conn.execute(
+            '''UPDATE users SET password_hash = $1, last_visit = $2
+                 WHERE id = $3''',
+            pbkdf2_sha256.hash(passwd), datetime.now(UTC), acc.get('user_id'))
+        res['done'] = True
+        await conn.close()
+        await set_flashed(
+            request, f'Внимание, {acc.get("username")}, у Вас новый пароль.')
+        return JSONResponse(res)
 
 
 class LogoutE(HTTPEndpoint):

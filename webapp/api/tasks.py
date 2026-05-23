@@ -3,9 +3,42 @@ import functools
 
 from datetime import datetime, UTC
 
+from aiosmtplib import send
+from email.message import EmailMessage
+
 from ..captcha.common import check_suffix, check_val
 from ..captcha.picturize.picture import generate_image
 from ..common.pg import get_conn
+from .tokens import create_request_token
+
+
+async def send_rfp_mail(request, acc):
+    token = await create_request_token(request, acc.get('id'))
+    url = request.url_for('auth:rfp', token=token)
+    content = request.app.jinja.get_template('emails/rfp.html').render(
+            username=acc.get('username'),
+            index=request.url_for('index'),
+            target=url, length=request.app.config.get('TLENGTH', cast=float),
+            interval=request.app.config.get('RINTERVAL', cast=float))
+    if request.app.config.get('DEBUG', cast=bool):
+        print(content)
+    else:
+        message = EmailMessage()
+        message["From"] = request.app.config.get('SENDER', cast=str)
+        message["To"] = acc.get('address')
+        message["Subject"] = request.app.config.get(
+            'SUBJECT_PREFIX', cast=str) + 'Сброс забытого пароля'
+        message.set_content(content)
+        message.replace_header('Content-Type', 'text/html; charset="utf-8"')
+        await send(
+            message,
+            recipients=[acc.get('address')],
+            hostname=request.app.config.get('MAIL_SERVER', cast=str),
+            port=request.app.config.get('MAIL_PORT', cast=str),
+            username=request.app.config.get('MAIL_USERNAME', cast=str),
+            password=request.app.config.get('MAIL_PASSWORD', cast=str),
+            use_tls=request.app.config.get('MAIL_USE_SSL', cast=bool))
+    return None
 
 
 async def rem_old_session(config, uid):

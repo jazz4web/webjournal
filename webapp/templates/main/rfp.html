@@ -1,0 +1,133 @@
+{% extends "base.html" %}
+
+{%- block title_part -%}Забыли пароль?{%- endblock title_part -%}
+
+{%- block styles -%}
+  {{- super() -}}
+  {%- assets filters='cssmin', output='generic/css/main/rfp.css',
+             'css/base.css',
+             'css/menu.css',
+             'css/page-content.css',
+             'css/flashed-error.css',
+             'css/mc.css',
+             'css/content-block.css',
+             'css/today-field.css',
+             'css/form-help.css',
+             'css/form-control.css',
+             'css/form-labeled.css',
+             'vendor/bootstrap/css/glyphicons.css',
+             'css/captcha.css',
+             'css/cookies-alert.css',
+             'css/footer.css' -%}
+    <link rel="stylesheet" href="{{ ASSET_URL }}">
+  {%- endassets -%}
+{%- endblock styles -%}
+
+{%- block templates -%}
+  {{- super() -}}
+  <script id="rfpt" type="text/template">
+    <div id="rfp" class="content-block">
+      <h1>Забыли пароль?</h1>
+      <div class="today-field"></div>
+      <div class="form-help">
+        <p>
+          Здесь можно отправить запрос на сброс забытого пароля. В форму
+          ниже введите свой зарегистрированный в сервисе адрес электронной
+          почты и код с картинки. Нажмите кнопку "Сбросить пароль". На ваш
+          адрес будет выслано письмо с инструкциями, следуйте им.
+          Если код на картинке плохо читается, можно обновить картинку
+          кнопкой со стрелками и найти хорошо читаемый код. Форма
+          действительна в течение 3-х минут после загрузки страницы или
+          обновления картинки с кодом. <b>Для справки:</b> код
+          состоит из строчных латинских букв и цифр без повторов, будьте
+          внимательны, очень легко спутать букву "o" и цифру "0", "l" и "1",
+          "i" и "j". Если в коде допущена ошибка, тест считается проваленным,
+          но есть возможность исправить ошибку и отправить форму вновь.
+        </p>
+      </div>
+      <div class="form-form">
+        <div class="form-group">
+          <div class="form-label">
+            <label for="raddress">Адрес эл.почты:</label>
+          </div>
+          <div class="form-input">
+            <input class="form-control"
+                   id="raddress"
+                   maxlength="128"
+                   name="raddress"
+                   placeholder="введите свой адрес эл.почты"
+                   required
+                   type="text">
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="form-label captcha-options">
+            <button type="button"
+                    title="обновить картинку"
+                    id="lcaptcha-reload"
+                    class="btn btn-default">
+              <span class="glyphicon glyphicon-refresh"
+                    aria-hidden="true"></span>
+            </button>
+          </div>
+          <div class="form-input">
+            <div id="lcaptcha-field" class="captcha-field"
+                 style="background:url(<% url %>)"></div>
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="form-label">
+            <label for="lcaptcha">Код картинки:</label>
+          </div>
+          <div class="form-input">
+            <input class="form-control"
+                   id="lcaptcha"
+                   placeholder="введите код с картинки"
+                   required
+                   type="text">
+          </div>
+        </div>
+        <div class="form-group-hidden">
+          <div class="form-label"></div>
+          <div class="form-input">
+            <input class="form-control"
+                   id="lsuffix"
+                   required
+                   type="text"
+                   value="<% captcha %>">
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="form-label"></div>
+          <div class="form-input">
+            <button type="button"
+                    class="btn btn-primary"
+                    id="rfp-submit"
+                    name="rfp-submit">Сбросить</button>
+            <button type="button"
+                    class="btn btn-info"
+                    id="rfp-reg">Новый</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </script>
+{%- endblock templates -%}
+
+{%- block scripts -%}
+  {{- super() -}}
+  {%- assets filters='rjsmin', output='generic/js/main/rfp.js',
+             'js/render-menu.js',
+             'js/render-footer.js',
+             'js/get-captcha.js',
+             'js/render-tf.js',
+             'js/check-pc.js',
+             'js/captcha-reload.js',
+             'js/set-cookies.js',
+             'js/reg-submit.js',
+             'js/show-error.js',
+             'js/scroll-panel.js',
+             'js/main/rfp.js' -%}
+    <script src="{{ ASSET_URL }}"></script>
+  {%- endassets -%}
+{%- endblock scripts -%}

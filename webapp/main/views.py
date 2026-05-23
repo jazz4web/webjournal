@@ -75,6 +75,11 @@ async def show_index(request):
                 {'item': random.choice(samples),
                  'value': await randomize(7),
                  'listed': False})
+        if realm == 'rfp':
+            await conn.close()
+            return request.app.jinja.TemplateResponse(
+                request, 'main/rfp.html',
+                {'listed': False})
     out, oute = 0, 0
     if cu and realm == 'logout':
         out = 1

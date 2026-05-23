@@ -1,0 +1,94 @@
+{% extends "auth/base.html" %}
+
+{%- block title_part -%}Сброс забытого пароля{%- endblock title_part -%}
+
+{%- block message -%}
+  Вы авторизованы, смените пароль в профиле, брелок аннулирован.
+{%- endblock message -%}
+
+{%- block templates -%}
+  {{- super() -}}
+  {%- if not cu -%}
+  <script id="rfpt" type="text/template">
+    <div id="rfpf" class="content-block">
+      <h1>Восстановите забытый пароль</h1>
+      <div class="today-field"></div>
+      <div class="form-help">
+        <p>
+          Привет <% username %>, здесь можно восстановить забытый пароль.
+          Введите в соответствующие поля свой адрес электронной почты, на
+          который получили сообщение и ссылку на эту страницу, придумайте и
+          введите новый пароль, повторите его ввод и нажмите кнопку
+          "Обновить пароль". Будьте внимательны, после обновления пароля
+          Вы сможете войти в сервис только с новым паролем. Повторно запросить
+          восстановление пароля можно будет не ранее чем через {{ interval }}
+          часов.
+        </p>
+      </div>
+      <div class="form-form">
+        <form>
+          <div class="form-group">
+            <div class="form-label">
+              <label for="rsaddress">Адрес эл.почты:</label>
+            </div>
+            <div class="form-input">
+              <input class="form-control"
+                     id="rsaddress"
+                     name="rsaddress"
+                     placeholder="введите свой адрес электронной почты"
+                     autocomplete="username"
+                     required
+                     type="text">
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="form-label">
+              <label for="rspassword">Новый пароль:</label>
+            </div>
+            <div class="form-input">
+              <input class="form-control"
+                     id="rspassword"
+                     name="rspassword"
+                     placeholder="введите желаемый пароль"
+                     autocomplete="new-password"
+                     required
+                     type="password">
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="form-label text-right">
+              <label for="rsconfirm">Повторить:</label>
+            </div>
+            <div class="form-input">
+              <input class="form-control"
+                     id="rsconfirm"
+                     name="rsconfirm"
+                     placeholder="повторите пароль"
+                     autocomplete="new-password"
+                     required
+                     type="password">
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="form-label"></div>
+            <div class="form-input">
+              <button type="button"
+                      class="btn btn-primary btn-block"
+                      id="rsp-submit"
+                      name="rsp-submit">Обновить пароль</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </script>
+  {%- endif -%}
+{%- endblock templates -%}
+
+{%- block scripts -%}
+  {{- super() -}}
+  {%- assets filters='rjsmin', output='generic/js/auth/rfp.js',
+             'js/auth/rfp.js' -%}
+    <script src="{{ ASSET_URL }}"></script>
+  {%- endassets -%}
+{%- endblock scripts -%}

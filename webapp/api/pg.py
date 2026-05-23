@@ -5,6 +5,24 @@ from validate_email import validate_email
 from ..common.random import get_unique_s
 
 
+async def check_acc(request, conn, address):
+    message = None
+    interval = timedelta(
+        seconds=round(
+            3600*request.app.config.get('RINTERVAL', cast=float)))
+    acc = await conn.fetchrow(
+        '''SELECT a.address, a.requested, a.id, u.username
+             FROM accounts AS a, users AS u
+             WHERE a.address = $1
+               AND a.user_id = u.id
+               AND a.user_id IS NOT NULL''', address)
+    if acc is None:
+        message = 'Аккаунт не существует.'
+    if acc and datetime.now(UTC) - acc.get('requested') < interval:
+        message = 'Сервис временно недоступен, попробуйте зайти позже.'
+    return message, acc
+
+
 async def filter_user(conn, login):
     squery = '''SELECT users.id, users.username,
                        users.password_hash, users.weight
