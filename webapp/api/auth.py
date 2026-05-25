@@ -1,4 +1,5 @@
 import asyncio
+import re
 
 from datetime import datetime, UTC
 
@@ -7,15 +8,116 @@ from starlette.endpoints import HTTPEndpoint
 from starlette.responses import JSONResponse
 from validate_email import validate_email
 
+from ..auth.attri import USERNAME_PATTERN
+from ..auth.pg import check_username
 from ..common.flashed import set_flashed
 from ..common.pg import get_conn
 from .redi import extract_cache
-from .pg import check_acc, create_session, filter_user
-from .tasks import change_pattern, rem_old_session, send_rfp_mail
+from .pg import check_acc, check_address, create_session, filter_user
+from .tasks import (
+    change_pattern, create_user, rem_old_session, send_reg_mail, send_rfp_mail)
 from .tokens import check_token, create_login_token
 from .tools import check_secure, fix_bad_token
 
 BADCAPTCHA = 'Неверный код, повторите попытку.'
+
+
+class CreateAcc(HTTPEndpoint):
+    async def get(self, request):
+        res = {'aid': None}
+        token = request.headers.get('x-rfp-token')
+        acc = await check_token(request.app.config, token)
+        if acc is None:
+            res['message'] = await fix_bad_token(request.app.config)
+            return JSONResponse(res)
+        conn = await get_conn(request.app.config)
+        acc = await conn.fetchrow(
+            'SELECT id, address, user_id FROM accounts WHERE id = $1',
+            acc.get('aid'))
+        await conn.close()
+        if acc is None:
+            res['message'] = await fix_bad_token(request.app.config)
+            return JSONResponse(res)
+        if acc and acc.get('user_id'):
+            res['message'] = 'Пользователь на этом аккаунте уже создан.'
+            return JSONResponse(res)
+        res['aid'] = True
+        return JSONResponse(res)
+
+    async def post(self, request):
+        res = {'done': False}
+        d = await request.form()
+        address, cache, captcha = (
+            d.get('address'), d.get('cache'), d.get('captcha'))
+        if not all((address, cache, captcha)):
+            res['message'] = 'Данные не соответствуют запросу.'
+            return JSONResponse(res)
+        suffix, val = await extract_cache(request, cache)
+        if captcha != val:
+            res['message'] = BADCAPTCHA
+            asyncio.ensure_future(
+                change_pattern(request.app.config, suffix))
+            return JSONResponse(res)
+        if not validate_email(address):
+            res['message'] = 'Нужно ввести адрес электронной почты.'
+            return JSONResponse(res)
+        conn = await get_conn(request.app.config)
+        message, account = await check_address(request, conn, address)
+        await conn.close()
+        if message or (account and account.get('user_id')):
+            orm = 'Аккаунт уже существует, пароль можно восстановить.'
+            res['message'] = message or orm
+            asyncio.ensure_future(
+                change_pattern(request.app.config, suffix))
+            return JSONResponse(res)
+        res['done'] = True
+        asyncio.ensure_future(
+            change_pattern(request.app.config, suffix))
+        asyncio.ensure_future(
+            send_reg_mail(request, address))
+        await set_flashed(
+            request, 'На Ваш адрес выслано письмо с инструкциями.')
+        return JSONResponse(res)
+
+    async def put(self, request):
+        res = {'done': None}
+        d = await request.form()
+        username, passwd, confirma = (
+            d.get('username'), d.get('passwd'), d.get('confirma'))
+        if not all((username, passwd, confirma)):
+            res['message'] = 'Нужно заполнить все поля формы.'
+            return JSONResponse(res)
+        p = re.compile(USERNAME_PATTERN)
+        if not p.match(username):
+            res['message'] = '''Псевдоним должен быть от 3 до 16 символов
+            (буквы латинского или русского алфавитов, цифры, точка, дефис,
+            нижнее подчёркивание) и начинаться с буквы.'''
+            return JSONResponse(res)
+        if await check_username(request.app.config, username):
+            res['message'] = '''Этот псевдоним уже зарегистрирован,
+            выберите другой.'''
+            return JSONResponse(res)
+        if passwd != confirma:
+            res['message'] = 'Пароли не совпадают.'
+            return JSONResponse(res)
+        acc = await check_token(request.app.config, d.get('key'))
+        if acc is None:
+            res['message'] = 'Брелок недействителен.'
+            return JSONResponse(res)
+        conn = await get_conn(request.app.config)
+        acc = await conn.fetchrow(
+            'SELECT id, user_id FROM accounts WHERE id = $1',
+            acc.get('aid'))
+        await conn.close()
+        if acc is None or acc.get('user_id'):
+            res['message'] = 'Данные неверны, действие отменено.'
+            return JSONResponse(res)
+        asyncio.ensure_future(
+            create_user(request, username, passwd, acc.get('id')))
+        res['done'] = True
+        await set_flashed(
+            request, f'Аккаунт {username} успешно создан, вы можете войти.')
+        return JSONResponse(res)
 
 
 class ResetFP(HTTPEndpoint):

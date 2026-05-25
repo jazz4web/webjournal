@@ -14,7 +14,7 @@ from webassets.ext.jinja2 import assets
 from .dirs import settings, static, templates
 from .errors import show_error
 
-from .api.auth import Login, Logout, LogoutE, ResetFP
+from .api.auth import CreateAcc, Login, Logout, LogoutE, ResetFP
 from .api.main import Captcha, Index
 from .auth.views import reset_fp
 from .captcha.views import show_captcha
@@ -75,6 +75,7 @@ app = StApp(
         Route('/ava/{username}/{size:int}', show_avatar, name='ava'),
         Route('/captcha/{suffix}', show_captcha, name='captcha'),
         Mount('/api', name='api', routes=[
+            Route('/reg', CreateAcc, name='areg'),
             Route('/rfp', ResetFP, name='arfp'),
             Route('/logoutall', LogoutE, name='alogaoutall'),
             Route('/logout', Logout, name='alogout'),
@@ -82,6 +83,7 @@ app = StApp(
             Route('/index', Index, name='aindex'),
             Route('/captcha', Captcha, name='acaptcha')]),
         Mount('/auth', name='auth', routes=[
+            Route('/reg/{token}', reset_fp, name='reg'),
             Route('/rfp/{token}', reset_fp, name='rfp')]),
         Mount('/static', app=StaticFiles(directory=static), name='static')],
     middleware=middleware,

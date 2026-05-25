@@ -37,3 +37,13 @@ CREATE TABLE captchas (
     val     varchar(5) UNIQUE,
     suffix  varchar(7) UNIQUE
 );
+
+CREATE TABLE settings(
+    indexpage varchar(16) DEFAULT NULL,
+    dgroup    varchar(16) DEFAULT NULL,
+    counters  text,
+    robots    text
+);
+
+INSERT INTO settings (indexpage, dgroup, counters, robots)
+  VALUES (NULL, NULL, NULL, NULL);

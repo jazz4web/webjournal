@@ -1,0 +1,143 @@
+{% extends "base.html" %}
+
+{%- block title_part -%}Регистрация{%- endblock title_part -%}
+
+{%- block styles -%}
+  {{- super() -}}
+  {%- assets filters='cssmin', output='generic/css/main/reg.css',
+             'css/base.css',
+             'css/menu.css',
+             'css/page-content.css',
+             'css/flashed-error.css',
+             'css/content-block.css',
+             'css/mc.css',
+             'css/today-field.css',
+             'css/form-help.css',
+             'css/form-labeled.css',
+             'css/form-control.css',
+             'vendor/bootstrap/css/glyphicons.css',
+             'css/captcha.css',
+             'css/cookies-alert.css',
+             'css/footer.css' -%}
+    <link rel="stylesheet" href="{{ ASSET_URL }}">
+  {%- endassets -%}
+{%- endblock styles -%}
+
+{%- block templates -%}
+  {{- super() -}}
+  <script id="regt" type="text/template">
+    <div id="reg" class="content-block">
+      <h1>Регистрация</h1>
+      <div class="today-field"></div>
+      <div class="form-help">
+        {%- if perm -%}
+        <p>
+          Здесь можно отправить запрос на регистрацию аккаунта. В форму
+          ниже введите свой адрес электронной почты, к нему будет привязан
+          созданный аккаунт, и код с картинки. Нажмите кнопку
+          "Создать аккаунт". На ваш адрес будет выслано письмо с инструкциями,
+          следуйте им. Если код на картинке плохо читается, можно обновить
+          картинку кнопкой со стрелками и найти хорошо читаемый код. Форма
+          действительна в течение 3-х минут после загрузки страницы или
+          обновления картинки с кодом. <b>Для справки:</b> код
+          состоит из строчных латинских букв и цифр без повторов, будьте
+          внимательны, очень легко спутать букву "o" и цифру "0", "l" и "1",
+          "i" и "j". Если в коде допущена ошибка, тест считается проваленным,
+          но есть возможность исправить ошибку и отправить форму вновь.
+        </p>
+        {%- else -%}
+        <p>
+          Самостоятельная регистрация аккаунтов временно приостановлена.
+          Если хотите получить аккаунт и принять участие в обсуждениях,
+          пишите на электронную почту администратору сайта, контакты можно
+          найти на стартовой странице, в письме укажите желаемый псевдоним.
+          Я надеюсь, что в скором времени самостоятельная регистрация
+          аккаунтов в этом сервисе будет восстановлена.
+        </p>
+        {%- endif -%}
+      </div>
+      {%- if perm -%}
+      <div class="form-form">
+        <div class="form-group">
+          <div class="form-label">
+            <label for="raddress">Адрес эл.почты:</label>
+          </div>
+          <div class="form-input">
+            <input class="form-control"
+                   id="raddress"
+                   maxlength="128"
+                   name="raddress"
+                   placeholder="введите свой адрес эл.почты"
+                   required
+                   type="text">
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="form-label captcha-options">
+            <button type="button"
+                    title="обновить картинку"
+                    id="lcaptcha-reload"
+                    class="btn btn-default">
+              <span class="glyphicon glyphicon-refresh"
+                    aria-hidden="true"></span>
+            </button>
+          </div>
+          <div class="form-input">
+            <div id="lcaptcha-field" class="captcha-field"
+                 style="background:url(<% url %>)"></div>
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="form-label">
+            <label for="lcaptcha">Код с картинки:</label>
+          </div>
+          <div class="form-input">
+            <input class="form-control"
+                   id="lcaptcha"
+                   placeholder="введите код с картинки"
+                   required
+                   type="text">
+          </div>
+        </div>
+        <div class="form-group-hidden">
+          <div class="form-input">
+            <input class="form-control"
+                   id="lsuffix"
+                   required
+                   type="text"
+                   value="<% captcha %>">
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="form-label"></div>
+          <div class="form-input">
+            <button type="button"
+                    class="btn btn-primary"
+                    id="reg-submit"
+                    name="reg-submit">Создать</button>
+          </div>
+        </div>
+      </div>
+      {%- endif -%}
+    </div>
+  </script>
+{%- endblock templates -%}
+
+{%- block scripts -%}
+  {{- super() -}}
+  <script>let c;{%- if perm -%}c=true;{%- else -%}c=false;{%- endif -%}</script>
+  {%- assets filters='rjsmin', output='generic/js/main/reg.js',
+             'js/render-menu.js',
+             'js/get-captcha.js',
+             'js/render-footer.js',
+             'js/render-tf.js',
+             'js/check-pc.js',
+             'js/captcha-reload.js',
+             'js/reg-submit.js',
+             'js/show-error.js',
+             'js/scroll-panel.js',
+             'js/set-cookies.js',
+             'js/main/reg.js' -%}
+    <script src="{{ ASSET_URL }}"></script>
+  {%- endassets -%}
+{%- endblock scripts -%}

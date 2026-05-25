@@ -1,0 +1,96 @@
+{% extends "auth/base.html" %}
+
+{%- block title_part -%}Регистрация{%- endblock title_part -%}
+
+{%- block message -%}
+  Вы авторизованы, действие невозможно.
+{%- endblock message -%}
+
+{%- block templates -%}
+  {{- super() -}}
+  {%- if not cu -%}
+  <script id="regt" type="text/template">
+    <div id="regf" class="content-block">
+      <h1>Регистрация</h1>
+      <div class="today-field"></div>
+      <div class="form-help">
+        <p>
+          Ваш аккаунт уже создан, чтобы завершить регистрацию, необходимо
+          задать псевдоним в сервисе и пароль для авторизации. Введите эти
+          данные в форму ниже, ввод пароля следует повторить. Имейте ввиду,
+          что псевдоним может содержать от 3-х до 16-ти символов (буквы
+          латинского или русского алфавитов, цифры, знак подчёркивания, дефис
+          и точка), первый символ псевдонима должен быть латинской или русской
+          буквой. Будьте внимательны, псевдоним и пароль, которые вы введёте
+          в эту форму, вам потребуются для авторизации, а восстановить пароль
+          можно будет не ранее, чем через {{ interval }} часов с момента
+          запроса регистрационной ссылки.
+        </p>
+      </div>
+      <div class="form-form">
+        <form>
+          <div class="form-group">
+            <div class="form-label">
+              <label for="username">Псевдоним:</label>
+            </div>
+            <div class="form-input">
+              <input class="form-control"
+                     id="username"
+                     name="username"
+                     autocomplete="username"
+                     placeholder="введите желаемый псевдоним"
+                     required
+                     type="text">
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="form-label">
+              <label for="crpassword">Пароль:</label>
+            </div>
+            <div class="form-input">
+              <input class="form-control"
+                     id="crpassword"
+                     name="crpassword"
+                     placeholder="введите желаемый пароль"
+                     autocomplete="new-password"
+                     required
+                     type="password">
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="form-label">
+              <label for="confirmation">Повторить:</label>
+            </div>
+            <div class="form-input">
+              <input class="form-control"
+                     id="confirmation"
+                     name="confirmation"
+                     placeholder="повторите пароль"
+                     required
+                     autocomplete="new-password"
+                     type="password">
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="form-label"></div>
+            <div class="form-input">
+              <button type="button"
+                      class="btn btn-primary btn-block"
+                      id="crp-submit"
+                      name="crp-submit">Создать пароль</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </script>
+  {%- endif -%}
+{%- endblock templates -%}
+
+{%- block scripts -%}
+  {{- super() -}}
+  {%- assets filters='rjsmin', output='generic/js/auth/reg.js',
+             'js/auth/reg.js' -%}
+    <script src="{{ ASSET_URL }}"></script>
+  {%- endassets -%}
+{%- endblock scripts -%}

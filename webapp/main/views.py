@@ -9,6 +9,7 @@ from starlette.responses import FileResponse, PlainTextResponse, Response
 from ..dirs import images
 from ..errors import E404
 
+from ..api.tasks import check_swapped
 from ..auth.cu import getcu
 from ..common.flashed import get_flashed
 from ..common.pg import get_conn
@@ -80,6 +81,14 @@ async def show_index(request):
             return request.app.jinja.TemplateResponse(
                 request, 'main/rfp.html',
                 {'listed': False})
+        if realm == 'reg':
+            asyncio.ensure_future(
+                check_swapped(request.app.config))
+            await conn.close()
+            return request.app.jinja.TemplateResponse(
+                request, 'main/reg.html',
+                {'perm': request.app.config.get('REGPERM', cast=bool),
+                 'listed': False})
     out, oute = 0, 0
     if cu and realm == 'logout':
         out = 1

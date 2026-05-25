@@ -12,6 +12,7 @@ DB=webjournal
 DSN='postgres://jazz:aa@localhost:5432/webjournal'
 REDI='redis://localhost:6379/0'
 SECURE=True
+REGPERM=True
 RINTERVAL=1
 TLENGTH=1
 MAIL_SERVER=smtp.yandex.ru

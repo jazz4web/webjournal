@@ -5,6 +5,46 @@ from validate_email import validate_email
 from ..common.random import get_unique_s
 
 
+async def sget_acc(conn, address):
+    now = datetime.now(UTC)
+    q = 'SELECT id FROM accounts WHERE address = $1 AND user_id IS NULL'
+    acc = await conn.fetchval(q, address)
+    if acc:
+        await conn.execute(
+            '''UPDATE accounts SET swap = null, requested = $1
+                 WHERE id = $2''', now, acc)
+    else:
+        await conn.execute(
+            '''INSERT INTO accounts (address, requested, swexpire)
+                 VALUES ($1, $2, $2)''', address, now)
+        acc = await conn.fetchval(q, address)
+    return acc
+
+
+async def check_address(request, conn, address):
+    message = None
+    interval = timedelta(
+        seconds=round(
+            3600*request.app.config.get('RINTERVAL', cast=float)))
+    acc = await conn.fetchrow(
+        'SELECT address, requested, user_id FROM accounts WHERE address = $1',
+        address)
+    if acc and datetime.now(UTC) - acc.get('requested') < interval:
+        message = 'Сервис временно недоступен, попробуйте зайти позже.'
+    if await check_swap(conn, address):
+        message = 'Адрес в свопе, выберите другой или повторите попытку позже.'
+    return message, acc
+
+
+async def check_swap(conn, address):
+    swapped = await conn.fetchrow(
+        'SELECT id FROM accounts WHERE swap = $1 AND swexpire > $2',
+        address, datetime.now(UTC))
+    if swapped:
+        return True
+    return None
+
+
 async def check_acc(request, conn, address):
     message = None
     interval = timedelta(

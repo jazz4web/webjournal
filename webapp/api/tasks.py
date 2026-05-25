@@ -6,10 +6,67 @@ from datetime import datetime, UTC
 from aiosmtplib import send
 from email.message import EmailMessage
 
+from ..auth.attri import groups
+from ..auth.pg import create_user_record
 from ..captcha.common import check_suffix, check_val
 from ..captcha.picturize.picture import generate_image
 from ..common.pg import get_conn
+from .pg import sget_acc
 from .tokens import create_request_token
+
+
+async def create_user(request, username, passwd, aid):
+    conn = await get_conn(request.app.config)
+    now = datetime.now(UTC)
+    dg = await conn.fetchval(
+        'SELECT dgroup FROM settings') or groups.default_group()
+    user_id = await create_user_record(conn, username, passwd, dg, now)
+    await conn.execute(
+        'UPDATE accounts SET user_id = $1 WHERE id = $2', user_id, aid)
+    await conn.close()
+
+
+async def check_swapped(config):
+    conn = await get_conn(config)
+    swapped = await conn.fetch(
+        'SELECT id FROM accounts WHERE swap IS NOT NULL AND swexpire < $1',
+        datetime.now(UTC))
+    for each in swapped:
+        await conn.execute(
+            'UPDATE accounts SET swap = NULL WHERE id = $1', each.get('id'))
+    await conn.close()
+
+
+async def send_reg_mail(request, address):
+    conn = await get_conn(request.app.config)
+    account = await sget_acc(conn, address)
+    await conn.close()
+    token = await create_request_token(request, account)
+    url = request.url_for('auth:reg', token=token)
+    content = request.app.jinja.get_template('emails/reg.html').render(
+        index=request.url_for('index'),
+        target=url,
+        length=request.app.config.get('TLENGTH', cast=float),
+        interval=request.app.config.get('RINTERVAL', cast=float))
+    if request.app.config.get('DEBUG', cast=bool):
+        print(content)
+    else:
+        message = EmailMessage()
+        message["From"] = request.app.config.get('SENDER', cast=str)
+        message["To"] = address
+        message["Subject"] = request.app.config.get(
+            'SUBJECT_PREFIX', cast=str) + 'Регистрация'
+        message.set_content(content)
+        message.replace_header('Content-Type', 'text/html; charset="utf-8"')
+        await send(
+            message,
+            recipients=[address],
+            hostname=request.app.config.get('MAIL_SERVER', cast=str),
+            port=request.app.config.get('MAIL_PORT', cast=str),
+            username=request.app.config.get('MAIL_USERNAME', cast=str),
+            password=request.app.config.get('MAIL_PASSWORD', cast=str),
+            use_tls=request.app.config.get('MAIL_USE_SSL', cast=bool))
+    return None
 
 
 async def send_rfp_mail(request, acc):
