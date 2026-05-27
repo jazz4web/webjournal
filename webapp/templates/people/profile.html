@@ -1,0 +1,451 @@
+{%- extends "base.html" -%}
+
+{%- block title_part -%}
+  {%- if username == cu['username'] -%}
+    Ваш профиль
+  {%- else -%}
+    Профиль {{ username }}
+  {%- endif -%}
+{%- endblock title_part -%}
+
+{%- block styles -%}
+  {{- super() -}}
+  {%- assets filters='cssmin', output='generic/css/people/profile.css',
+             'css/base.css',
+             'css/menu.css',
+             'css/page-content.css',
+             'css/flashed-alert.css',
+             'css/flashed-error.css',
+             'css/content-block.css',
+             'css/entity-block.css',
+             'css/avatar.css',
+             'css/personal-details.css',
+             'css/form-help.css',
+             'css/today-field.css',
+             'css/next-block.css',
+             'css/form-control.css',
+             'css/form-labeled.css',
+             'css/avatar-block.css',
+             'vendor/bootstrap/css/glyphicons.css',
+             'css/profile.css',
+             'css/footer.css' -%}
+    <link rel="stylesheet" href="{{ ASSET_URL }}">
+  {%- endassets -%}
+{%- endblock styles -%}
+
+{%- block templates -%}
+  {{- super() -}}
+  <script id="profilet" type="text/template">
+    <div id="profile" class="entity-block content-block">
+      <h2>
+        <% #owner %>
+          Ваш профиль
+        <% /owner %>
+        <% ^owner %>
+          Профиль {{ username }}
+        <% /owner %>
+      </h2>
+      <div class="details-block">
+        <div class="user-avatar avatar"
+             style="background:url(<% user.ava %>)"></div>
+        <div class="user-info">
+          <h3><% user.username %></h3>
+          <div class="personal-details">
+            <div class="column bordered">Группа:</div>
+            <div class="column bordered"><% user.group %></div>
+            <% #address %>
+            <div class="column bordered">Почта:</div>
+            <div class="column bordered"><% user.address %></div>
+            <% /address %>
+            <div class="column bordered">Зарегистрирован:</div>
+            <div class="column bordered date-field">
+              <% user.registered %>
+            </div>
+            <div class="column">Последний визит:</div>
+            <div class="column last-seen"><% user.last_visit %></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <% #description %>
+      <div id="description-block" class="entity-block next-block">
+        <% #user.description %>
+          <div class="description-text">
+            <p class="blog-description"><% user.description %></p>
+          </div>
+        <% /user.description %>
+        <% #owner %>
+          <% ^user.description %>
+            <div class="description-text">
+              <div class="flashed-alert alert-block">
+                Добавьте описание своего блога.
+              </div>
+            </div>
+          <% /user.description %>
+          <div class="description-options">
+            <button type="button"
+                    title="добавьте или измените описание блога"
+                    class="btn btn-default"
+                    id="fix-description">
+              Изменить описание блога.
+            </button>
+          </div>
+        <% /owner %>
+      </div>
+      <% #owner %>
+        <div id="description-e" class="entity-block next-block hidden">
+          <div class="length-marker">
+            Осталось: <span
+            id="length-marker">500</span>
+          </div>
+          <div class="form-form">
+            <div class="form-group form-group-a">
+              <textarea id="description-editor"
+                        placeholder="введите текст описания"
+                        class="form-control"
+                        rows="6"><% user.description %></textarea>
+            </div>
+          </div>
+          <div class="form-group">
+            <button id="description-submit"
+                    class="btn btn-info"
+                    type="button">
+              Сохранить
+            </button>
+            <button type="button"
+                    id="cancel-description"
+                    class="btn btn-default">
+              Отменить
+            </button>
+          </div>
+        </div>
+      <% /owner %>
+    <% /description %>
+    <% #user.description %>
+      <% #user.last_published %>
+        <div class="entity-block next-block blog-link-block">
+          <a href="/blogs/<% user.username %>">
+            <% user.username %>&nbsp;блог
+          </a>
+        </div>
+      <% /user.last_published %>
+    <% /user.description %>
+    <% #chgroup %>
+      <div id="permissions" class="entity-block next-block">
+        <div class="actions-header">
+          <h3>Изменить группу <% user.username %></h3>
+        </div>
+        <div class="form-body">
+          <div class="today-field"></div>
+          <div class="form-help">
+            <p>
+              Здесь можно изменить группу <b><% user.username %></b>.
+              Группа пользователя опеределяет его возможности в этом сервисе,
+              самый высокий статус у пользователей группы "Администраторы",
+              пользователям из группы "Изгои" запрещён вход в сервис.
+              Чтобы изменить группу пользователя, достаточно выбрать нужную
+              из списка ниже.
+            </p>
+          </div>
+          <div class="form-form">
+            <div class="form-group">
+              <select id="select-group">
+                <% #groups %>
+                  <option value="<% . %>"><% . %></option>
+                <% /groups %>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+    <% /chgroup %>
+    <% #owner %>
+      <div id="changeemf" class="entity-block hidden next-block">
+        <div class="actions-header">
+          <h3>Запрос на смену адреса</h3>
+        </div>
+        <div class="form-body">
+          <div class="today-field"></div>
+          <div class="form-help">
+            <p>
+              Уважаемый <% user.username %>, для смены адреса электронной
+              почты Вашего аккаунта необходимо заполнить форму ниже. Введите в
+              соответствующие поля Ваш новый адрес электронной почты и пароль,
+              нажмите кнопку "Отправить запрос". На Ваш новый адрес будет
+              выслана инструкция о дальнейших действиях, следуйте ей. Имейте
+              ввиду, что смену адреса и сброс пароля Вы можете запросить один
+              раз в {{ interval }} часов и не ранее, чем через {{ interval }}
+              часов с момента регистрации.
+            </p>
+          </div>
+          <div class="form-form">
+            <form>
+              <div class="form-group">
+                <div class="form-label">
+                  <label for="chaddress">Адрес эл.почты:</label>
+                </div>
+                <div class="form-input">
+                  <input id="chaddress"
+                         name="chaddress"
+                         class="form-control"
+                         placeholder="введите свой адрес электронной почты"
+                         autocomplete="username"
+                         required
+                         type="text">
+                </div>
+              </div>
+              <div class="form-group">
+                <div class="form-label">
+                  <label for="chapasswd">Пароль:</label>
+                </div>
+                <div class="form-input">
+                  <input class="form-control"
+                         id="chapasswd"
+                         name="chapasswd"
+                         placeholder="введите свой пароль"
+                         autocomplete="current-password"
+                         required
+                         type="password">
+                </div>
+              </div>
+              <div class="form-group">
+                <div class="form-label"></div>
+                <div class="form-input">
+                  <button type="button"
+                          class="btn btn-primary btn-block"
+                          id="chaddress-submit">
+                    Отправить запрос
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+      <div id="changepwdf" class="entity-block hidden next-block">
+        <div class="actions-header">
+          <h3>Смена пароля</h3>
+        </div>
+        <div class="form-body">
+          <div class="today-field"></div>
+          <div class="form-help">
+            <p>
+              Уважаемый <% user.username %>, для смены Вашего текущего пароля
+              заполните форму ниже. Введите в соответствующие поля Ваш текущий
+              пароль, придумайте и введите новый пароль, повторите ввод нового
+              пароля, затем нажмите кнопку "Сменить пароль", и Ваш текущий
+              пароль будет заменён на новый. В случае, если Вы забыли свой
+              текущий пароль, пароль можно восстановить в соответствующем
+              разделе сервиса, для этого нужно выйти из сервиса и проследовать
+              по ссылке в главном меню "Действия"->"Получить пароль".
+            </p>
+          </div>
+          <div class="form-form">
+            <form>
+              <div class="form-group">
+                <div class="form-label">
+                  <label for="curpwd">Текущий пароль:</label>
+                </div>
+                <div class="form-input">
+                  <input id="curpwd"
+                         name="curpwd"
+                         class="form-control"
+                         placeholder="введите свой текущий пароль"
+                         autocomplete="currentpwd"
+                         required
+                         type="password">
+                </div>
+              </div>
+              <div class="form-group">
+                <div class="form-label">
+                  <label for="newpwd">Новый пароль:</label>
+                </div>
+                <div class="form-input">
+                  <input id="newpwd"
+                         name="newpwd"
+                         class="form-control"
+                         placeholder="введите новый пароль"
+                         autocomplete="newpwd"
+                         required
+                         type="password">
+                </div>
+              </div>
+              <div class="form-group">
+                <div class="form-label">
+                  <label for="newpwdconfirm">Повторить:</label>
+                </div>
+                <div class="form-input">
+                  <input id="newpwdconfirm"
+                         name="newpwdconfirm"
+                         class="form-control"
+                         placeholder="повторите новый пароль"
+                         autocomplete="newpwdconfirm"
+                         required
+                         type="password">
+                </div>
+              </div>
+              <div class="form-group">
+                <div class="form-label"></div>
+                <div class="form-input">
+                  <button type="button"
+                          class="btn btn-primary btn-block"
+                          id="changepwd-submit">
+                    Поменять пароль
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+      <div id="changeavaf" class="entity-block hidden next-block">
+        <div class="actions-header">
+          <h3>Ваш аватар</h3>
+        </div>
+        <div class="form-body">
+          <div class="avatar"
+               style="background:url(/ava/<% user.username %>/160)"></div>
+          <div id="upload-form">
+            <div class="today-field"></div>
+            <div class="form-help">
+              <p>
+                Выберите файл изображения, процесс выгрузки начнётся
+                автоматически. Поддерживаются файлы JPEG, PNG и GIF форматов.
+                Максимальный размер файла ограничен &mdash; 200КиБ. Размер
+                изображения не должен превышать 200х200 пикселей. После
+                выгрузки файл будет верифицирован, а изображение установлено
+                на Ваш аватар. Менять изображение можно любое количество раз.
+                После смены аватара рекомендуется обновить кеш браузера.
+              </p>
+            </div>
+            <div class="form-form">
+              <form id="ava-form" class="form" method="POST"
+                    role="form" novalidate
+                    enctype="multipart/form-data">
+                <div class="form-group">
+                  <input accept="image/jpeg,image/png,image/gif"
+                         id="image"
+                         name="image"
+                         type="file">
+                </div>
+                <div class="form-group hidden">
+                  <input class="btn btn-default"
+                         id="image-submit"
+                         name="image-submit"
+                         type="submit"
+                         value="Выгрузить">
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="entity-block next-block">
+        <div class="actions-header">
+          <h3>Действия</h3>
+        </div>
+        <div class="actions-body">
+          <button id="emchange"
+                  type="button"
+                  class="btn btn-default">
+            Сменить адрес
+          </button>
+          <button id="changepwd"
+                  type="button"
+                  class="btn btn-default">
+            Сменить пароль
+          </button>
+          <button id="changeava"
+                  type="button"
+                  class="btn btn-default">
+            Сменить аватар
+          </button>
+        </div>
+      </div>
+      <% #hasfriends %>
+        <div class="entity-block next-block">
+          <div class="actions-header">
+            <h3>Список друзей</h3>
+          </div>
+          <div class="actions-body relation">
+            <% #friends %>
+              <a class="otherlink" href="/people/<% . %>"><% . %></a>,
+            <% /friends %>
+          </div>
+        </div>
+      <% /hasfriends %>
+      <% #hasblocked %>
+        <div class="entity-block next-block">
+          <div class="actions-header">
+            <h3>Список заблокированных</h3>
+          </div>
+          <div class="actions-body relation">
+            <% #blocked %>
+              <a class="otherlink" href="/people/<% . %>"><% . %></a>,
+            <% /blocked %>
+          </div>
+        </div>
+      <% /hasblocked %>
+    <% /owner %>
+    <% ^owner %>
+      <% #acts %>
+        <div class="entity-block next-block">
+          <div class="actions-header">
+            <h3>Действия</h3>
+          </div>
+          <div class="actions-body">
+            <% #pm %>
+              <button id="pm-message"
+                      type="button"
+                      class="btn btn-default"
+                      data-url="/pm/<% user.username %>">
+                приват
+              </button>
+            <% /pm %>
+            <% #block %>
+              <% ^rel.friend %>
+              <button id="blocking-button"
+                      type="button"
+                      data-uid="<% user.uid %>"
+                      class="btn btn-danger">
+                <% #rel.blocker %>cнять блок<% /rel.blocker %>
+                <% ^rel.blocker %>блокировать<% /rel.blocker %>
+              </button>
+              <% /rel.friend %>
+            <% /block %>
+            <% #mfriend %>
+              <button id="make-friend"
+                      type="button"
+                      data-uid="<% user.uid %>"
+                      class="btn btn-success">
+                <% #rel.friend %>не дружить<% /rel.friend %>
+                <% ^rel.friend %>дружить<% /rel.friend %>
+              </button>
+            <% /mfriend %>
+          </div>
+        </div>
+      <% /acts %>
+    <% /owner %>
+  </script>
+{%- endblock templates -%}
+
+{%- block scripts -%}
+  {{- super() -}}
+  <script>let cu="{{ cu.username }}",ses="{{ cu.ses }}",username="{{ username }}";</script>
+  {%- assets filters='rjsmin', output='generic/js/people/profile.js',
+             'js/render-menu.js',
+             'js/render-footer.js',
+             'js/ping.js',
+             'js/check-auth.js',
+             'js/close-topflashed.js',
+             'js/check-data.js',
+             'js/check-br.js',
+             'js/slide-page.js',
+             'js/check-pc.js',
+             'js/format-datetime.js',
+             'js/render-tf.js',
+             'js/render-lastseen.js',
+             'js/people/profile.js' -%}
+    <script src="{{ ASSET_URL }}"></script>
+  {%- endassets -%}
+{%- endblock scripts -%}

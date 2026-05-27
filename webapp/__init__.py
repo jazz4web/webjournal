@@ -16,9 +16,11 @@ from .errors import show_error
 
 from .api.auth import CreateAcc, Login, Logout, LogoutE, ResetFP
 from .api.main import Captcha, Index
+from .api.people import Profile
 from .auth.views import reset_fp
 from .captcha.views import show_captcha
 from .main.views import show_avatar, show_favicon, show_humans, show_index
+from .people.views import show_profile
 
 try:
     from .tuning import SECRET_KEY, SDESC, MAIL_PASSWORD
@@ -75,6 +77,7 @@ app = StApp(
         Route('/ava/{username}/{size:int}', show_avatar, name='ava'),
         Route('/captcha/{suffix}', show_captcha, name='captcha'),
         Mount('/api', name='api', routes=[
+            Route('/profile', Profile, name='aprofile'),
             Route('/reg', CreateAcc, name='areg'),
             Route('/rfp', ResetFP, name='arfp'),
             Route('/logoutall', LogoutE, name='alogaoutall'),
@@ -85,6 +88,8 @@ app = StApp(
         Mount('/auth', name='auth', routes=[
             Route('/reg/{token}', reset_fp, name='reg'),
             Route('/rfp/{token}', reset_fp, name='rfp')]),
+        Mount('/people', name='people', routes=[
+            Route('/{username}', show_profile, name='profile'),]),
         Mount('/static', app=StaticFiles(directory=static), name='static')],
     middleware=middleware,
     exception_handlers=errs)

@@ -38,6 +38,24 @@ CREATE TABLE captchas (
     suffix  varchar(7) UNIQUE
 );
 
+CREATE TABLE friends (
+    author_id integer REFERENCES users(id),
+    friend_id integer REFERENCES users(id),
+    CONSTRAINT author_friend_uni UNIQUE (author_id, friend_id)
+);
+
+CREATE TABLE followers (
+    author_id   integer REFERENCES users(id),
+    follower_id integer REFERENCES users(id),
+    CONSTRAINT author_follower_uni UNIQUE (author_id, follower_id)
+);
+
+CREATE TABLE blockers (
+    target_id  integer REFERENCES users(id),
+    blocker_id integer REFERENCES users(id),
+    CONSTRAINT target_blocker_uni UNIQUE (target_id, blocker_id)
+);
+
 CREATE TABLE settings(
     indexpage varchar(16) DEFAULT NULL,
     dgroup    varchar(16) DEFAULT NULL,

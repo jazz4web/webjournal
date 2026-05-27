@@ -1,0 +1,14 @@
+#changeavaf .avatar {
+  width: 160px;
+  height: 160px;
+  margin: 0 auto 4px;
+}
+
+#changeavaf .form-group {
+  margin: 5px auto 0;
+  width: max-content;
+}
+
+#changeavaf .hidden {
+  display: none;
+}

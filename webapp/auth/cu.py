@@ -30,8 +30,10 @@ async def checkcu(request, conn, token):
             return {'id': query.get('id'),
                     'username': query.get('username'),
                     'group': query.get('ugroup'),
-                    'registered': query.get('registered'),
-                    'lp': query.get('last_published'),
+                    'registered': query.get('registered').isoformat()
+                    if query.get('registered') else None,
+                    'lp': query.get('last_published').isoformat()
+                    if query.get('last_published') else None,
                     'weight': query.get('weight'),
                     'brkey': query.get('brkey'),
                     'ava': request.url_for(
@@ -57,7 +59,8 @@ async def getcu(request, conn):
                 ping_user(request.app.config, query.get('id')))
             return {'id': query.get('id'),
                     'username': query.get('username'),
-                    'lp': query.get("last_published"),
+                    'lp': query.get("last_published").isoformat()
+                    if query.get("last_published") else None,
                     'weight': query.get('weight'),
                     'ava': request.url_for(
                         'ava', username=query.get('username'), size=22)._url,

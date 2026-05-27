@@ -209,7 +209,9 @@
                   </a>
                   <div class="items-box items-box-a">
                     <div class="menu-list-item">
-                      <a href="" class="item-link">
+                      <a href="{{ url_for(
+                          'people:profile', username=cu.username) }}"
+                         class="item-link">
                         Профиль
                       </a>
                     </div>

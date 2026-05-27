@@ -5,6 +5,43 @@ from validate_email import validate_email
 from ..common.random import get_unique_s
 
 
+async def check_rel(conn, uid1, uid2):
+    friend = bool(await conn.fetchrow(
+        '''SELECT author_id, friend_id FROM friends
+             WHERE author_id = $1 AND friend_id = $2''', uid1, uid2))
+    follower = bool(await conn.fetchrow(
+        '''SELECT author_id, follower_id FROM followers
+             WHERE author_id = $1 AND follower_id = $2''', uid1, uid2))
+    blocker = bool(await conn.fetchrow(
+        '''SELECT target_id, blocker_id FROM blockers
+             WHERE target_id = $1 AND blocker_id = $2''', uid2, uid1))
+    blocked = bool(await conn.fetchrow(
+        '''SELECT target_id, blocker_id FROM blockers
+             WHERE target_id = $1 AND blocker_id = $2''', uid1, uid2))
+    return {'friend': friend, 'follower': follower,
+            'blocker': blocker, 'blocked': blocked}
+
+
+async def filter_target_user(request, conn, username):
+    query = await conn.fetchrow(
+        '''SELECT id, username, ugroup, weight, registered,
+                  last_visit, description, last_published
+             FROM users
+             WHERE username = $1''', username)
+    if query:
+        return {'uid': query.get('id'),
+                'username': query.get('username'),
+                'group': query.get('ugroup'),
+                'weight': query.get('weight'),
+                'registered': query.get('registered').isoformat(),
+                'last_visit': query.get('last_visit').isoformat(),
+                'description': query.get('description'),
+                'last_published': query.get('last_published').isoformat()
+                if query.get('last_published') else None,
+                'ava': request.url_for(
+                    'ava', username=query.get('username'), size=160)._url}
+
+
 async def sget_acc(conn, address):
     now = datetime.now(UTC)
     q = 'SELECT id FROM accounts WHERE address = $1 AND user_id IS NULL'

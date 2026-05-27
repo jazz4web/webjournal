@@ -1,0 +1,16 @@
+.personal-details {
+  text-shadow: 0 0 3px lightgray;
+  font-style: italic;
+  font-size: 0.9em;
+  display: grid;
+  grid-template-columns: max-content 1fr;
+}
+
+.column {
+  padding-right: 6px;
+  padding-bottom: 2px;
+}
+
+.bordered {
+  border-bottom: thin dashed lightgray;
+}

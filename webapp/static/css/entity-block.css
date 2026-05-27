@@ -1,0 +1,16 @@
+.entity-block {
+  padding: 6px 8px 8px;
+  border: 1px solid gainsboro;
+  border-radius: 4px;
+  background-color: snow;
+  box-shadow: 0 0 5px silver;
+}
+
+.entity-block h2 {
+  margin: 0 0 6px 0;
+}
+
+.entity-link {
+  color: dimgray;
+  text-decoration: none;
+}
