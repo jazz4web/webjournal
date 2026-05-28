@@ -1,10 +1,65 @@
+import asyncio
+import functools
+
 from starlette.endpoints import HTTPEndpoint
 from starlette.responses import JSONResponse
 
 from ..auth.cu import checkcu
 from ..common.pg import get_conn
-from .pg import check_rel, filter_target_user
-from .tools import check_g_secure, check_profile_permissions
+from .avas import check_img
+from .pg import check_rel, filter_target_user, rem_session
+from .tools import check_g_secure, check_profile_permissions, check_secure
+
+
+class ChangeAva(HTTPEndpoint):
+    async def post(self, request):
+        res = {'done': None}
+        d = await request.form()
+        img, auth = d.get('image'), d.get('token')
+        ses, brkey, message = await check_secure(request)
+        if message:
+            res['message'] = message
+            return JSONResponse(res)
+        conn = await get_conn(request.app.config)
+        cu = await checkcu(request, conn, auth)
+        if cu is None:
+            res['message'] = 'Действие требует авторизации.'
+            await conn.close()
+            return JSONResponse(res)
+        if brkey != cu.get('brkey') or ses != cu.get('ses'):
+            res['message'] = await rem_session(conn, cu)
+            await conn.close()
+            return JSONResponse(res)
+        if not img:
+            res['message'] = 'Требуется файл изображения.'
+            await conn.close()
+            return JSONResponse(res)
+        binary = await img.read()
+        await img.close()
+        if len(binary) > 200 * 1024:
+            res['message'] = 'Недопустимый размер файла.'
+            await conn.close()
+            return JSONResponse(res)
+        loop = asyncio.get_running_loop()
+        img = await loop.run_in_executor(
+            None, functools.partial(check_img, binary))
+        if img is None:
+            res['message'] = 'Файл не соответствует заданным условиям.'
+            await conn.close()
+            return JSONResponse(res)
+        uid = await conn.fetchval(
+            'SELECT user_id FROM avatars WHERE user_id = $1', cu.get('id'))
+        if uid:
+            await conn.execute(
+                'UPDATE avatars SET picture = $1 WHERE user_id = $2',
+                img, uid)
+        else:
+            await conn.execute(
+                'INSERT INTO avatars (picture, user_id) VALUES ($1, $2)',
+                img, cu.get('id'))
+        await conn.close()
+        res['done'] = True
+        return JSONResponse(res)
 
 
 class Profile(HTTPEndpoint):

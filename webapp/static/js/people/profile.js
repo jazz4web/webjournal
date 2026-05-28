@@ -15,7 +15,6 @@ $(function() {
       username: username
     },
     success: function(data) {
-      console.log(data)
       checkData(data);
       if (data.message) {
         let html = Mustache.render($('#ealertt').html(), data);
@@ -43,6 +42,38 @@ $(function() {
     dataType: 'json'
   });
   if (cu === username ) {
+    $('body').on('change', '#image', function() {
+      let file = $(this)[0].files[0];
+      if (file.size <= 204800) {
+        let fd = new FormData($('#ava-form')[0]);
+        fd.append('token', window.localStorage.getItem('sestee'));
+        $.ajax({
+          method: 'POST',
+          url: '/api/change-ava',
+          processData: false,
+          contentType: false,
+          cache: false,
+          headers: {
+            'x-br-ses': ses,
+            'x-br-tee': checkBR()
+          },
+          data: fd,
+          success: function(data) {
+            if (data.done) {
+              window.location.reload();
+            } else {
+              showError('#mc', data);
+              scrollPanel($('#ealert'));
+            }
+          },
+          dataType: 'json'
+        });
+      } else {
+        let d = {'message': 'Недопустимый размер файла.'};
+        showError('#mc', d);
+        scrollPanel($('#ealert'));
+      }
+    });
     $('body').on('click', '#cancel-description', function() {
       $(this).blur();
       $(this).parents('#description-e').slideUp('slow');

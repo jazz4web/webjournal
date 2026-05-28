@@ -5,6 +5,13 @@ from validate_email import validate_email
 from ..common.random import get_unique_s
 
 
+async def rem_session(conn, cu):
+    await conn.execute(
+        'DELETE FROM sessions WHERE suffix = $1 AND user_id = $2',
+        cu.get('ses'), cu.get('id'))
+    return 'Брелок скомпрометирован, действие отменено.'
+
+
 async def check_rel(conn, uid1, uid2):
     friend = bool(await conn.fetchrow(
         '''SELECT author_id, friend_id FROM friends
