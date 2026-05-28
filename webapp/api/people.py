@@ -5,10 +5,12 @@ from starlette.endpoints import HTTPEndpoint
 from starlette.responses import JSONResponse
 
 from ..auth.cu import checkcu
+from ..common.flashed import set_flashed
 from ..common.pg import get_conn
 from .avas import check_img
 from .pg import check_rel, filter_target_user, rem_session
-from .tools import check_g_secure, check_profile_permissions, check_secure
+from .tools import (
+    check_g_secure, check_permissions, check_profile_permissions, check_secure)
 
 
 class ChangeAva(HTTPEndpoint):
@@ -59,6 +61,7 @@ class ChangeAva(HTTPEndpoint):
                 img, cu.get('id'))
         await conn.close()
         res['done'] = True
+        await set_flashed(request, 'Аватар изменён, обновите кэш браузера.')
         return JSONResponse(res)
 
 
@@ -91,4 +94,35 @@ class Profile(HTTPEndpoint):
             await conn.close()
             return JSONResponse(res)
         await conn.close()
+        return JSONResponse(res)
+
+    async def put(self, request):
+        res = {'done': None}
+        d = await request.form()
+        ses, brkey, message = await check_secure(request)
+        if message:
+            res['message'] = message
+            return JSONResponse(res)
+        conn = await get_conn(request.app.config)
+        cu = await checkcu(request, conn, d.get('auth'))
+        if message := await check_permissions(cu, 100):
+            res['message'] = message
+            await conn.close()
+            return JSONResponse(res)
+        if brkey != cu.get('brkey') or ses != cu.get('ses'):
+            res['message'] = await rem_session(conn, cu)
+            await conn.close()
+            return JSONResponse(res)
+        text = d.get('text')
+        if text:
+            await conn.execute(
+                'UPDATE users SET description = $1 WHERE id = $2',
+                text.strip()[:500], cu.get('id'))
+        else:
+            await conn.execute(
+                'UPDATE users SET description = $1 WHERE id = $2',
+                None, cu.get('id'))
+        await conn.close()
+        res['done'] = True
+        await set_flashed(request, 'Описание блога обновлено.')
         return JSONResponse(res)

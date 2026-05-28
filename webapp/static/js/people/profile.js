@@ -29,6 +29,11 @@ $(function() {
         if ($('.today-field').length) {
           renderTF('.today-field', luxon.DateTime.now());
         }
+        if (!data.user.description) {
+          $('#length-marker').text(500);
+        } else {
+          $('#length-marker').text(500 - data.user.description.length);
+        }
         if ($('#select-group').length) {
           let s = $('#select-group option');
           for (let n = 0; n < s.length; n++) {
@@ -74,6 +79,38 @@ $(function() {
         scrollPanel($('#ealert'));
       }
     });
+    $('body').on('click', '#description-submit', function() {
+      $(this).blur();
+      if (!$('#description-editor').parents('.form-group')
+                                   .hasClass('has-error')) {
+        $.ajax({
+          method: 'PUT',
+          url: '/api/profile',
+          headers: {
+            'x-br-ses': ses,
+            'x-br-tee': checkBR()
+          },
+          data: {
+            auth: window.localStorage.getItem('sestee'),
+            text: $('#description-editor').val()
+          },
+          success: function(data) {
+            if (data.done) {
+              window.location.reload();
+            } else {
+              showError('#mc', data);
+              scrollPanel($('#ealert'));
+              setTimeout(function() {checkPC(860); }, 400);
+            }
+          },
+          dataType: 'json'
+        });
+      }
+    });
+    $('body').on(
+      'keyup', '#description-editor',
+      {len: 500, marker: '#length-marker', block: '.length-marker'},
+      trackMarker);
     $('body').on('click', '#cancel-description', function() {
       $(this).blur();
       $(this).parents('#description-e').slideUp('slow');
