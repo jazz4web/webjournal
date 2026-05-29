@@ -1,6 +1,9 @@
 import asyncio
 import functools
 
+from datetime import datetime, UTC
+
+from passlib.hash import pbkdf2_sha256
 from starlette.endpoints import HTTPEndpoint
 from starlette.responses import JSONResponse
 
@@ -11,6 +14,50 @@ from .avas import check_img
 from .pg import check_rel, filter_target_user, rem_session
 from .tools import (
     check_g_secure, check_permissions, check_profile_permissions, check_secure)
+
+
+class ChangePasswd(HTTPEndpoint):
+    async def post(self, request):
+        res = {'done': None}
+        d = await request.form()
+        passwd, newpwd, confirma, auth = (
+            d.get('passwd'), d.get('newpwd'),
+            d.get('confirma'), d.get('auth'))
+        ses, brkey, message = await check_secure(request)
+        if message:
+            res['message'] = message
+            return JSONResponse(res)
+        if not all((passwd, newpwd, confirma, auth)):
+            res['message'] = 'Ваши данные не прошли проверку.'
+            return JSONResponse(res)
+        if newpwd != confirma:
+            res['message'] = 'Пароли не совпадают.'
+            return JSONResponse(res)
+        conn = await get_conn(request.app.config)
+        cu = await checkcu(request, conn, auth)
+        if cu is None:
+            res['message'] = 'Действие требует авторизации.'
+            await conn.close()
+            return JSONResponse(res)
+        if brkey != cu.get('brkey') or ses != cu.get('ses'):
+            res['message'] = await rem_session(conn, cu)
+            await conn.close()
+            return JSONResponse(res)
+        if pbkdf2_sha256.verify(
+                passwd, await conn.fetchval(
+                    'SELECT password_hash FROM users WHERE id = $1',
+                    cu.get('id'))):
+            await conn.execute(
+                '''UPDATE users SET password_hash = $1, last_visit = $2
+                     WHERE id = $3''',
+                pbkdf2_sha256.hash(newpwd), datetime.now(UTC), cu.get('id'))
+            await set_flashed(request, 'У вас новый пароль.')
+            res['done'] = True
+            await conn.close()
+            return JSONResponse(res)
+        await conn.close()
+        res['message'] = 'Пароль недействителен.'
+        return JSONResponse(res)
 
 
 class ChangeAva(HTTPEndpoint):

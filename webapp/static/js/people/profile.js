@@ -47,6 +47,35 @@ $(function() {
     dataType: 'json'
   });
   if (cu === username ) {
+    $('body').on('click', '#changepwd-submit', function() {
+      $(this).blur();
+      let tee = {
+        passwd: $('#curpwd').val(),
+        newpwd: $('#newpwd').val(),
+        confirma: $('#newpwdconfirm').val(),
+        auth: window.localStorage.getItem('sestee')
+      };
+      if (tee.passwd && tee.newpwd && tee.confirma && tee.auth) {
+        $.ajax({
+          method: 'POST',
+          url: '/api/change-passwd',
+          headers: {
+            'x-br-ses': ses,
+            'x-br-tee': checkBR()
+          },
+          data: tee,
+          success: function(data) {
+            if (data.done) {
+              window.location.reload();
+            } else {
+              showError('#mc', data);
+              scrollPanel($('#ealert'));
+            }
+          },
+          dataType: 'json'
+        });
+      }
+    });
     $('body').on('change', '#image', function() {
       let file = $(this)[0].files[0];
       if (file.size <= 204800) {
