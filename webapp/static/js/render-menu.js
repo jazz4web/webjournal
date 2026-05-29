@@ -1,4 +1,15 @@
 function renderMenu() {
+  $('body').on('mouseenter', '#page-content', function() {
+    if ($('.navbar-toggle').is(':hidden')) {
+      if ($('.open').length) {
+        $('.open').slideUp('slow').removeClass('open');
+      }
+    } else {
+      $('.menu-box').slideUp('slow', function() {
+        $('.menu-box').removeAttr('style');
+      });
+    }
+  });
   $('body').on('mouseleave', '.open', function() {
     if ($('.navbar-toggle').is(':hidden')) {
       $('.open').slideUp('slow').removeClass('open');
