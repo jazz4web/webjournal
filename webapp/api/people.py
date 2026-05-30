@@ -11,9 +11,55 @@ from ..auth.cu import checkcu
 from ..common.flashed import set_flashed
 from ..common.pg import get_conn
 from .avas import check_img
-from .pg import check_rel, filter_target_user, rem_session
+from .pg import check_data, check_rel, filter_target_user, rem_session
+from .tasks import send_mail_mail
 from .tools import (
     check_g_secure, check_permissions, check_profile_permissions, check_secure)
+
+
+class ChangeM(HTTPEndpoint):
+    async def post(self, request):
+        res = {'done': None}
+        d = await request.form()
+        address, passwd, auth = (
+            d.get('address'), d.get('passwd'), d.get('auth'))
+        ses, brkey, message = await check_secure(request)
+        if message:
+            res['message'] = message
+            return JSONResponse(res)
+        if not all((address, passwd, auth)):
+            res['message'] = 'Отправленные данные не прошли проверку.'
+            return JSONResponse(res)
+        conn = await get_conn(request.app.config)
+        cu = await checkcu(request, conn, auth)
+        if cu is None:
+            res['message'] = 'Действие требует авторизации.'
+            await conn.close()
+            return JSONResponse(res)
+        if brkey != cu.get('brkey') or ses != cu.get('ses'):
+            res['message'] = await rem_session(conn, cue)
+            await conn.close()
+            return JSONResponse(res)
+        if pbkdf2_sha256.verify(
+                passwd, await conn.fetchval(
+                    'SELECT password_hash FROM users WHERE id = $1',
+                    cu.get('id'))):
+            message = await check_data(
+                request.app.config, conn, cu.get('id'), address)
+            if message:
+                res['message'] = message
+                await conn.close()
+                return JSONResponse(res)
+            asyncio.ensure_future(
+                send_mail_mail(request, address, cu))
+            res['done'] = True
+            await set_flashed(
+                request, 'На ваш новый адрес выслано письмо с инструкциями.')
+            await conn.close()
+            return JSONResponse(res)
+        await conn.close()
+        res['message'] = 'Пароль недействителен.'
+        return JSONResponse(res)
 
 
 class ChangePasswd(HTTPEndpoint):

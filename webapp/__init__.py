@@ -16,8 +16,8 @@ from .errors import show_error
 
 from .api.auth import CreateAcc, Login, Logout, LogoutE, ResetFP
 from .api.main import Captcha, Index
-from .api.people import ChangeAva, ChangePasswd, Profile
-from .auth.views import reset_fp
+from .api.people import ChangeAva, ChangeM, ChangePasswd, Profile
+from .auth.views import change_mail, reset_fp
 from .captcha.views import show_captcha
 from .main.views import show_avatar, show_favicon, show_humans, show_index
 from .people.views import show_profile
@@ -77,6 +77,7 @@ app = StApp(
         Route('/ava/{username}/{size:int}', show_avatar, name='ava'),
         Route('/captcha/{suffix}', show_captcha, name='captcha'),
         Mount('/api', name='api', routes=[
+            Route('/change-m', ChangeM, name='achangem'),
             Route('/change-passwd', ChangePasswd, name='achpwd'),
             Route('/change-ava', ChangeAva, name='achava'),
             Route('/profile', Profile, name='aprofile'),
@@ -88,6 +89,7 @@ app = StApp(
             Route('/index', Index, name='aindex'),
             Route('/captcha', Captcha, name='acaptcha')]),
         Mount('/auth', name='auth', routes=[
+            Route('/mail/{token}', change_mail, name='mail'),
             Route('/reg/{token}', reset_fp, name='reg'),
             Route('/rfp/{token}', reset_fp, name='rfp')]),
         Mount('/people', name='people', routes=[

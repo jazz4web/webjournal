@@ -75,6 +75,7 @@ async def show_index(request):
                 request, 'main/login.html',
                 {'item': random.choice(samples),
                  'value': await randomize(7),
+                 'flashed': await get_flashed(request),
                  'listed': False})
         if realm == 'rfp':
             await conn.close()

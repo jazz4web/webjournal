@@ -1,7 +1,7 @@
 import asyncio
 import functools
 
-from datetime import datetime, UTC
+from datetime import datetime, timedelta, UTC
 
 from aiosmtplib import send
 from email.message import EmailMessage
@@ -13,6 +13,47 @@ from ..captcha.picturize.picture import generate_image
 from ..common.pg import get_conn
 from .pg import sget_acc
 from .tokens import create_request_token
+
+
+async def send_mail_mail(request, address, cu):
+    conn = await get_conn(request.app.config)
+    length = timedelta(
+        seconds=round(3600*request.app.config.get('TLENGTH', cast=float)))
+    await conn.execute(
+        '''UPDATE accounts SET swap = $1, requested = $2, swexpire = $3
+             WHERE user_id = $4''',
+        address, datetime.now(UTC), datetime.now(UTC)+length, cu.get('id'))
+    account = await conn.fetchrow(
+        'SELECT id, address FROM accounts WHERE user_id = $1', cu.get('id'))
+    await conn.close()
+    token = await create_request_token(request, account.get('id'))
+    url = request.url_for('auth:mail', token=token)
+    content = request.app.jinja.get_template(
+        'emails/mail.html').render(
+            username=cu.get('username'),
+            index=request.url_for('index'),
+            target=url,
+            length=request.app.config.get('TLENGTH', cast=float),
+            interval=request.app.config.get('RINTERVAL', cast=float),
+            old=account.get('address'), new=address)
+    if request.app.config.get('DEBUG', cast=bool):
+        print(content)
+    else:
+        message = EmailMessage()
+        message["From"] = request.app.config.get('SENDER', cast=str)
+        message["To"] = address
+        message["Subject"] = request.app.config.get(
+            'SUBJECT_PREFIX', cast=str) + "Смена e-mail адреса."
+        message.set_content(content)
+        message.replace_header('Content-Type', 'text/html; charset="utf-8"')
+        await send(
+            message,
+            recipients=[address],
+            hostname=request.app.config.get('MAIL_SERVER', cast=str),
+            port=request.app.config.get('MAIL_PORT', cast=str),
+            username=request.app.config.get('MAIL_USERNAME', cast=str),
+            password=request.app.config.get('MAIL_PASSWORD', cast=str),
+            use_tls=request.app.config.get('MAIL_USE_SSL', cast=bool))
 
 
 async def create_user(request, username, passwd, aid):

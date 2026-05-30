@@ -65,6 +65,29 @@ async def sget_acc(conn, address):
     return acc
 
 
+async def check_data(config, conn, uid, address):
+    acc = await conn.fetchrow(
+        'SELECT address, requested, user_id FROM accounts WHERE user_id = $1',
+        uid)
+    length = timedelta(
+        seconds=round(3600*config.get('TLENGTH', cast=float)))
+    interval = timedelta(
+        seconds=round(3600*config.get('RINTERVAL', cast=float)))
+    if datetime.now(UTC) - acc.get('requested') < interval:
+        return 'Сервис временно недоступен, попробуйте зайти позже.'
+    if acc.get('address') == address:
+        return 'Задан ваш текущий адрес, запрос не имеет смысла.'
+    if await check_swap(conn, address):
+        return 'Адрес в свопе, выберите другой или повторите попытку позже.'
+    requested = await conn.fetchrow(
+        'SELECT requested, user_id FROM accounts WHERE address = $1', address)
+    if requested and requested.get('user_id'):
+        return 'Этот адрес уже зарегистрирован, запрос отклонён.'
+    if requested and datetime.now(UTC) - requested.get('requested') < length:
+        return 'Адрес регистрируется, выберите другой или попробуйте позже.'
+    return None
+
+
 async def check_address(request, conn, address):
     message = None
     interval = timedelta(

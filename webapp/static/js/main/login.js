@@ -11,6 +11,7 @@ $(function() {
   renderMenu();
   renderFooter();
   getCaptcha('#logint');
+  $('body').on('click', '.closeable', closeTopFlashed);
   $('body').on('click', '#lcaptcha-reload',
     {field: '#lcaptcha-field', suffix: '#lsuffix', captcha: '#lcaptcha'},
     captchaReload);

@@ -47,6 +47,35 @@ $(function() {
     dataType: 'json'
   });
   if (cu === username ) {
+    $('body').on('click', '#chaddress-submit', function() {
+      $(this).blur();
+      console.log('yep');
+      let tee = {
+        address: $('#chaddress').val(),
+        passwd: $('#chapasswd').val(),
+        auth: window.localStorage.getItem('sestee')
+      };
+      if (tee.address && tee.passwd && tee.auth) {
+        $.ajax({
+          method: 'POST',
+          url: '/api/change-m',
+          headers: {
+            'x-br-ses': ses,
+            'x-br-tee': checkBR()
+          },
+          data: tee,
+          success: function(data) {
+            if (data.done) {
+              window.location.reload();
+            } else {
+              showError('#mc', data);
+              scrollPanel($('#ealert'));
+            }
+          },
+          dataType: 'json'
+        });
+      }
+    });
     $('body').on('click', '#changepwd-submit', function() {
       $(this).blur();
       let tee = {
