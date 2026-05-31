@@ -15,7 +15,6 @@ $ source venv/bin/activate
 $ pip install -r requirements.txt
 $ tar xvaf deployment/vendor.tar.gz -C webapp/static
 $ cp env_template .env
-$ mkdir webapp/static/generic
 $ ln -s -T ~/workspace/webjournal/webapp/static/vendor/bootstrap/fonts/ webapp/static/fonts
 $ python insert_captchas.py
 $ python create_root.py

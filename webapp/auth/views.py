@@ -32,7 +32,7 @@ async def change_mail(request):
     if acc is None or cu.get('username') != acc.get('username') or \
             acc.get('swap') is None:
         await conn.close()
-        await set_flashed(request, 'Данные устарели, действие отменено.')
+        await set_flashed(request, 'Данные под сомнением, действие отменено.')
         return RedirectResponse(request.url_for('index'))
     newacc = await conn.fetchrow(
         'SELECT id, address, user_id FROM accounts WHERE address = $1',
