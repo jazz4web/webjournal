@@ -14,6 +14,8 @@ from webassets.ext.jinja2 import assets
 from .dirs import settings, static, templates
 from .errors import show_error
 
+from .admin.views import show_tools
+from .api.admin import Admin
 from .api.auth import CreateAcc, Login, Logout, LogoutE, ResetFP
 from .api.main import Captcha, Index
 from .api.people import ChangeAva, ChangeM, ChangePasswd, Profile
@@ -76,7 +78,10 @@ app = StApp(
         Route('/humans.txt', show_humans, name='humans.txt'),
         Route('/ava/{username}/{size:int}', show_avatar, name='ava'),
         Route('/captcha/{suffix}', show_captcha, name='captcha'),
+        Mount('/admin', name='admin', routes=[
+            Route('/', show_tools, name='tools')]),
         Mount('/api', name='api', routes=[
+            Route('/admin-tools', Admin, name='aadmin'),
             Route('/change-m', ChangeM, name='achangem'),
             Route('/change-passwd', ChangePasswd, name='achpwd'),
             Route('/change-ava', ChangeAva, name='achava'),
