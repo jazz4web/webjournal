@@ -1,0 +1,9 @@
+.options-panel {
+  border: 1px solid gainsboro;
+  box-shadow: 0 0 5px silver;
+  background-color: snow;
+  background-image: linear-gradient(to top, whitesmoke, snow);
+  border-radius: 4px;
+  padding: 4px 0;
+  text-align: center;
+}

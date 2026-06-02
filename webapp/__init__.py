@@ -15,7 +15,7 @@ from .dirs import settings, static, templates
 from .errors import show_error
 
 from .admin.views import show_tools
-from .api.admin import Admin
+from .api.admin import Admin, DGroup
 from .api.auth import CreateAcc, Login, Logout, LogoutE, ResetFP
 from .api.main import Captcha, Index
 from .api.people import ChangeAva, ChangeM, ChangePasswd, Profile
@@ -81,6 +81,7 @@ app = StApp(
         Mount('/admin', name='admin', routes=[
             Route('/', show_tools, name='tools')]),
         Mount('/api', name='api', routes=[
+            Route('/chdg', DGroup, name='achdg'),
             Route('/admin-tools', Admin, name='aadmin'),
             Route('/change-m', ChangeM, name='achangem'),
             Route('/change-passwd', ChangePasswd, name='achpwd'),

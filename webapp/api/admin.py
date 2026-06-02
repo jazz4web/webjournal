@@ -16,6 +16,35 @@ from .pg import rem_session
 from .tools import check_permissions, check_g_secure, check_secure
 
 
+class DGroup(HTTPEndpoint):
+    async def put(self, request):
+        res = {'done': None}
+        d = await request.form()
+        dgroup = d.get('dgroup', '')
+        if dgroup not in groups.default_groups():
+            res['message'] = 'Запрос содержит неверные параметры.'
+            return JSONResponse(res)
+        ses, brkey, message = await check_secure(request)
+        if message:
+            res['message'] = message
+            return JSONResponse(res)
+        conn = await get_conn(request.app.config)
+        cu = await checkcu(request, conn, d.get('auth'))
+        if message := await check_permissions(cu, 255):
+            res['message'] = message
+            await conn.close()
+            return JSONResponse(res)
+        if brkey != cu.get('brkey') or ses != cu.get('ses'):
+            res['message'] = await rem_session(conn, cu)
+            await conn.close()
+            return JSONResponse(res)
+        await conn.execute('UPDATE settings SET dgroup = $1', dgroup)
+        await conn.close()
+        res['done'] = True
+        await set_flashed(request, f'Группа по умолчанию &mdash; {dgroup}.')
+        return JSONResponse(res)
+
+
 class Admin(HTTPEndpoint):
     async def get(self, request):
         res = {'cu': None}
@@ -28,6 +57,9 @@ class Admin(HTTPEndpoint):
             res['message'] = message
             await conn.close()
             return JSONResponse(res)
+        res['groups'] = groups.default_groups()
+        res['dgroup'] = await conn.fetchval(
+            'SELECT dgroup FROM settings') or groups.default_group()
         await conn.close()
         return JSONResponse(res)
 

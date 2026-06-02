@@ -14,6 +14,9 @@
              'css/form-help.css',
              'css/form-control.css',
              'css/form-labeled.css',
+             'vendor/bootstrap/css/glyphicons.css',
+             'css/options-panel.css',
+             'css/next-block.css',
              'css/footer.css' -%}
     <link rel="stylesheet" type="text/css" href="{{ ASSET_URL }}">
   {%- endassets -%}
@@ -108,6 +111,40 @@
           </form>
         </div>
       </div>
+      <div id="default-perms-editor" class="hidden">
+        <div class="form-help">
+          <p>
+            Здесь задаётся группа вновь регистрируемых пользователей.
+            Просто выберите желаемую группу в списке ниже, всем вновь
+            регистрируемым пользователям, включая аккаунты, создаваемые
+            администратором сервиса, будет присвоена эта пользовательская
+            группа.
+          </p>
+        </div>
+        <div class="form-group">
+          <select id="select-group">
+            <% #groups %>
+              <option value="<% . %>"><% . %></option>
+            <% /groups %>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div id="options-block" class="options-panel next-block">
+      <button id="create-user"
+              type="button"
+              class="btn-success btn-sm"
+              title="новый участник">
+        <span class="glyphicon glyphicon-user"
+              aria-hidden="true"></span>
+      </button>
+      <button id="edit-perms"
+              type="button"
+              class="btn-sm btn-primary"
+              title="установить группу по-умолчанию">
+        <span class="glyphicon glyphicon-wrench"
+              aria-hidden="true"></span>
+      </button>
     </div>
   </script>
 {%- endblock templates -%}

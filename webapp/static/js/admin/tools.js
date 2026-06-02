@@ -22,11 +22,62 @@ $(function() {
         let html = Mustache.render($('#toolst').html(), data);
         $('#mc').append(html);
         checkPC(860);
+        let s = $('#select-group option');
+        for (let n = 0; n < s.length; n++) {
+          if (s[n].value == data.dgroup) {
+            $(s[n]).attr('selected', 'selected');
+          }
+        }
       }
     },
     dataType: 'json'
   });
   if (tee) {
+    $('body').on('click', '#edit-perms', function() {
+      $(this).blur();
+      let p = $('#default-perms-editor');
+      if (p.is(':hidden')) {
+        p.siblings().each(function() {
+          if (!$(this).is(':hidden')) $(this).slideUp('slow');
+        });
+        p.slideDown('slow');
+      }
+    });
+    $('body').on('click', '#create-user', function() {
+      $(this).blur();
+      let p = $('#new-user-editor');
+      if (p.is(':hidden')) {
+        p.siblings().each(function() {
+          if (!$(this).is(':hidden')) $(this).slideUp('slow');
+        });
+        p.slideDown('slow');
+      }
+    });
+    $('body').on('change', '#select-group', function() {
+      let res = $(this).val();
+      $.ajax({
+        method: 'PUT',
+        url: '/api/chdg',
+        headers: {
+          'x-br-ses': ses,
+          'x-br-tee': checkBR()
+        },
+        data: {
+          dgroup: res,
+          auth: window.localStorage.getItem('sestee')
+        },
+        success: function(data) {
+          if (data.done) {
+            window.location.reload();
+          } else {
+            showError('#mc', data);
+            scrollPanel($('#ealert'));
+            setTimeout(function() { checkPC(860); }, 400);
+          }
+        },
+        dataType: 'json'
+      });
+    });
     $('body').on('click', '#user-submit', function() {
       $(this).blur();
       let tee = {
