@@ -39,6 +39,7 @@ $(function() {
           } else {
             showError('#mc', data);
             scrollPanel($('#ealert'));
+            setTimeout(function() { checkPC(860);}, 400);
           }
         },
         dataType: 'json'

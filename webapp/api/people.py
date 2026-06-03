@@ -7,6 +7,7 @@ from passlib.hash import pbkdf2_sha256
 from starlette.endpoints import HTTPEndpoint
 from starlette.responses import JSONResponse
 
+from ..auth.attri import groups
 from ..auth.cu import checkcu
 from ..common.flashed import set_flashed
 from ..common.pg import get_conn
@@ -186,6 +187,58 @@ class Profile(HTTPEndpoint):
                     target.get('uid'))
             await conn.close()
             return JSONResponse(res)
+        await conn.close()
+        return JSONResponse(res)
+
+    async def post(self, request):
+        res = {'done': None}
+        d = await request.form()
+        username, group, auth = (
+            d.get('username'), d.get('group'), d.get('auth'))
+        ses, brkey, message = await check_secure(request)
+        if message:
+            res['message'] = message
+            return JSONResponse(res)
+        conn = await get_conn(request.app.config)
+        cu = await checkcu(request, conn, auth)
+        if message := await check_permissions(cu, 200):
+            res['message'] = message
+            await conn.close()
+            return JSONResponse(res)
+        if brkey != cu.get('brkey') or ses != cu.get('ses'):
+            res['message'] = await rem_session(conn, cu)
+            await conn.close()
+            return JSONResponse(res)
+        if cu.get('username') == username:
+            res['message'] = 'Действие не позволено.'
+            await conn.close()
+            return JSONResponse(res)
+        if (cu.get('weight') < 255 and group not in groups.keeper_groups()) \
+                or (cu.get('weight') == 255 and group not in groups.groups()):
+            res['message'] = 'Недопустимая группа, действие отменено.'
+            await conn.close()
+            return JSONResponse(res)
+        user = await conn.fetchrow(
+            'SELECT id, username, ugroup FROM users WHERE username = $1',
+            username)
+        if user is None:
+            res['message'] = 'Неизвестный пользователь, действие отменено.'
+            await conn.close()
+            return JSONResponse(res)
+        await conn.execute(
+            'UPDATE users SET ugroup = $1, weight = $2 WHERE username = $3',
+            group, groups.weigh(group), user.get('username'))
+        if group in (groups.keeper, groups.keeperpro, groups.root):
+            await conn.execute(
+                'DELETE FROM blockers WHERE blocker_id = $1',
+                user.get('id'))
+            await conn.execute(
+                'DELETE FROM blockers WHERE target_id = $1',
+                user.get('id'))
+        res['done'] = True
+        await set_flashed(
+            request,
+            f'Для {user.get("username")} установлена группа {group}.')
         await conn.close()
         return JSONResponse(res)
 

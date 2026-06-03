@@ -46,6 +46,34 @@ $(function() {
     },
     dataType: 'json'
   });
+  if (window.localStorage.getItem('sestee')) {
+    $('body').on('change', '#select-group', function() {
+      let res = $(this).val();
+      $.ajax({
+        method: 'POST',
+        url: '/api/profile',
+        headers: {
+          'x-br-ses': ses,
+          'x-br-tee': checkBR()
+        },
+        data: {
+          group: res,
+          username: username,
+          auth: window.localStorage.getItem('sestee')
+        },
+        success: function(data) {
+          if (data.done) {
+            window.location.reload();
+          } else {
+            showError('#mc', data);
+            scrollPanel($('#ealert'));
+            setTimeout(function() { checkPC(860);}, 400);
+          }
+        },
+        dataType: 'json'
+      });
+    });
+  }
   if (cu === username ) {
     $('body').on('click', '#chaddress-submit', function() {
       $(this).blur();

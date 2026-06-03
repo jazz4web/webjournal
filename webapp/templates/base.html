@@ -128,12 +128,14 @@
                     Ссылки
                   </a>
                 </div>
+                {%- if cu['weight'] >= 100 -%}
                 <div class="menu-list-item">
                   <a href="" class="item-link">
                     Черновики
                   </a>
                 </div>
                 <div role="separator" class="divider"></div>
+                {%- endif -%}
                 {%- if cu['weight'] >= 150 -%}
                   <div class="menu-list-item">
                     <a href="" class="item-link">
