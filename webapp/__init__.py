@@ -18,11 +18,11 @@ from .admin.views import show_tools
 from .api.admin import Admin, DGroup
 from .api.auth import CreateAcc, Login, Logout, LogoutE, ResetFP
 from .api.main import Captcha, Index
-from .api.people import ChangeAva, ChangeM, ChangePasswd, Profile
+from .api.people import ChangeAva, ChangeM, ChangePasswd, People, Profile
 from .auth.views import change_mail, reset_fp
 from .captcha.views import show_captcha
 from .main.views import show_avatar, show_favicon, show_humans, show_index
-from .people.views import show_profile
+from .people.views import show_people, show_profile
 
 try:
     from .tuning import SECRET_KEY, SDESC, MAIL_PASSWORD
@@ -81,6 +81,7 @@ app = StApp(
         Mount('/admin', name='admin', routes=[
             Route('/', show_tools, name='tools')]),
         Mount('/api', name='api', routes=[
+            Route('/people', People, name='apeople'),
             Route('/chdg', DGroup, name='achdg'),
             Route('/admin-tools', Admin, name='aadmin'),
             Route('/change-m', ChangeM, name='achangem'),
@@ -99,6 +100,7 @@ app = StApp(
             Route('/reg/{token}', reset_fp, name='reg'),
             Route('/rfp/{token}', reset_fp, name='rfp')]),
         Mount('/people', name='people', routes=[
+            Route('/', show_people, name='people'),
             Route('/{username}', show_profile, name='profile'),]),
         Mount('/static', app=StaticFiles(directory=static), name='static')],
     middleware=middleware,

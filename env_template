@@ -22,3 +22,4 @@ MAIL_USERNAME=avm4dev
 MAIL_PASSWORD=#############
 SUBJECT_PREFIX='[Sphinx] '
 SENDER='robot <avm4dev@yandex.ru>'
+USERS_PER_PAGE=5

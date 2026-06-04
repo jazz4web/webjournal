@@ -1,0 +1,47 @@
+.entity-pagination {
+  display: flex;
+  justify-content: center;
+  column-gap: 2px;
+  padding: 6px 0;
+  background-color: ivory;
+  background-image: linear-gradient(to top, whitesmoke, ivory);
+  border: 1px solid gainsboro;
+  box-shadow: 0 0 3px tan;
+  border-radius: 4px;
+}
+
+#prev-link, #next-link, .page-link, .page-empty, .page-current {
+  padding: 6px 12px 4px;
+  border-radius: 5px;
+  font-size: 0.8em;
+  box-shadow: 0 0 3px tan;
+}
+
+.page-empty {
+  border: 2px solid pink;
+}
+
+#prev-link, #next-link, .page-current, .page-link {
+  border: thin solid gainsboro;
+}
+
+.page-current {
+  background-color: blue;
+  background-image: linear-gradient(to top, steelblue, royalblue);
+  color: white;
+}
+
+.page-link {
+  background-color: ivory;
+  background-image: linear-gradient(to top, ivory, whitesmoke);
+}
+
+#prev-link, #next-link, .page-link {
+  color: blue;
+}
+
+#prev-link:hover, #next-link:hover, .page-link:hover {
+  cursor: pointer;
+  background-image: linear-gradient(to bottom, lightblue, skyblue);
+  border: thin solid lightblue;
+}

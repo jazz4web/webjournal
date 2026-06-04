@@ -9,13 +9,50 @@ from starlette.responses import JSONResponse
 
 from ..auth.attri import groups
 from ..auth.cu import checkcu
+from ..common.aparsers import parse_page
 from ..common.flashed import set_flashed
 from ..common.pg import get_conn
 from .avas import check_img
-from .pg import check_data, check_rel, filter_target_user, rem_session
+from .pg import (
+    check_data, check_last, check_rel, filter_target_user,
+    rem_session, select_users)
 from .tasks import send_mail_mail
 from .tools import (
     check_g_secure, check_permissions, check_profile_permissions, check_secure)
+
+
+class People(HTTPEndpoint):
+    async def get(self, request):
+        res = {'cu': None}
+        token = request.headers.get('x-auth-sestee')
+        conn = await get_conn(request.app.config)
+        cu = await checkcu(request, conn, token)
+        res['cu'] = cu
+        message = await check_g_secure(request, cu, 0)
+        if message:
+            res['message'] = message
+            await conn.close()
+            return JSONResponse(res)
+        page = await parse_page(request)
+        last = await check_last(
+            conn, page,
+            request.app.config.get('USERS_PER_PAGE', cast=int, default=3),
+            'SELECT count(*) FROM users WHERE id != $1', cu.get('id'))
+        if page > last:
+            res['message'] = f'Всего известно страниц: {last}.'
+            await conn.close()
+            return JSONResponse(res)
+        is_admin = cu.get('weight') == 255
+        res['pagination'] = dict()
+        await select_users(
+            request, conn, cu.get('id'), is_admin, res['pagination'], page,
+            request.app.config.get('USERS_PER_PAGE', cast=int, default=3),
+            last)
+        if res['pagination'] and \
+                (res['pagination']['next'] or res['pagination']['prev']):
+            res['pv'] = True
+        await conn.close()
+        return JSONResponse(res);
 
 
 class ChangeM(HTTPEndpoint):

@@ -1,0 +1,30 @@
+.entity-attributes {
+  display: flex;
+}
+
+.author-avatar {
+  width: 98px;
+  height: 98px;
+  margin: 0 12px 0 0;
+}
+
+.entity-info h3 {
+  margin: 2px 0 4px;
+  font-size: 1em;
+  font-weight: 500;
+}
+
+.column {
+  margin: 0;
+}
+
+.author-profile-link {
+  color: seagreen;
+  font-style: italic;
+  text-decoration: none;
+  text-shadow: 0 0 2px tan;
+}
+
+.author-profile-link:hover {
+  text-shadow: 0 0 4px darkseagreen;
+}

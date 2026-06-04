@@ -1,3 +1,17 @@
+{% macro show_pv() %}
+  <div class="entity-pagination next-block">
+    <% #pagination.prev %>
+      <div id="prev-link">&laquo;</div>
+    <% /pagination.prev %>
+    <% #pagination.pages %>
+      <div class="page-num"><% . %></div>
+    <% /pagination.pages %>
+    <% #pagination.next %>
+      <div id="next-link">&raquo;</div>
+    <% /pagination.next %>
+  </div>
+{% endmacro %}
+
 {% macro show_empty(message) %}
   <div class="flashed-alert">
     <div class="today-field"></div>

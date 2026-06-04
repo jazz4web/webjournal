@@ -1,0 +1,85 @@
+{%- extends "base.html" -%}
+{% from "macros/_common.html" import show_empty -%}
+{% from "macros/_common.html" import show_pv %}
+
+{%- block title_part -%}Люди{%- endblock title_part -%}
+
+{%- block styles -%}
+  {{- super() -}}
+  {%- assets filters='cssmin', output='generic/css/people/people.css',
+             'css/base.css',
+             'css/menu.css',
+             'css/page-content.css',
+             'css/flashed-alert.css',
+             'css/flashed-error.css',
+             'css/today-field.css',
+             'css/empty-message.css',
+             'css/entity-block.css',
+             'css/next-block.css',
+             'css/avatar.css',
+             'css/personal-details.css',
+             'css/entity-attributes.css',
+             'css/entity-pagination.css',
+             'css/footer.css' -%}
+    <link rel="stylesheet" href="{{ ASSET_URL }}">
+  {%- endassets -%}
+{%- endblock styles -%}
+
+{%- block templates -%}
+  {{- super() -}}
+  <script id="peoplet" type="text/template">
+    <% #pagination.users %>
+      <div class="entity-block">
+        <div class="entity-attributes">
+          <div class="author-avatar avatar"
+               style="background:url(<% ava %>)"></div>
+          <div class="entity-info">
+            <h3>
+              <a class="author-profile-link" href="/people/<% username %>">
+                <% username %>
+              </a>
+            </h3>
+            <div class="personal-details">
+              <div class="column">Группа:</div>
+              <div class="column"><% group %></div>
+              <div class="column">Зарегистрирован:</div>
+              <div class="column date-field"><% registered %></div>
+              <div class="column">Последний визит:</div>
+              <div class="column last-seen"><% last_visit %></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    <% /pagination.users %>
+    <% ^pagination.users %>
+      {{ show_empty('Сайт в стадии разработки, попробуйте зайти позже.') }}
+    <% /pagination.users %>
+    <% #pv %>
+      {{- show_pv() -}}
+    <% /pv %>
+  </script>
+{%- endblock templates -%}
+
+{%- block scripts -%}
+  {{- super() -}}
+  <script>let ses="{{ cu.ses }}",page={{ page }};</script>
+  {%- assets filters='rjsmin', output='generic/js/people/people.js',
+             'js/render-menu.js',
+             'js/render-footer.js',
+             'js/check-auth.js',
+             'js/ping.js',
+             'js/close-topflashed.js',
+             'js/check-data.js',
+             'js/check-br.js',
+             'js/slide-page.js',
+             'js/check-pc.js',
+             'js/render-tf.js',
+             'js/check-next.js',
+             'js/format-datetime.js',
+             'js/render-lastseen.js',
+             'js/render-pv.js',
+             'js/set-cookies.js',
+             'js/people/people.js' -%}
+    <script src="{{ ASSET_URL }}"></script>
+  {%- endassets -%}
+{%- endblock scripts -%}
