@@ -29,6 +29,7 @@ $(function() {
         if ($('.today-field').length) {
           renderTF('.today-field', luxon.DateTime.now());
         }
+        $('.relation').each(fixComma);
         if (!data.user.description) {
           $('#length-marker').text(500);
         } else {
@@ -47,6 +48,56 @@ $(function() {
     dataType: 'json'
   });
   if (window.localStorage.getItem('sestee')) {
+    $('body').on('click', '#blocking-button', function() {
+      $(this).blur();
+      $.ajax({
+        method: 'PUT',
+        url: '/api/people',
+        headers: {
+          'x-br-ses': ses,
+          'x-br-tee': checkBR()
+        },
+        data: {
+          auth: window.localStorage.getItem('sestee'),
+          uid: $(this).data().uid
+        },
+        success: function(data) {
+          if (data.done) {
+            window.location.reload();
+          } else {
+            showError('#mc', data);
+            scrollPanel($('#ealert'));
+            setTimeout(function() { checkPC(860); }, 400);
+          }
+        },
+        dataType: 'json'
+      });
+    });
+    $('body').on('click', '#make-friend', function() {
+      $(this).blur();
+      $.ajax({
+        method: 'POST',
+        url: '/api/people',
+        headers: {
+          'x-br-ses': ses,
+          'x-br-tee': checkBR()
+        },
+        data: {
+          auth: window.localStorage.getItem('sestee'),
+          uid: $(this).data().uid
+        },
+        success: function(data) {
+          if (data.done) {
+            window.location.reload();
+          } else {
+            showError('#mc', data);
+            scrollPanel($('#ealert'));
+            setTimeout(function() { checkPC(860); }, 400);
+          }
+        },
+        dataType: 'json'
+      });
+    });
     $('body').on('change', '#select-group', function() {
       let res = $(this).val();
       $.ajax({

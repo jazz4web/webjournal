@@ -54,6 +54,135 @@ class People(HTTPEndpoint):
         await conn.close()
         return JSONResponse(res);
 
+    async def post(self, request):
+        res = {'done': None}
+        d = await request.form()
+        uid, auth = int(d.get('uid', '0')), d.get('auth')
+        ses, brkey, message = await check_secure(request)
+        if message:
+            res['message'] = message
+            return JSONResponse(res)
+        conn = await get_conn(request.app.config)
+        cu = await checkcu(request, conn, auth)
+        if message := await check_permissions(cu, 100):
+            res['message'] = message
+            await conn.close()
+            return JSONResponse(res)
+        if brkey != cu.get('brkey') or ses != cu.get('ses'):
+            res['message'] = await rem_session(conn, cu)
+            await conn.close()
+            return JSONResponse(res)
+        if cu.get('id') == uid:
+            res['message'] = 'Действие не позволено.'
+            await conn.close()
+            return JSONResponse(res)
+        target = await conn.fetchrow(
+            'SELECT id, username FROM users WHERE id = $1',
+            int(d.get('uid', '0')))
+        if target is None:
+            res['message'] = 'Запрос содержит неверные параметры.'
+            await conn.close()
+            return JSONResponse(res)
+        rel = await check_rel(conn, cu.get('id'), target.get('id'))
+        if rel['friend']:
+            await conn.execute(
+                'DELETE FROM friends WHERE author_id = $1 AND friend_id = $2',
+                cu.get('id'), target.get('id'))
+            await set_flashed(
+                request, f'{target.get("username")} удалён из списка друзей.')
+        else:
+            message = None
+            if rel['blocker']:
+                message = '{0} заблокирован, действие отменено.'.format(
+                    target.get('username'))
+            if rel['blocked']:
+                message = '{0} заблокировал вас, действие отменено.'.format(
+                    target.get('username'))
+            if rel['blocker'] or rel['blocked']:
+                res['message'] = message
+                await conn.close()
+                return JSONResponse(res)
+            else:
+                await conn.execute(
+                    '''INSERT INTO friends (author_id, friend_id)
+                         VALUES ($1, $2)''', cu.get('id'), target.get('id'))
+                await set_flashed(
+                    request,
+                    f'{target.get("username")} добавлен в список друзей.')
+        res['done'] = True
+        await conn.close()
+        return JSONResponse(res)
+
+    async def put(self, request):
+        res = {'done': None}
+        d = await request.form()
+        uid, auth = int(d.get('uid', '0')), d.get('auth')
+        ses, brkey, message = await check_secure(request)
+        if message:
+            res['message'] = message
+            return JSONResponse(res)
+        conn = await get_conn(request.app.config)
+        cu = await checkcu(request, conn, auth)
+        if messsage := await check_permissions(cu, 0):
+            res['message'] = message
+            await conn.close()
+            return JSONResponse(res)
+        if brkey != cu.get('brkey') or ses != cu.get('ses'):
+            res['message'] = await rem_session(conn, cu)
+            await conn.close()
+            return JSONResponse(res)
+        if cu.get('id') == uid:
+            res['message'] = 'Действие не позволено.'
+            await conn.close()
+            return JSONResponse(res)
+        target = await conn.fetchrow(
+            'SELECT id, username, weight FROM users WHERE id = $1',
+            int(d.get('uid', '0')))
+        if target is None:
+            res['message'] = 'Запрос содержит неверные данные.'
+            await conn.close()
+            return JSONResponse(res)
+        if cu.get('weight') >= 250 or target.get('weight') >= 250:
+            res['message'] = 'Вам недоступно это действие.'
+            await conn.close()
+            return JSONResponse(res)
+        rel = await check_rel(conn, cu.get('id'), target.get('id'))
+        if rel['friend']:
+            res['message'] = 'Вы не можете блокировать друзей.'
+            await conn.close()
+            return JSONResponse(res)
+        if rel['blocker']:
+            await conn.execute(
+                '''DELETE FROM blockers
+                     WHERE target_id = $1 AND blocker_id = $2''',
+                target.get('id'), cu.get('id'))
+            await set_flashed(request, 'Блокировка снята.')
+        else:
+            await conn.execute(
+                '''INSERT INTO blockers (target_id, blocker_id)
+                     VALUES ($1, $2)''', target.get('id'), cu.get('id'))
+            if await conn.fetchrow(
+                    '''SELECT * FROM followers
+                         WHERE author_id = $1 AND follower_id = $2''',
+                    cu.get('id'), target.get('id')):
+                await conn.execute(
+                    '''DELETE FROM followers
+                         WHERE author_id = $1 AND follower_id = $2''',
+                    cu.get('id'), target.get('id'))
+            if await conn.fetchrow(
+                    '''SELECT * FROM friends
+                         WHERE author_id = $1 AND friend_id = $2''',
+                    target.get('id'), cu.get('id')):
+                await conn.execute(
+                    '''DELETE FROM friends
+                         WHERE author_id = $1 AND friend_id = $2''',
+                    target.get('id'), cu.get('id'))
+            await set_flashed(
+                request, f'{target.get("username")} заблокирован.')
+        await conn.close()
+        res['done'] = True
+        return JSONResponse(res)
+
 
 class ChangeM(HTTPEndpoint):
     async def post(self, request):
@@ -222,6 +351,23 @@ class Profile(HTTPEndpoint):
                 res['user']['address'] = await conn.fetchval(
                     'SELECT address FROM accounts WHERE user_id = $1',
                     target.get('uid'))
+            if res['owner']:
+                res['blocked'] = [record.get('username')
+                                  for record in await conn.fetch(
+                    '''SELECT users.username FROM users, blockers
+                         WHERE users.id = blockers.target_id
+                           AND blockers.blocker_id = $1
+                           ORDER BY users.username ASC''', cu.get('id'))]
+                if res['blocked']:
+                    res['hasblocked'] = True
+                res['friends'] = [record.get('username')
+                                  for record in await conn.fetch(
+                    '''SELECT users.username FROM users, friends
+                         WHERE users.id = friends.friend_id
+                           AND friends.author_id = $1
+                           ORDER BY users.username ASC''', cu.get('id'))]
+                if res['friends']:
+                    res['hasfriends'] = True
             await conn.close()
             return JSONResponse(res)
         await conn.close()
