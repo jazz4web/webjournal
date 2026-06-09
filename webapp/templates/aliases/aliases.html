@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+{% from "macros/_aliases.html" import show_alias %}
+{% from "macros/_common.html" import show_pv %}
+
+{%- block title_part -%}ваши ссылки{%- endblock title_part -%}
+
+{%- block styles -%}
+  {{- super() -}}
+  {%- assets filters='cssmin', output='generic/css/aliases/aliases.css',
+             'css/base.css',
+             'css/menu.css',
+             'css/page-content.css',
+             'css/flashed-alert.css',
+             'css/flashed-error.css',
+             'css/today-field.css',
+             'css/next-block.css',
+             'css/content-block.css',
+             'css/entity-block.css',
+             'css/form-help.css',
+             'css/form-control.css',
+             'css/inline-form.css',
+             'css/aliases.css',
+             'vendor/bootstrap/css/glyphicons.css',
+             'css/personal-details.css',
+             'css/entity-pagination.css',
+             'css/footer.css' -%}
+    <link rel="stylesheet" type="text/css" href="{{ ASSET_URL }}">
+  {%- endassets -%}
+{%- endblock styles -%}
+
+{%- block templates -%}
+  {{- super() -}}
+  <script id="aliasest" type="text/template">
+    <% #extra %>
+      <div id="new-title" class="content-block entity-block">
+        <h2>Создайте новый алиас</h2>
+        <div class="block-body">
+          <div class="today-field"></div>
+          <div class="form-help">
+            <p>
+              <% cu.username %>, здесь можно создать алиас для
+              любой внешней ссылки сети Интернет, для этого введите url-адрес
+              в поле ввода и нажмите кнопку "Создать". Поддерживаются только
+              http и https ссылки с обязательным указанием протокола.
+            </p>
+          </div>
+          <div class="form-form inline-form">
+            <div class="input-block input-field">
+              <input id="link"
+                     class="form-control"
+                     type="text"
+                     placeholder="введите url вашей ссылки">
+            </div>
+            <div class="button-block">
+              <button id="link-submit"
+                      class="btn btn-primary"
+                      type="button">Укоротить</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    <% /extra %>
+    <% #pagination.aliases %>
+      {{ show_alias() }}
+    <% /pagination.aliases %>
+    <% ^pagination.aliases %>
+      <div class="flashed-alert next-block">
+        На текущий момент алиасы отсутствуют.
+      </div>
+    <% /pagination.aliases %>
+    <% #pv %>
+      {{- show_pv() -}}
+    <% /pv %>
+  </script>
+  <script id="aliast" type="text/template">
+    {{ show_alias(f=True) }}
+  </script>
+{%- endblock templates -%}
+
+{%- block scripts -%}
+  {{- super() -}}
+  <script>let ses="{{ cu.ses }}",page={{ page }};</script>
+  {%- assets filters='rjsmin', output='generic/js/aliases/aliases.js',
+             'js/render-menu.js',
+             'js/render-footer.js',
+             'js/check-auth.js',
+             'js/ping.js',
+             'js/close-topflashed.js',
+             'js/check-data.js',
+             'js/check-br.js',
+             'js/slide-page.js',
+             'js/check-pc.js',
+             'js/render-tf.js',
+             'js/format-datetime.js',
+             'js/copy-alias.js',
+             'js/scroll-panel.js',
+             'js/check-next.js',
+             'js/render-pv.js',
+             'js/hide-button.js',
+             'js/aliases/aliases.js' -%}
+    <script src="{{ ASSET_URL }}"></script>
+  {%- endassets -%}
+{%- endblock scripts -%}

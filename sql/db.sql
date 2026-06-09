@@ -65,3 +65,12 @@ CREATE TABLE settings(
 
 INSERT INTO settings (indexpage, dgroup, counters, robots)
   VALUES (NULL, NULL, NULL, NULL);
+
+CREATE TABLE aliases (
+    url       text,
+    created   timestamp with time zone,
+    clicked   integer       DEFAULT 0,
+    suffix    varchar(10)   UNIQUE,
+    author_id integer       REFERENCES users(id),
+    CONSTRAINT author_url_uni UNIQUE (author_id, url)
+);

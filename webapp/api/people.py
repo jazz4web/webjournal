@@ -142,7 +142,7 @@ class People(HTTPEndpoint):
             res['message'] = 'Запрос содержит неверные данные.'
             await conn.close()
             return JSONResponse(res)
-        if cu.get('weight') >= 250 or target.get('weight') >= 250:
+        if cu.get('weight') >= 200 or target.get('weight') >= 200:
             res['message'] = 'Вам недоступно это действие.'
             await conn.close()
             return JSONResponse(res)

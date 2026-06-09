@@ -23,3 +23,4 @@ MAIL_PASSWORD=#############
 SUBJECT_PREFIX='[Sphinx] '
 SENDER='robot <avm4dev@yandex.ru>'
 USERS_PER_PAGE=5
+ALIASES_PER_PAGE=5

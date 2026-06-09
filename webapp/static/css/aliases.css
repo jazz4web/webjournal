@@ -1,0 +1,22 @@
+.form-form {
+  margin: 6px 0 0;
+}
+
+.alias-info-block .column {
+  padding: 2px 0;
+}
+
+.alias-options {
+  margin: 4px 0 0;
+}
+
+.column a {
+  color: royalblue;
+  text-shadow: 0 0 3px lightgray;
+  text-decoration: none;
+}
+
+.column a:hover {
+  text-shadow: 0 0 3px skyblue;
+  text-decoration: underline;
+}

@@ -1,0 +1,38 @@
+{% macro show_alias(f=False) %}
+  <div class="entity-block
+              {% if f %}found-alias next-block{% endif %}">
+    <div class="alias-info-block personal-details">
+      <div class="column">Ссылка:</div>
+      <div class="column"><a href="<% url %>"><% parsed %></a></div>
+      <div class="column">Алиас:</div>
+      <div class="column"><a href="<% alias %>"><% alias %></a></div>
+      <div class="column">Создан:</div>
+      <div class="column date-field"><% created %></div>
+      <div class="column">Переходов:&nbsp;</div>
+      <div class="column"><% clicked %></div>
+    </div>
+    <div class="alias-options">
+      <button type="button"
+              title="скопировать в буфер обмена"
+              id="alias-<% suffix %>"
+              data-clipboard-text="<% alias %>"
+              class="btn-primary btn-sm copy-button">
+        <span class="glyphicon glyphicon-link"
+              aria-hidden="true"></span>
+      </button>
+      <button type="button"
+              title="удалить"
+              class="btn-default btn-sm trash-button">
+        <span class="glyphicon glyphicon-trash"
+              aria-hidden="true"></span>
+      </button>
+      <button type="button"
+              title="удалить безвозвратно"
+              data-suffix="<% suffix %>"
+              class="btn-danger btn-sm remove-button hidden">
+        <span class="glyphicon glyphicon-remove-circle"
+              aria-hidden="true"></span>
+      </button>
+    </div>
+  </div>
+{% endmacro %}

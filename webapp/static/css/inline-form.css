@@ -1,0 +1,14 @@
+.inline-form {
+  display: flex;
+  column-gap: 6px;
+}
+
+.input-block {
+  width: 100%;
+}
+
+.input-block input {
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+}

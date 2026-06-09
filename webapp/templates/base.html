@@ -125,9 +125,8 @@
               </a>
               <div class="items-box">
                 <div class="menu-list-item">
-                  <a href="" class="item-link">
-                    Ссылки
-                  </a>
+                  <a href="{{ url_for('aliases:aliases') }}"
+                     class="item-link">Ссылки</a>
                 </div>
                 {%- if cu['weight'] >= 100 -%}
                 <div class="menu-list-item">

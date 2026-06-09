@@ -15,13 +15,16 @@ from .dirs import settings, static, templates
 from .errors import show_error
 
 from .admin.views import show_tools
+from .aliases.views import show_aliases
 from .api.admin import Admin, DGroup
+from .api.aliases import Aliases
 from .api.auth import CreateAcc, Login, Logout, LogoutE, ResetFP
 from .api.main import Captcha, Index
 from .api.people import ChangeAva, ChangeM, ChangePasswd, People, Profile
 from .auth.views import change_mail, reset_fp
 from .captcha.views import show_captcha
-from .main.views import show_avatar, show_favicon, show_humans, show_index
+from .main.views import (
+        jump, show_avatar, show_favicon, show_humans, show_index)
 from .people.views import show_people, show_profile
 
 try:
@@ -76,11 +79,15 @@ app = StApp(
         Route('/', show_index, name='index'),
         Route('/favicon.ico', show_favicon, name='favicon'),
         Route('/humans.txt', show_humans, name='humans.txt'),
+        Route('/{suffix}', jump, name='jump'),
         Route('/ava/{username}/{size:int}', show_avatar, name='ava'),
         Route('/captcha/{suffix}', show_captcha, name='captcha'),
         Mount('/admin', name='admin', routes=[
             Route('/', show_tools, name='tools')]),
+        Mount('/aliases', name='aliases', routes=[
+            Route('/', show_aliases, name='aliases')]),
         Mount('/api', name='api', routes=[
+            Route('/aliases', Aliases, name='aaliases'),
             Route('/people', People, name='apeople'),
             Route('/chdg', DGroup, name='achdg'),
             Route('/admin-tools', Admin, name='aadmin'),
