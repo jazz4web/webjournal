@@ -8,6 +8,34 @@ from ..common.aparsers import iter_pages, parse_url
 from ..common.random import get_unique_s
 
 
+async def sadmin_auth_aliases(
+        request, conn, author, cu, target, page, per_page, last):
+    query = await conn.fetch(
+        '''SELECT url, created, clicked, suffix FROM aliases
+             WHERE author_id = $1
+             ORDER BY created DESC LIMIT $2 OFFSET $3''',
+        author.get('id'), per_page, per_page*(page-1))
+    if query:
+        target['page'] = page
+        target['next'] = page + 1 if page + 1 <= last else None
+        target['prev'] = page -1 or None
+        target['pages'] = await iter_pages(page, last)
+        target['aliases'] = [
+                {'url': record.get('url'),
+                 'parsed': await parse_url(record.get('url')),
+                 'created': record.get('created').isoformat(),
+                 'clicked': record.get('clicked'),
+                 'suffix': record.get('suffix'),
+                 'author': author.get('username'),
+                 'profile': request.url_for(
+                     'people:profile',
+                     username=author.get('username'))._url,
+                 'canrem': author.get('weight') < cu.get('weight'),
+                 'alias': request.url_for(
+                     'jump', suffix=record.get('suffix'))._url}
+                 for record in query]
+
+
 async def select_aliases(request, conn, uid, target, page, per_page, last):
     query = await conn.fetch(
         '''SELECT url, created, clicked, suffix FROM aliases

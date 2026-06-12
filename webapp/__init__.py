@@ -14,9 +14,10 @@ from webassets.ext.jinja2 import assets
 from .dirs import settings, static, templates
 from .errors import show_error
 
-from .admin.views import show_tools
+from .admin.views import admin_aliases, admin_auth_aliases, show_tools
 from .aliases.views import show_aliases
-from .api.admin import Admin, DGroup
+from .api.admin import (
+    Admin, Alis, AuthAlis, DGroup)
 from .api.aliases import Aliases
 from .api.auth import CreateAcc, Login, Logout, LogoutE, ResetFP
 from .api.main import Captcha, Index
@@ -83,10 +84,15 @@ app = StApp(
         Route('/ava/{username}/{size:int}', show_avatar, name='ava'),
         Route('/captcha/{suffix}', show_captcha, name='captcha'),
         Mount('/admin', name='admin', routes=[
-            Route('/', show_tools, name='tools')]),
+            Route('/', show_tools, name='tools'),
+            Route('/aliases', admin_aliases, name='admaliases'),
+            Route('/aliases/{username}', admin_auth_aliases, name='adauthal'),
+            ]),
         Mount('/aliases', name='aliases', routes=[
             Route('/', show_aliases, name='aliases')]),
         Mount('/api', name='api', routes=[
+            Route('/admin-auth-aliases', AuthAlis, name='aadmauthaliases'),
+            Route('/admin-aliases', Alis, name='aadmaliases'),
             Route('/aliases', Aliases, name='aaliases'),
             Route('/people', People, name='apeople'),
             Route('/chdg', DGroup, name='achdg'),

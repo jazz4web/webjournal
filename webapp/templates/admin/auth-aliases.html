@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{%- from "macros/_admin.html" import show_alias -%}
+{%- from "macros/_common.html" import show_pv -%}
+{%- from "macros/_common.html" import show_empty -%}
+
+{%- block title_part -%}Ссылки {{ author }}{%- endblock title_part -%}
+
+{%- block styles -%}
+  {{- super() -}}
+  {%- assets filters='cssmin', output='generic/css/admin/auth-aliases.css',
+             'css/base.css',
+             'css/menu.css',
+             'css/page-content.css',
+             'css/flashed-alert.css',
+             'css/flashed-error.css',
+             'css/today-field.css',
+             'css/empty-message.css',
+             'css/entity-block.css',
+             'css/next-block.css',
+             'css/form-control.css',
+             'vendor/bootstrap/css/glyphicons.css',
+             'css/personal-details.css',
+             'css/aliases.css',
+             'css/entity-pagination.css',
+             'css/footer.css' -%}
+    <link rel="stylesheet" type="text/css" href="{{ ASSET_URL }}">
+  {%- endassets -%}
+{%- endblock styles -%}
+
+{%- block templates -%}
+  {{- super() -}}
+  <script id="aliasest" type="text/template">
+    <% #pagination.aliases %>
+      <div class="entity-block">
+        {{- show_alias() -}}
+      </div>
+    <% /pagination.aliases %>
+    <% ^pagination.aliases %>
+      {{ show_empty('У пользователя нет алиасов.') }}
+    <% /pagination.aliases %>
+    <% #pv %>
+      {{- show_pv() -}}
+    <% /pv %>
+  </script>
+{%- endblock templates -%}
+
+{%- block scripts -%}
+  {{- super() -}}
+  <script>let ses="{{cu.ses}}",page={{page}},author="{{author}}";</script>
+  {%- assets filters='rjsmin', output='generic/js/admin/auth-aliases.js',
+             'js/render-menu.js',
+             'js/render-footer.js',
+             'js/check-auth.js',
+             'js/ping.js',
+             'js/close-topflashed.js',
+             'js/check-data.js',
+             'js/check-br.js',
+             'js/slide-page.js',
+             'js/check-pc.js',
+             'js/render-tf.js',
+             'js/check-next.js',
+             'js/render-pv.js',
+             'js/format-datetime.js',
+             'js/hide-button.js',
+             'js/show-error.js',
+             'js/scroll-panel.js',
+             'js/rem-ali.js',
+             'js/admin/auth-aliases.js' -%}
+    <script src="{{ ASSET_URL }}"></script>
+  {%- endassets -%}
+{%- endblock scripts -%}

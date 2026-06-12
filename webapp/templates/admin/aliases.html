@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+{%- from "macros/_admin.html" import show_alias -%}
+
+{%- block title_part -%}Панель ссылок{%- endblock title_part -%}
+
+{%- block styles -%}
+  {{- super() -}}
+  {%- assets filters='cssmin', output='generic/css/admin/aliases.css',
+             'css/base.css',
+             'css/menu.css',
+             'css/page-content.css',
+             'css/flashed-alert.css',
+             'css/flashed-error.css',
+             'css/entity-block.css',
+             'css/next-block.css',
+             'css/form-control.css',
+             'css/inline-form.css',
+             'vendor/bootstrap/css/glyphicons.css',
+             'css/admaliases.css',
+             'css/aliases.css',
+             'css/personal-details.css',
+             'css/footer.css' -%}
+    <link rel="stylesheet" type="text/css" href="{{ ASSET_URL }}">
+  {%- endassets -%}
+{%- endblock styles -%}
+
+{%- block templates -%}
+  {{- super() -}}
+  <script id="aliast" type="text/template">
+    <div id="alias" class="entity-block next-block">{{- show_alias() -}}</div>
+  </script>
+  <script id="searcht" type="text/template">
+    <div class="entity-block">
+      <div class="form-form inline-form">
+        <div class="input-block">
+          <input id="suffix"
+                 class="form-control"
+                 type="text"
+                 placeholder="найти по алиасу">
+        </div>
+        <div class="button-block">
+          <button id="suffix-submit"
+                  class="btn btn-default"
+                  type="button">
+            <span class="glyphicon glyphicon-search"
+                  aria-hidden="true"></span>
+          </button>
+        </div>
+      </div>
+      <hr>
+      <div class="form-form inline-form">
+        <div class="input-block">
+          <input id="username"
+                 class="form-control"
+                 type="text"
+                 autocomplete="given-name"
+                 placeholder="найти по псевдониму">
+        </div>
+        <div class="button-block">
+          <button id="username-submit"
+                  class="btn btn-default"
+                  type="button">
+            <span class="glyphicon glyphicon-search"
+                  aria-hidden="true"></span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </script>
+{%- endblock templates -%}
+
+{%- block scripts -%}
+  {{- super() -}}
+  <script>let ses="{{ cu.ses }}";</script>
+  {%- assets filters='rjsmin', output='generic/js/admin/aliasess.js',
+             'js/render-menu.js',
+             'js/render-footer.js',
+             'js/check-auth.js',
+             'js/ping.js',
+             'js/close-topflashed.js',
+             'js/check-permissions.js',
+             'js/check-data.js',
+             'js/check-br.js',
+             'js/slide-page.js',
+             'js/check-pc.js',
+             'js/format-datetime.js',
+             'js/show-error.js',
+             'js/scroll-panel.js',
+             'js/hide-button.js',
+             'js/rem-ali.js',
+             'js/admin/aliases.js' -%}
+    <script src="{{ ASSET_URL }}"></script>
+  {%- endassets -%}
+{%- endblock scripts -%}
