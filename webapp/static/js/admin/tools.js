@@ -12,7 +12,6 @@ $(function() {
     url: '/api/admin-tools',
     headers: tee,
     success: function(data) {
-      console.log(data);
       checkData(data);
       if (data.message) {
         let html = Mustache.render($('#ealertt').html(), data);

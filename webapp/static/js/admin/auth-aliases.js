@@ -51,7 +51,6 @@ $(function() {
     });
     $('body').on('click', '.trash-button', hideButton);
     $('body').on('click', '.remove-button', {page: page}, remAli);
-    
   }
   checkPC(860);
 });

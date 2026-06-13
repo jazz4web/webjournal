@@ -123,7 +123,7 @@ class People(HTTPEndpoint):
             return JSONResponse(res)
         conn = await get_conn(request.app.config)
         cu = await checkcu(request, conn, auth)
-        if messsage := await check_permissions(cu, 0):
+        if message := await check_permissions(cu, 0):
             res['message'] = message
             await conn.close()
             return JSONResponse(res)
@@ -204,7 +204,7 @@ class ChangeM(HTTPEndpoint):
             await conn.close()
             return JSONResponse(res)
         if brkey != cu.get('brkey') or ses != cu.get('ses'):
-            res['message'] = await rem_session(conn, cue)
+            res['message'] = await rem_session(conn, cu)
             await conn.close()
             return JSONResponse(res)
         if pbkdf2_sha256.verify(

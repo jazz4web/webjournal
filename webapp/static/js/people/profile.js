@@ -128,7 +128,6 @@ $(function() {
   if (cu === username ) {
     $('body').on('click', '#chaddress-submit', function() {
       $(this).blur();
-      console.log('yep');
       let tee = {
         address: $('#chaddress').val(),
         passwd: $('#chapasswd').val(),
