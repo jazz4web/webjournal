@@ -4,8 +4,83 @@ from datetime import datetime, timedelta, UTC
 
 from validate_email import validate_email
 
-from ..common.aparsers import iter_pages, parse_url
+from ..common.aparsers import iter_pages, parse_title, parse_units, parse_url
 from ..common.random import get_unique_s
+
+
+async def get_album(conn, uid, suffix):
+    query = await conn.fetchrow(
+        '''SELECT id, title, created, suffix, state, volume FROM albums
+             WHERE suffix = $1 AND author_id = $2''',
+        suffix, uid)
+    if query:
+        num = await conn.fetchval(
+            'SELECT count(*) FROM pictures WHERE album_id = $1',
+            query.get('id'))
+        return {'id': query.get('id'),
+                'title': query.get('title'),
+                'created': query.get('created').isoformat(),
+                'suffix': query.get('suffix'),
+                'state': query.get('state'),
+                'volume_': query.get('volume'),
+                'volume': await parse_units(query.get('volume')),
+                'files': num,
+                'parsed': await parse_title(query.get('title'), 65)}
+    return None
+
+
+async def create_new_album(conn, uid, title, state):
+    now = datetime.now(UTC)
+    suffix = await get_unique_s(conn, 'albums', 8)
+    empty = await conn.fetchval(
+        'SELECT id FROM albums WHERE author_id IS NULL')
+    if empty:
+        await conn.execute(
+            '''UPDATE albums SET title = $1,
+                                 created = $2,
+                                 changed = $2,
+                                 suffix = $3,
+                                 state = $4,
+                                 volume = 0,
+                                 author_id = $5 WHERE id = $6''',
+            title, now, suffix, state, uid, empty)
+    else:
+        await conn.execute(
+            '''INSERT INTO
+                 albums (title, created, changed, suffix, state, author_id)
+                 VALUES ($1, $2, $2, $3, $4, $5)''',
+            title, now, suffix, state, uid)
+    return suffix
+
+
+async def select_albums(conn, uid, page, per_page, last):
+    query = await conn.fetch(
+        '''SELECT title, suffix FROM albums
+             WHERE author_id = $1
+             ORDER BY changed DESC LIMIT $2 OFFSET $3''',
+        uid, per_page, per_page*(page-1))
+    if query:
+        return {'page': page,
+                'next': page + 1 if page + 1 <= last else None,
+                'prev': page - 1 or None,
+                'pages': await iter_pages(page, last),
+                'albums': [{'title': record.get('title'),
+                            'parsed': await parse_title(
+                                record.get('title'), 65)
+                            if len(record.get('title')) > 65 else None,
+                            'suffix': record.get('suffix')}
+                           for record in query]}
+
+
+async def get_user_stat(conn, uid):
+    return {'albums': await conn.fetchval(
+        'SELECT count(*) FROM albums WHERE author_id = $1', uid),
+            'files': await conn.fetchval(
+        '''SELECT count(*) FROM albums, pictures
+             WHERE author_id = $1
+             AND pictures.album_id = albums.id''', uid),
+            'volume': await parse_units(await conn.fetchval(
+        'SELECT sum(volume) FROM albums WHERE author_id = $1''', uid) or 0)}
 
 
 async def sadmin_auth_aliases(

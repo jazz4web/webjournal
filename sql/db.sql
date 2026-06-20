@@ -74,3 +74,27 @@ CREATE TABLE aliases (
     author_id integer       REFERENCES users(id),
     CONSTRAINT author_url_uni UNIQUE (author_id, url)
 );
+
+CREATE TABLE albums (
+    id        serial        PRIMARY KEY,
+    title     varchar(100),
+    created   timestamp with time zone,
+    changed   timestamp with time zone,
+    suffix    varchar(8)    UNIQUE,
+    state     varchar(10),
+    volume    integer       DEFAULT 0,
+    author_id integer       REFERENCES users(id),
+    CONSTRAINT author_title_uni UNIQUE (author_id, title)
+);
+
+CREATE TABLE pictures (
+    uploaded timestamp with time zone,
+    picture  bytea,
+    filename varchar(128),
+    width    integer,
+    height   integer,
+    format   varchar(6),
+    volume   integer,
+    suffix   varchar(14)   UNIQUE,
+    album_id integer       REFERENCES albums(id)
+);

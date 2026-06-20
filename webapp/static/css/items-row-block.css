@@ -1,0 +1,38 @@
+.items-row-block {
+  margin: 6px 0 0;
+}
+
+.album-header-panel {
+  padding: 8px 12px;
+  background-color: ghostwhite;
+  background-image: linear-gradient(to top, whitesmoke, ghostwhite);
+}
+
+.album-header-panel:hover {
+  cursor: pointer;
+}
+
+.stat-block {
+  padding: 0 12px 6px;
+}
+
+.item-statistic {
+  background-color: linen;
+  border-radius: 5px;
+  box-shadow: 0 0 5px gray;
+  margin: 6px 0;
+}
+
+.item-tools-panel {
+  text-align: center;
+}
+
+.item-statistic {
+  padding: 6px 16px;
+}
+
+#title-change {
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+}

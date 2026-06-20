@@ -1,0 +1,249 @@
+{% extends "base.html" %}
+{%- from "macros/_common.html" import show_pv -%}
+{%- from "macros/_pictures.html" import album_statistic -%}
+
+{%- block title_part -%}Ваши альбомы{%- endblock title_part -%}
+
+{%- block styles -%}
+  {{- super() -}}
+  {%- assets filters='cssmin', output='generic/css/pictures/albums.css',
+             'css/base.css',
+             'css/menu.css',
+             'css/page-content.css',
+             'css/flashed-error.css',
+             'css/flashed-alert.css',
+             'css/entity-block.css',
+             'css/today-field.css',
+             'css/form-control.css',
+             'css/form-labeled.css',
+             'css/form-help.css',
+             'css/inline-form.css',
+             'vendor/bootstrap/css/glyphicons.css',
+             'css/personal-details.css',
+             'css/albums.css',
+             'css/items-row-block.css',
+             'css/clicked-item.css',
+             'css/next-block.css',
+             'css/entity-pagination.css',
+             'css/footer.css' -%}
+    <link rel="stylesheet" href="{{ ASSET_URL }}">
+  {%- endassets -%}
+{%- endblock styles -%}
+
+{%- block templates -%}
+  {{- super() -}}
+  {%- if cu -%}
+    {{ album_statistic(status, a=True) }}
+    <script id="ustatt" type="text/template">
+      <div class="personal-details statistic-block">
+        <div class="column bordered">Зарегистрирован:</div>
+        <div class="column bordered date-field"><% cu.registered %></div>
+        <div class="column bordered">В группе:</div>
+        <div class="column bordered"><% cu.group %></div>
+        <div class="column bordered">Альбомов:</div>
+        <div class="column bordered"><% stat.albums %></div>
+        <div class="column bordered">Файлов:</div>
+        <div class="column bordered"><% stat.files %></div>
+        <div class="column">На диске:</div>
+        <div class="column"><% stat.volume %></div>
+      </div>
+    </script>
+    <script id="albumst" type="text/template">
+      <div id="statistic-block" class="entity-block">
+      </div>
+      <div id="albums-block" class="entity-block next-block">
+        <div class="tools-panel">
+          {#<button type="button"
+                  id="user-home"
+                  class="btn-info btn-sm"
+                  data-uid="<% cu.id %>"
+                  title="показать статистику">
+            <span class="glyphicon glyphicon-home"
+                  aria-hidden="true"></span>
+          </button>#}
+          <button type="button"
+                  id="album-reload"
+                  class="btn-default btn-sm"
+                  title="обновить">
+            <span class="glyphicon glyphicon-refresh"
+                  aria-hidden="true"></span>
+          </button>
+          <% #extra %>
+            <button type="button"
+                    id="album-search"
+                    class="btn-info btn-sm"
+                    title="поиск">
+              <span class="glyphicon glyphicon-search"
+                    aria-hidden="true"></span>
+            </button>
+            <button type="button"
+                    id="create-new-album"
+                    class="btn-primary btn-sm"
+                    title="создать новый">
+              <span class="glyphicon glyphicon-folder-close"
+                    aria-hidden="true"></span>
+            </button>
+          <% /extra %>
+          <% ^extra %>
+            <button type="button"
+                    id="album-first-page"
+                    class="btn-default btn-sm"
+                    title="в начало">
+              <span class="glyphicon glyphicon-circle-arrow-left"
+                    aria-hidden="true"></span>
+            </button>
+          <% /extra %>
+        </div>
+        <% #extra %>
+          <div id="find-pic-block" class="hidden">
+            <div class="form-form inline-form">
+              <div class="input-block">
+                <input class="form-control"
+                       type="text"
+                       placeholder="введите суффикс изображения"
+                       id="find-input">
+              </div>
+              <div class="button-block">
+                <button id="find-submit"
+                        class="btn btn-default"
+                        type="button">
+                  <span class="glyphicon glyphicon-search"
+                        aria-hidden="true"></span>
+                </button>
+              </div>
+            </div>
+          </div>
+          <div id="create-form-block" class="next-block">
+            <div class="today-field"></div>
+            <div class="form-help">
+              <p>
+                Для создания нового альбома достаточно ввести его название
+                (от 3-х до 100-а знаков), выбрать статус и нажать кнопку
+                "Создать". Изображения из публичного альбома видны всем
+                пользователям сети, из скрытого альбома - только
+                авторизованным пользователям, из альбома для друзей &mdash;
+                только авторизованным пользователям из вашего списка
+                друзей.
+              </p>
+            </div>
+            <div class="form-form">
+              <div id="title-group" class="form-group">
+                <div class="form-label">
+                  <label for="title">Название:</label>
+                </div>
+                <div class="form-input">
+                  <input class="form-control"
+                         id="title"
+                         name="title"
+                         placeholder="введите название альбома"
+                         required
+                         type="text">
+                </div>
+              </div>
+              <div class="form-group">
+                <div class="form-label"></div>
+                <div class="form-input checkbox">
+                    <input id="pub-f"
+                           name="pub-f"
+                           type="checkbox"
+                           class="custom-checkbox"
+                           value="{{ status.pub }}"
+                           checked>
+                    <label for="pub-f">
+                      {{ status.pub }}
+                    </label>
+                </div>
+              </div>
+              <div class="form-group">
+                <div class="form-label"></div>
+                <div class="form-input checkbox">
+                    <input id="priv-f"
+                           name="priv-f"
+                           type="checkbox"
+                           value="{{ status.priv }}"
+                           class="custom-checkbox">
+                    <label for="priv-f">
+                      {{ status.priv }}
+                    </label>
+                </div>
+              </div>
+              <div class="form-group">
+                <div class="form-label"></div>
+                <div class="form-input checkbox">
+                    <input id="ffo-f"
+                           name="ffo-f"
+                           type="checkbox"
+                           value="{{ status.ffo }}"
+                           class="custom-checkbox">
+                    <label for="ffo-f">
+                      {{ status.ffo }}
+                    </label>
+                </div>
+              </div>
+              <div class="form-group">
+                <div class="form-label"></div>
+                <div class="form-input">
+                  <button class="btn btn-primary btn-block"
+                         id="create-new"
+                         type="button">
+                    Создать
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        <% /extra %>
+        <% #pagination.albums %>
+          <div class="items-row-block bordered">
+            <% #parsed %>
+              <div class="album-header-panel"
+                   data-suffix="<% suffix %>"
+                   title="<% title %>"><% parsed %></div>
+            <% /parsed %>
+            <% ^parsed %>
+              <div class="album-header-panel"
+                   data-suffix="<% suffix %>"><% title %></div>
+            <% /parsed %>
+          </div>
+        <% /pagination.albums %>
+        <% ^pagination %>
+          <div id="no-albums" class="flashed-alert">
+            Альбомы пока не созданы.
+          </div>
+        <% /pagination %>
+      </div>
+      <% #pv %>
+        {{ show_pv() -}}
+      <% /pv %>
+    </script>
+  {%- endif -%}
+{%- endblock templates -%}
+
+{%- block scripts -%}
+  {{- super() -}}
+  <script>let ses="{{cu.ses}}",page={{page}};</script>
+  {%- assets filters='rjsmin', output='generic/js/pictures/albums.js',
+             'js/render-menu.js',
+             'js/render-footer.js',
+             'js/check-auth.js',
+             'js/ping.js',
+             'js/check-data.js',
+             'js/check-br.js',
+             'js/close-topflashed.js',
+             'js/slide-page.js',
+             'js/check-pc.js',
+             'js/render-tf.js',
+             'js/format-datetime.js',
+             'js/checkbox.js',
+             'js/render-pv.js',
+             'js/reload.js',
+             'js/scroll-panel.js',
+             'js/mark-input-error.js',
+             'js/show-error.js',
+             'js/show-album-stat.js',
+             'js/show-rename-form.js',
+             'js/show-state-form.js',
+             'js/pictures/albums.js' -%}
+    <script src="{{ ASSET_URL }}"></script>
+  {%- endassets -%}
+{%- endblock scripts -%}

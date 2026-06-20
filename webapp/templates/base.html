@@ -138,7 +138,8 @@
                 {%- endif -%}
                 {%- if cu['weight'] >= 150 -%}
                   <div class="menu-list-item">
-                    <a href="" class="item-link">
+                    <a href="{{ url_for('pictures:albums') }}"
+                       class="item-link">
                       Картинки
                     </a>
                   </div>

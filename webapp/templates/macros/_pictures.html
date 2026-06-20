@@ -1,0 +1,83 @@
+{% macro album_statistic(status, a=False) %}
+  <script id="astatt" type="text/template">
+    <div class="stat-block hidden">
+      <div class="personal-details
+           {% if a %}item-statistic{% else %}statistic-block{% endif %}">
+        {% if not a %}
+        <div class="column bordered">Альбом:</div>
+        <div id="old-title" class="column bordered"
+             title="<% album.title %>"><% album.parsed22 %></div>
+        {% endif %}
+        <div class="column bordered">Создан:</div>
+        <div class="column bordered item-date-field"><% album.created %></div>
+        <div class="column bordered">Размер:</div>
+        <div class="column bordered"><% album.volume %></div>
+        <div class="column bordered">Файлов:</div>
+        <div class="column bordered"><% album.files %></div>
+        <div class="column">Статус:</div>
+        <div class="column"><% album.state %></div>
+      </div>
+      <div class="item-tools-panel">
+        {%- if a -%}
+        <button type="button"
+                class="btn-sm btn-primary show-album"
+                title="перейти в альбом"
+                data-dest="<% album.suffix %>">
+          <span class="glyphicon glyphicon-folder-open"
+                aria-hidden="true"></span>
+        </button>
+        {% endif %}
+        <button type="button"
+                title="переименовать альбом"
+                class="btn-sm btn-default show-rename-form">
+          <span class="glyphicon glyphicon-edit"
+                aria-hidden="true"></span>
+        </button>
+        <button type="button"
+                title="сменить статус"
+                class="btn-sm btn-default show-state-form">
+          <span class="glyphicon glyphicon-check"
+                aria-hidden="true"></span>
+        </button>
+        {% if not a %}
+        <button type="button"
+                title="удалить альбом"
+                class="btn-sm btn-danger remove-album">
+          <span class="glyphicon glyphicon-trash"
+                aria-hidden="true"></span>
+        </button>
+        {% endif %}
+      </div>
+      <div id="rename-form" class="album-form hidden">
+        <div class="form-group-a">
+          <input type="text"
+                 class="form-control"
+                 id="title-change"
+                 value="<% album.title %>">
+        </div>
+        <div class="form-group-b">
+          <button id="rename-album"
+                  data-suffix="<% album.suffix %>"
+                  class="btn-primary btn-block btn-sm">
+            переименовать
+          </button>
+        </div>
+      </div>
+      <div id="change-status-form" class="album-form hidden">
+        <div class="form-group-b">
+          <select id="select-status"
+                  data-suffix="<% album.suffix %>">
+            <option value="{{ status.pub }}">
+              {{ status.pub }}
+            </option>
+            <option value="{{ status.priv }}">
+              {{ status.priv }}
+            </option>
+            <option value="{{ status.ffo }}">
+              {{ status.ffo }}
+            </option>
+        </div>
+      </div>
+    </div>
+  </script>
+{% endmacro %}

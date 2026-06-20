@@ -22,11 +22,13 @@ from .api.aliases import Aliases
 from .api.auth import CreateAcc, Login, Logout, LogoutE, ResetFP
 from .api.main import Captcha, Index
 from .api.people import ChangeAva, ChangeM, ChangePasswd, People, Profile
+from .api.pictures import Albums, Albumstat
 from .auth.views import change_mail, reset_fp
 from .captcha.views import show_captcha
 from .main.views import (
         jump, show_avatar, show_favicon, show_humans, show_index)
 from .people.views import show_people, show_profile
+from .pictures.views import show_album, show_albums
 
 try:
     from .tuning import SECRET_KEY, SDESC, MAIL_PASSWORD
@@ -91,6 +93,8 @@ app = StApp(
         Mount('/aliases', name='aliases', routes=[
             Route('/', show_aliases, name='aliases')]),
         Mount('/api', name='api', routes=[
+            Route('/albumstat', Albumstat, name='albumstat'),
+            Route('/pictures', Albums, name='aalbums'),
             Route('/admin-auth-aliases', AuthAlis, name='aadmauthaliases'),
             Route('/admin-aliases', Alis, name='aadmaliases'),
             Route('/aliases', Aliases, name='aaliases'),
@@ -115,6 +119,9 @@ app = StApp(
         Mount('/people', name='people', routes=[
             Route('/', show_people, name='people'),
             Route('/{username}', show_profile, name='profile'),]),
+        Mount('/pictures', name='pictures', routes=[
+            Route('/', show_albums, name='albums'),
+            Route('/{suffix}', show_album, name='album')]),
         Mount('/static', app=StaticFiles(directory=static), name='static')],
     middleware=middleware,
     exception_handlers=errs)

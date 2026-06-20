@@ -1,0 +1,33 @@
+#statistic-block {
+  padding: 12px 8px;
+}
+
+.bordered {
+  margin: 0 0 8px 0;
+}
+
+.personal-details {
+  font-size: 1em;
+}
+
+.tools-panel {
+  text-align: center;
+}
+
+#create-form-block, #find-pic-block {
+  margin: 6px 0 0;
+  border-bottom: 2px solid gainsboro;
+  padding: 0 4px 4px 4px;
+}
+
+#no-albums {
+  margin: 6px 0 0 0;
+}
+
+.form-group-a {
+  margin: 6px 0 6px;
+}
+
+.form-group-b {
+  margin: 6px 0 0;
+}
