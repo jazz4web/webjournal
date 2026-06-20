@@ -17,6 +17,37 @@
         <div class="column">Статус:</div>
         <div class="column"><% album.state %></div>
       </div>
+      <div id="rename-form" class="album-form hidden">
+        <div class="form-group-a">
+          <input type="text"
+                 class="form-control"
+                 id="title-change"
+                 value="<% album.title %>">
+        </div>
+        <div class="form-group-a">
+          <button id="rename-album"
+                  data-suffix="<% album.suffix %>"
+                  class="btn-primary btn-block btn-sm">
+            переименовать
+          </button>
+        </div>
+      </div>
+      <div id="change-status-form" class="album-form hidden">
+        <div class="form-group-a">
+          <select id="select-status"
+                  data-suffix="<% album.suffix %>">
+            <option value="{{ status.pub }}">
+              {{ status.pub }}
+            </option>
+            <option value="{{ status.priv }}">
+              {{ status.priv }}
+            </option>
+            <option value="{{ status.ffo }}">
+              {{ status.ffo }}
+            </option>
+          </select>
+        </div>
+      </div>
       <div class="item-tools-panel">
         {%- if a -%}
         <button type="button"
@@ -47,36 +78,6 @@
                 aria-hidden="true"></span>
         </button>
         {% endif %}
-      </div>
-      <div id="rename-form" class="album-form hidden">
-        <div class="form-group-a">
-          <input type="text"
-                 class="form-control"
-                 id="title-change"
-                 value="<% album.title %>">
-        </div>
-        <div class="form-group-b">
-          <button id="rename-album"
-                  data-suffix="<% album.suffix %>"
-                  class="btn-primary btn-block btn-sm">
-            переименовать
-          </button>
-        </div>
-      </div>
-      <div id="change-status-form" class="album-form hidden">
-        <div class="form-group-b">
-          <select id="select-status"
-                  data-suffix="<% album.suffix %>">
-            <option value="{{ status.pub }}">
-              {{ status.pub }}
-            </option>
-            <option value="{{ status.priv }}">
-              {{ status.priv }}
-            </option>
-            <option value="{{ status.ffo }}">
-              {{ status.ffo }}
-            </option>
-        </div>
       </div>
     </div>
   </script>
