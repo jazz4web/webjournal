@@ -1,12 +1,12 @@
 {% macro album_statistic(status, a=False) %}
   <script id="astatt" type="text/template">
     <div class="stat-block hidden">
-      <div class="personal-details
-           {% if a %}item-statistic{% else %}statistic-block{% endif %}">
+      <div class="personal-details statistic-block
+                  {% if a %}item-statistic{% endif %}">
         {% if not a %}
         <div class="column bordered">Альбом:</div>
-        <div id="old-title" class="column bordered"
-             title="<% album.title %>"><% album.parsed22 %></div>
+        <div class="column bordered"
+             title="<% album.title %>"><% album.parsed %></div>
         {% endif %}
         <div class="column bordered">Создан:</div>
         <div class="column bordered item-date-field"><% album.created %></div>

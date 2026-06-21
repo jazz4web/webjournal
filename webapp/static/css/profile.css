@@ -16,8 +16,16 @@
   font-size: 1.1em;
 }
 
+.user-info .personal-details {
+  font-size: 1em;
+}
+
 .column {
-  margin: 0 0 4px 0;
+  margin: 0 0 6px 0;
+}
+
+.bordered {
+  border-bottom: thin dashed lightgray;
 }
 
 .description-text {

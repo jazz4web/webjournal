@@ -1,9 +1,7 @@
-#statistic-block {
-  padding: 12px 8px;
-}
-
-.bordered {
-  margin: 0 0 8px 0;
+.statistic-block .bordered {
+  margin: 0 0 6px 0;
+  padding: 4px 6px 4px 0;
+  border-bottom: thin dashed lightgray;
 }
 
 .personal-details {

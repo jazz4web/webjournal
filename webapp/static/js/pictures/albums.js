@@ -98,6 +98,7 @@ $(function() {
         sb.slideUp('slow', function() {
           sb.remove();
           th.removeClass('clicked-item');
+          checkPC(860);
         });
       }
     });
@@ -151,6 +152,7 @@ $(function() {
           let sb = $('.stat-block');
           sb.slideUp('slow', function() {
             sb.remove();
+            checkPC(860);
           });
         }
       } else {
@@ -173,6 +175,7 @@ $(function() {
           let sb = $('.stat-block');
           sb.slideUp('slow', function() {
             sb.remove();
+            checkPC(860);
           });
         }
       } else {

@@ -22,7 +22,7 @@ function showAlbumStat(elem, ses) {
         }
         let html = Mustache.render($('#astatt').html(), data);
         elem.after(html);
-        $('.stat-block').slideDown('slow');
+        $('.stat-block').slideDown('slow', function() { checkPC(860);});
         formatDateTime($('.item-date-field'));
         let s = $('#select-status option');
         for (let n = 0; n < s.length; n++) {
@@ -31,7 +31,6 @@ function showAlbumStat(elem, ses) {
           }
         }
         scrollPanel(elem);
-        checkPC(860);
       } else {
         showError('#mc', data);
         scrollPanel($('#ealert'));

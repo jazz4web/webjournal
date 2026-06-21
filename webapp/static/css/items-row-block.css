@@ -2,6 +2,10 @@
   margin: 6px 0 0;
 }
 
+.bordered {
+  border-bottom: thin solid lightgray;
+}
+
 .album-header-panel {
   padding: 8px 12px;
   background-color: ghostwhite;
@@ -12,14 +16,20 @@
   cursor: pointer;
 }
 
+.clicked-item {
+  background-color: steelblue;
+  background-image: linear-gradient(to top, cornflowerblue, steelblue);
+  color: snow;
+}
+
 .stat-block {
   padding: 0 12px 6px;
 }
 
 .item-statistic {
-  background-color: linen;
+  background-color: seashell;
   border-radius: 5px;
-  box-shadow: 0 0 5px gray;
+  box-shadow: 0 0 8px gray;
   margin: 6px 0;
 }
 
