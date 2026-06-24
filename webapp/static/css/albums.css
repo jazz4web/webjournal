@@ -8,7 +8,11 @@
   font-size: 1em;
 }
 
-.tools-panel {
+.stat-block .statistic-block {
+  margin: 0 0 6px 0;
+}
+
+.tools-panel, .item-tools-panel {
   text-align: center;
 }
 
@@ -24,4 +28,10 @@
 
 .form-group-a {
   margin: 0 0 6px;
+}
+
+#title-change {
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
 }

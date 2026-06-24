@@ -67,15 +67,18 @@ $(function() {
     });
     $('body').on('click', '.trash-button', hideButton);
     $('body').on('click', '.page-link', function(event) {
-      window.location.assign('/aliases/?page=' + $(this).text().trim());
+      window.location.assign(
+        window.location.pathname + '?page=' + $(this).text().trim());
     });
     $('body').on('click', '#next-link', {page: page}, function(event) {
       let p = event.data.page + 1;
-      window.location.assign('/aliases/?page=' + p);
+      window.location.assign(
+        window.location.pathname + '?page=' + p);
     });
     $('body').on('click', '#prev-link', {page: page}, function(event) {
       let p = event.data.page - 1;
-      window.location.assign('/aliases/?page=' + p);
+      window.location.assign(
+        window.location.pathname + '?page=' + p);
     });
     $('body').on('keyup', '#link', function(event) {
       if (event.which == 13) $('#link-submit').trigger('click');

@@ -24,12 +24,7 @@ function showAlbumStat(elem, ses) {
         elem.after(html);
         $('.stat-block').slideDown('slow', function() { checkPC(860);});
         formatDateTime($('.item-date-field'));
-        let s = $('#select-status option');
-        for (let n = 0; n < s.length; n++) {
-          if (s[n].value == data.album.state) {
-            $(s[n]).attr('selected', 'selected');
-          }
-        }
+        checkSelector(data.album.state);
         scrollPanel(elem);
       } else {
         showError('#mc', data);

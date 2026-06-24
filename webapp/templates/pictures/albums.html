@@ -50,16 +50,8 @@
     <script id="albumst" type="text/template">
       <div id="statistic-block" class="entity-block">
       </div>
-      <div id="albums-block" class="entity-block next-block">
+      <div class="entity-block next-block">
         <div class="tools-panel">
-          {#<button type="button"
-                  id="user-home"
-                  class="btn-info btn-sm"
-                  data-uid="<% cu.id %>"
-                  title="показать статистику">
-            <span class="glyphicon glyphicon-home"
-                  aria-hidden="true"></span>
-          </button>#}
           <button type="button"
                   id="album-reload"
                   class="btn-default btn-sm"
@@ -240,6 +232,7 @@
              'js/mark-input-error.js',
              'js/show-error.js',
              'js/show-album-stat.js',
+             'js/check-selector.js',
              'js/show-rename-form.js',
              'js/show-state-form.js',
              'js/pictures/albums.js' -%}

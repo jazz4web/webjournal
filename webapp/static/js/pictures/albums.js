@@ -72,11 +72,11 @@ $(function() {
   if (ses) {
     $('body').on('click', '#album-first-page', function() {
       $(this).blur();
-      window.location.assign('/pictures/');
+      window.location.assign(window.location.pathname);
     });
     $('body').on('click', '.show-album', function() {
       $(this).blur();
-      let url = '/pictures/' + $(this).data().dest;
+      let url = window.location.pathname + $(this).data().dest;
       window.location.assign(url);
     });
     $('body').on('click', '.show-state-form', showStateForm);
@@ -187,14 +187,17 @@ $(function() {
     $('body').on('click', '#album-reload', reload);
     $('body').on('click', '#next-link', {page: page}, function(event) {
       let p = event.data.page + 1;
-      window.location.assign('/pictures/?page=' + p);
+      window.location.assign(
+        window.location.pathname + '?page=' + p);
     });
     $('body').on('click', '#prev-link', {page: page}, function(event) {
       let p = event.data.page - 1;
-      window.location.assign('/pictures/?page=' + p);
+      window.location.assign(
+        window.location.pathname + '?page=' + p);
     });
     $('body').on('click', '.page-link', function(event) {
-      window.location.assign('/pictures/?page=' + $(this).text().trim());
+      window.location.assign(
+        window.location.pathname + '?page=' + $(this).text().trim());
     });
   }
   checkPC(860);

@@ -22,7 +22,7 @@ from .api.aliases import Aliases
 from .api.auth import CreateAcc, Login, Logout, LogoutE, ResetFP
 from .api.main import Captcha, Index
 from .api.people import ChangeAva, ChangeM, ChangePasswd, People, Profile
-from .api.pictures import Albums, Albumstat
+from .api.pictures import Album, Albums, Albumstat
 from .auth.views import change_mail, reset_fp
 from .captcha.views import show_captcha
 from .main.views import (
@@ -93,6 +93,7 @@ app = StApp(
         Mount('/aliases', name='aliases', routes=[
             Route('/', show_aliases, name='aliases')]),
         Mount('/api', name='api', routes=[
+            Route('/pictures/{suffix}', Album, name='aalbum'),
             Route('/albumstat', Albumstat, name='albumstat'),
             Route('/pictures', Albums, name='aalbums'),
             Route('/admin-auth-aliases', AuthAlis, name='aadmauthaliases'),

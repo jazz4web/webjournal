@@ -38,14 +38,17 @@ $(function() {
   });
   $('body').on('click', '#next-link', {page: page}, function(event) {
     let p = event.data.page + 1;
-    window.location.assign('/people/?page=' + p);
+    window.location.assign(
+      window.location.pathname + '?page=' + p);
   });
   $('body').on('click', '#prev-link', {page: page}, function(event) {
     let p = event.data.page - 1;
-    window.location.assign('/people/?page=' + p);
+    window.location.assign(
+      window.location.pathname + '?page=' + p);
   });
   $('body').on('click', '.page-link', function(event) {
-    window.location.assign('/people/?page=' + $(this).text().trim());
+    window.location.assign(
+      window.location.pathname + '?page=' + $(this).text().trim());
   });
   checkPC(860);
   setTimeout(setCookies, 900);
