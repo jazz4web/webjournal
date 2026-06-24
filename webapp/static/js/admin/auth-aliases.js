@@ -37,18 +37,9 @@ $(function() {
     dataType: 'json'
   });
   if (ses) {
-    let url = window.location.pathname + '?page=';
-    $('body').on('click', '.page-link', function(event) {
-      window.location.assign(url + $(this).text().trim());
-    });
-    $('body').on('click', '#next-link', {page: page}, function(event) {
-      let p = event.data.page + 1;
-      window.location.assign(url + p);
-    });
-    $('body').on('click', '#prev-link', {page: page}, function(event) {
-      let p = event.data.page - 1;
-      window.location.assign(url + p);
-    });
+    $('body').on('click', '.page-link', linkPage);
+    $('body').on('click', '#next-link', {page: page}, linkNext);
+    $('body').on('click', '#prev-link', {page: page}, linkPrev);
     $('body').on('click', '.trash-button', hideButton);
     $('body').on('click', '.remove-button', {page: page}, remAli);
   }

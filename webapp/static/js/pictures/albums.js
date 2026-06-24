@@ -185,20 +185,9 @@ $(function() {
       }
     });
     $('body').on('click', '#album-reload', reload);
-    $('body').on('click', '#next-link', {page: page}, function(event) {
-      let p = event.data.page + 1;
-      window.location.assign(
-        window.location.pathname + '?page=' + p);
-    });
-    $('body').on('click', '#prev-link', {page: page}, function(event) {
-      let p = event.data.page - 1;
-      window.location.assign(
-        window.location.pathname + '?page=' + p);
-    });
-    $('body').on('click', '.page-link', function(event) {
-      window.location.assign(
-        window.location.pathname + '?page=' + $(this).text().trim());
-    });
+    $('body').on('click', '#next-link', {page: page}, linkNext);
+    $('body').on('click', '#prev-link', {page: page}, linkPrev);
+    $('body').on('click', '.page-link', linkPage);
   }
   checkPC(860);
 });
