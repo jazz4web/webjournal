@@ -36,12 +36,7 @@ $(function() {
           $('#length-marker').text(500 - data.user.description.length);
         }
         if ($('#select-group').length) {
-          let s = $('#select-group option');
-          for (let n = 0; n < s.length; n++) {
-            if (s[n].value == data.user.group) {
-              $(s[n]).attr('selected', 'selected');
-            }
-          }
+          checkSelector('#select-group option', data.user.group);
         }
       }
     },

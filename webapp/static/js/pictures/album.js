@@ -30,7 +30,7 @@ $(function() {
           renderTF('.today-field', luxon.DateTime.now());
         }
         formatDateTime($('.date-field'));
-        checkSelector(data.album.state);
+        checkSelector('#select-status option', data.album.state);
         if (data.pv) renderPV(data.pagination.page);
         $('.items-row-block').each(function() {
           if (!$(this).next().length) $(this).removeClass('bordered');

@@ -21,12 +21,7 @@ $(function() {
         let html = Mustache.render($('#toolst').html(), data);
         $('#mc').append(html);
         checkPC(860);
-        let s = $('#select-group option');
-        for (let n = 0; n < s.length; n++) {
-          if (s[n].value == data.dgroup) {
-            $(s[n]).attr('selected', 'selected');
-          }
-        }
+        checkSelector('#select-group option', data.dgroup);
       }
     },
     dataType: 'json'
