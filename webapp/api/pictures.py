@@ -165,6 +165,24 @@ class Album(HTTPEndpoint):
                 await conn.close()
                 return JSONResponse(res)
             await set_flashed(request, 'Статус альбома изменён.')
+        elif field == 'title':
+            if not value or len(value.strip()) > 100 or len(value.strip()) < 3:
+                res['message'] = 'Имя альбома должно быть от 3 до 100 знаков.'
+                await conn.close()
+                return JSONResponse(res)
+            if album.get('title') == value.strip():
+                res['message'] = 'Запрос не имеет смысла.'
+                await conn.close()
+                return JSONResponse(res)
+            rep = await conn.fetchrow(
+                '''SELECT title FROM albums
+                     WHERE title = $1 AND author_id = $2''',
+                value.strip(), cu.get('id'))
+            if rep:
+                res['message'] = 'Такой альбом уже существует, отклонено.'
+                await conn.close()
+                return JSONResponse(res)
+            await set_flashed(request, 'Альбом переименован.')
         q = f'UPDATE albums SET {field} = $1 WHERE id = $2'
         await conn.execute(q, value.strip(), album.get('id'))
         await conn.close()

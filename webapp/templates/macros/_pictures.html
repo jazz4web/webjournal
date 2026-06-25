@@ -3,11 +3,9 @@
     <div class="stat-block {% if a %}hidden{% endif %}">
       <div class="personal-details statistic-block
                   {% if a %}item-statistic{% endif %}">
-        {% if not a %}
         <div class="column bordered">Альбом:</div>
-        <div class="column bordered"
+        <div id="old-title" class="column bordered"
              title="<% album.title %>"><% album.parsed %></div>
-        {% endif %}
         <div class="column bordered">Создан:</div>
         <div class="column bordered
                     {% if a %}item-date-field{% else %}date-field{% endif %}">

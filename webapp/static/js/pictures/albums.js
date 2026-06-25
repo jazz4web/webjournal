@@ -81,6 +81,13 @@ $(function() {
     });
     $('body').on('change', '#select-status', {suffix:null}, changeStatus);
     $('body').on('click', '.show-state-form', showStateForm);
+    $('body').on('click', '#rename-album', {suffix:null}, renameAlbum);
+    $('body').on(
+      'keyup blur', '#title-change', {min:3, max:100, bloc:'#rename-form'},
+      markInputError);
+    $('body').on('keyup', '#title-change', function(event) {
+      if (event.which === 13) $('#rename-album').trigger('click');
+    });
     $('body').on('click', '.show-rename-form', showRenameForm);
     $('body').on('click', '.album-header-panel', function() {
       if (!$(this).hasClass('clicked-item')) {
