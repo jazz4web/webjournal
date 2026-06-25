@@ -79,6 +79,7 @@ $(function() {
       let url = window.location.pathname + $(this).data().dest;
       window.location.assign(url);
     });
+    $('body').on('change', '#select-status', {suffix:null}, changeStatus);
     $('body').on('click', '.show-state-form', showStateForm);
     $('body').on('click', '.show-rename-form', showRenameForm);
     $('body').on('click', '.album-header-panel', function() {

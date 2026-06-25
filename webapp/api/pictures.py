@@ -135,6 +135,42 @@ class Album(HTTPEndpoint):
         await conn.close()
         return JSONResponse(res)
 
+    async def put(self, request):
+        res = {'album': None}
+        d = await request.form()
+        field, value = d.get('field', ''), d.get('value', '')
+        ses, brkey, message = await check_secure(request)
+        if message:
+            res['message'] = message
+            return JSONResponse(res)
+        conn = await get_conn(request.app.config)
+        cu = await checkcu(request, conn, d.get('auth'))
+        if message := await check_permissions(cu, 150):
+            res['message'] = message
+            await conn.close()
+            return JSONResponse(res)
+        if brkey != cu.get('brkey') or ses != cu.get('ses'):
+            res['message'] = await rem_session(conn, cu)
+            await conn.close()
+            return JSONResponse(res)
+        album = await get_album(
+            conn, cu.get('id'), suffix=request.path_params.get('suffix'))
+        if album is None:
+            res['message'] = 'Альбом не существует.'
+            await conn.close()
+            return JSONResponse(res)
+        if field == 'state':
+            if value not in status:
+                res['message'] = 'Неизвестный статус альбома, отклонено.'
+                await conn.close()
+                return JSONResponse(res)
+            await set_flashed(request, 'Статус альбома изменён.')
+        q = f'UPDATE albums SET {field} = $1 WHERE id = $2'
+        await conn.execute(q, value.strip(), album.get('id'))
+        await conn.close()
+        res['album'] = album.get('suffix')
+        return JSONResponse(res)
+
 
 class Albumstat(HTTPEndpoint):
     async def get(self, request):

@@ -110,6 +110,7 @@ $(function() {
         });
       }
     });
+    $('body').on('change', '#select-status', {suffix:suffix}, changeStatus);
     $('body').on('click', '.show-state-form', showStateForm);
     $('body').on('click', '.show-rename-form', showRenameForm);
   }
