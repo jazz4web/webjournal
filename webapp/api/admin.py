@@ -65,6 +65,9 @@ class AuthAlis(HTTPEndpoint):
     async def get(self, request):
         res = {'cu': None}
         token = request.headers.get('x-auth-sestee')
+        if token is None:
+            res['message'] = 'Запрос оформлен неверно, отклонено.'
+            return JSONResponse(res)
         conn = await get_conn(request.app.config)
         cu = await checkcu(request, conn, token)
         res['cu'] = cu
@@ -106,6 +109,9 @@ class Alis(HTTPEndpoint):
     async def get(self, request):
         res = {'cu': None}
         token = request.headers.get('x-auth-sestee')
+        if token is None:
+            res['message'] = 'Запрос оформлен неверно, отклонено.'
+            return JSONResponse(res)
         conn = await get_conn(request.app.config)
         cu = await checkcu(request, conn, token)
         await conn.close()
@@ -230,6 +236,9 @@ class Admin(HTTPEndpoint):
     async def get(self, request):
         res = {'cu': None}
         token = request.headers.get('x-auth-sestee')
+        if token is None:
+            res['message'] = 'Запрос оформлен неверно, отклонено.'
+            return JSONResponse(res)
         conn = await get_conn(request.app.config)
         cu = await checkcu(request, conn, token)
         res['cu'] = cu

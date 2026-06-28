@@ -54,6 +54,9 @@ class Aliases(HTTPEndpoint):
     async def get(self, request):
         res = {'cu': None}
         token = request.headers.get('x-auth-sestee')
+        if token is None:
+            res['message'] = 'Запрос оформлен неверно, отклонено.'
+            return JSONResponse(res)
         conn = await get_conn(request.app.config)
         cu = await checkcu(request, conn, token)
         res['cu'] = cu

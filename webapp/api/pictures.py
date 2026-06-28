@@ -14,15 +14,131 @@ from ..common.random import get_unique_s
 from ..pictures.attri import status
 from .checkimg import read_data
 from .pg import (
-    check_last, create_new_album, get_album, get_user_stat,
-    rem_session, select_albums, select_pictures)
+    check_last, create_new_album, get_album, get_pic_stat,
+    get_user_stat, rem_session, select_albums, select_pictures)
 from .tools import check_g_secure, check_permissions, check_secure
 
 
+class Search(HTTPEndpoint):
+    async def get(self, request):
+        res = {'album': None}
+        token = request.headers.get('x-auth-sestee')
+        if token is None:
+            res['message'] = 'Запрос оформлен неверно, отклонено.'
+            res.pop('album')
+            return JSONResponse(res)
+        conn = await get_conn(request.app.config)
+        cu = await checkcu(request, conn, token)
+        message = await check_g_secure(request, cu, 150)
+        if message:
+            res['message'] = message
+            await conn.close()
+            return JSONResponse(res)
+        suffix = request.query_params.get('suffix', None)
+        if suffix is None:
+            res['message'] = 'Пустой запрос не имеет смысла.'
+            await conn.close()
+            return JSONResponse(res)
+        if '/' in suffix:
+            suffix = suffix.split('/')[-1]
+        s = await conn.fetchval(
+            '''SELECT albums.suffix FROM albums, pictures
+                 WHERE albums.id = pictures.album_id
+                   AND pictures.suffix = $1 AND albums.author_id = $2''',
+            suffix, cu.get('id'))
+        if s is None:
+            res['message'] = 'У вас нет такого файла.'
+            return JSONResponse(res)
+        res['album'] = request.url_for('pictures:album', suffix=s)._url
+        return JSONResponse(res)
+
+
+class Picstat(HTTPEndpoint):
+    async def get(self, request):
+        res = {'picture': None}
+        token = request.headers.get('x-auth-sestee')
+        if token is None:
+            res['message'] = 'Запрос оформлен неверно, отклонено.'
+            res.pop('picture')
+            return JSONResponse(res)
+        conn = await get_conn(request.app.config)
+        cu = await checkcu(request, conn, token)
+        message = await check_g_secure(request, cu, 150)
+        if message:
+            res['message'] = message
+            await conn.close()
+            return JSONResponse(res)
+        suffix = request.query_params.get('suffix', None)
+        if suffix is None:
+            res['message'] = 'Не указан файл изображения.'
+            await conn.close()
+            return JSONResponse(res)
+        pic = await get_pic_stat(request, conn, cu.get('id'), suffix)
+        if pic is None:
+            res['message'] = 'Файл не существует.'
+            await conn.close()
+            return JSONResponse(res)
+        res['picture'] = pic
+        await conn.close()
+        return JSONResponse(res)
+
+
 class Album(HTTPEndpoint):
+    async def delete(self, request):
+        res = {'url': None}
+        d = await request.form()
+        ses, brkey, message = await check_secure(request)
+        if message:
+            res['message'] = message
+            return JSONResponse(res)
+        conn = await get_conn(request.app.config)
+        cu = await checkcu(request, conn, d.get('auth'))
+        if message := await check_permissions(cu, 150):
+            res['message'] = message
+            await conn.close()
+            return JSONResponse(res)
+        if brkey != cu.get('brkey') or ses != cu.get('ses'):
+            res['message'] = await rem_session(conn, cu)
+            await conn.close()
+            return JSONResponse(res)
+        picture = await conn.fetchrow(
+            '''SELECT albums.volume AS avol,
+                      albums.suffix AS asuffix,
+                      pictures.volume AS pvol,
+                      pictures.album_id AS aid FROM albums, pictures
+                 WHERE albums.id = pictures.album_id
+                   AND albums.author_id = $1
+                   AND pictures.suffix = $2''',
+            cu.get('id'), d.get('picture'))
+        if picture is None:
+            res['message'] = 'Нет такого файла.'
+            await conn.close()
+            return JSONResponse(res)
+        await conn.execute(
+            'UPDATE albums SET changed = $1, volume = $2 WHERE id = $3',
+            datetime.now(UTC), picture.get('avol')-picture.get('pvol'),
+            picture.get('aid'))
+        await conn.execute(
+            'DELETE FROM pictures WHERE suffix = $1', d.get('picture'))
+        await conn.close()
+        page = int(d.get('page', '0'))
+        if page >= 2:
+            res['url'] = request.url_for(
+                'pictures:album',
+                suffix=picture.get('asuffix'))._url + f'?page={page}'
+        else:
+            res['url'] = request.url_for(
+                'pictures:album', suffix=picture.get('asuffix'))._url
+        await set_flashed(request, 'Файл успешно удалён.')
+        return JSONResponse(res)
+
     async def get(self, request):
         res = {'cu': None, 'album': None}
         token = request.headers.get('x-auth-sestee')
+        if token is None:
+            res['message'] = 'Запрос оформлен неверно, отклонено.'
+            res.pop('album')
+            return JSONResponse(res)
         conn = await get_conn(request.app.config)
         cu = await checkcu(request, conn, token)
         res['cu'] = cu
@@ -194,6 +310,10 @@ class Albumstat(HTTPEndpoint):
     async def get(self, request):
         res = {'album': None}
         token = request.headers.get('x-auth-sestee')
+        if token is None:
+            res['message'] = 'Запрос оформлен неверно, отклонено.'
+            res.pop('album')
+            return JSONResponse(res)
         conn = await get_conn(request.app.config)
         cu = await checkcu(request, conn, token)
         message = await check_g_secure(request, cu, 150)
@@ -216,9 +336,46 @@ class Albumstat(HTTPEndpoint):
 
 
 class Albums(HTTPEndpoint):
+    async def delete(self, request):
+        res = {'done': None}
+        d = await request.form()
+        ses, brkey, message = await check_secure(request)
+        if message:
+            res['message'] = message
+            return JSONResponse(res)
+        conn = await get_conn(request.app.config)
+        cu = await checkcu(request, conn, d.get('auth'))
+        if message := await check_permissions(cu, 150):
+            res['message'] = message
+            await conn.close()
+            return JSONResponse(res)
+        if brkey != cu.get('brkey') or ses != cu.get('ses'):
+            res['message'] = await rem_session(conn, cu)
+            await conn.close()
+            return JSONResponse(res)
+        target = await get_album(conn, cu.get('id'), d.get('suffix'))
+        if target is None:
+            res['message'] = 'У вас нет такого альбома.'
+            await conn.close()
+            return JSONResponse(res)
+        if target.get('files'):
+            res['message'] = 'В альбоме есть файлы, нельзя удалить альбом.'
+            await conn.close()
+            return JSONResponse(res)
+        await conn.execute(
+            '''UPDATE albums SET title = NULL, author_id = NULL
+                 WHERE suffix = $1''', target.get('suffix'))
+        res['done'] = True
+        await conn.close()
+        await set_flashed(request, 'Альбом удалён.')
+        return JSONResponse(res)
+
     async def get(self, request):
         res = {'cu': None}
         token = request.headers.get('x-auth-sestee')
+        if token is None:
+            res['message'] = 'Запрос оформлен неверно, отклонено.'
+            return JSONResponse(res)
         conn = await get_conn(request.app.config)
         cu = await checkcu(request, conn, token)
         res['cu'] = cu

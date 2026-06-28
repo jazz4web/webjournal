@@ -140,6 +140,100 @@
       {{- show_pv() -}}
     <% /pv %>
   </script>
+  <script id="picturet" type="text/template">
+    <div class="stat-block pic-stat-block hidden">
+      <div class="personal-details statistic-block item-statistic">
+        <div class="column bordered">Файл:</div>
+        <div class="column bordered"
+             title="<% picture.filename %>"><% picture.parsed %></div>
+        <div class="column bordered">Загружен:</div>
+        <div class="column bordered item-date-field">
+          <% picture.uploaded %>
+        </div>
+        <div class="column bordered">Формат:</div>
+        <div class="column bordered"><% picture.format %></div>
+        <div class="column bordered">Размер:</div>
+        <div class="column bordered">
+          <% picture.width %>&times;<% picture.height %>
+        </div>
+        <div class="column">Размер файла:</div>
+        <div class="column"><% picture.volume %></div>
+      </div>
+      <div class="picture-body next-block">
+        <img alt="<% picture.suffix %>"
+             class="pb"
+             width="<% picture.width %>"
+             height="<% picture.height %>"
+             src="<% picture.url %>">
+      </div>
+      <div id="link-form" class="album-form hidden">
+        <div class="form-group-a">
+          <input type="text"
+                 id="copy-box"
+                 class="form-control"
+                 name="copy-box"
+                 value="<% picture.url %>">
+        </div>
+        <div class="form-group-a">
+          <button id="copy-button"
+                  type="button"
+                  data-clipboard-target="#copy-box"
+                  class="btn-sm btn-primary btn-block">
+            скопировать в буфер обмена
+          </button>
+        </div>
+      </div>
+      <div id="md-form" class="album-form hidden">
+        <div class="form-group-a">
+          <input type="text"
+                 id="copy-box-b"
+                 class="form-control"
+                 name="copy-box-b"
+                 value="![<% picture.suffix %>](<% picture.path %>)">
+        </div>
+        <div class="form-group-a">
+          <button id="copy-button-b"
+                  type="button"
+                  data-clipboard-target="#copy-box-b"
+                  class="btn-sm btn-primary btn-block">
+            скопировать в буфер обмена
+          </button>
+        </div>
+      </div>
+      <div id="remove-form" class="album-form hidden">
+        <div class="form-group-a">
+          <button id="rem-pic-button"
+                  type="button"
+                  title="удалить безвозвратно"
+                  data-suffix="<% picture.suffix %>"
+                  class="btn-sm btn-danger">
+            <span class="glyphicon glyphicon-remove-sign"
+                  aria-hidden="true"></span>
+          </button>
+        </div>
+      </div>
+      <div class="item-tools-panel">
+        <button type="button"
+                title="ссылка здесь"
+                class="btn-sm btn-primary copy-link">
+          <span class="glyphicon glyphicon-link"
+                aria-hidden="true"></span>
+        </button>
+        <button type="button"
+                title="код здесь"
+                class="btn-sm btn-success copy-md-code">
+          <span class="glyphicon glyphicon-barcode"
+                aria-hidden="true"></span>
+        </button>
+        <button type="button"
+                title="удалить"
+                class="btn-sm btn-default trash-button">
+          <span class="glyphicon glyphicon-trash"
+                aria-hidden="true"></span>
+        </button>
+      </div>
+    </div>
+  </script>
 {%- endblock templates -%}
 
 {%- block scripts -%}
@@ -167,6 +261,7 @@
              'js/change-status.js',
              'js/rename-album.js',
              'js/mark-input-error.js',
+             'js/copy-this.js',
              'js/pictures/album.js' -%}
     <script src="{{ ASSET_URL }}"></script>
   {%- endassets -%}

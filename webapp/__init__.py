@@ -22,11 +22,12 @@ from .api.aliases import Aliases
 from .api.auth import CreateAcc, Login, Logout, LogoutE, ResetFP
 from .api.main import Captcha, Index
 from .api.people import ChangeAva, ChangeM, ChangePasswd, People, Profile
-from .api.pictures import Album, Albums, Albumstat
+from .api.pictures import Album, Albums, Albumstat, Picstat, Search
 from .auth.views import change_mail, reset_fp
 from .captcha.views import show_captcha
 from .main.views import (
-        jump, show_avatar, show_favicon, show_humans, show_index)
+        jump, show_avatar, show_favicon, show_humans,
+        show_index, show_picture)
 from .people.views import show_people, show_profile
 from .pictures.views import show_album, show_albums
 
@@ -85,6 +86,7 @@ app = StApp(
         Route('/{suffix}', jump, name='jump'),
         Route('/ava/{username}/{size:int}', show_avatar, name='ava'),
         Route('/captcha/{suffix}', show_captcha, name='captcha'),
+        Route('/picture/{suffix}', show_picture, name='picture'),
         Mount('/admin', name='admin', routes=[
             Route('/', show_tools, name='tools'),
             Route('/aliases', admin_aliases, name='admaliases'),
@@ -93,6 +95,8 @@ app = StApp(
         Mount('/aliases', name='aliases', routes=[
             Route('/', show_aliases, name='aliases')]),
         Mount('/api', name='api', routes=[
+            Route('/search', Search, name='asearch'),
+            Route('/picstat', Picstat, name='apicstat'),
             Route('/pictures/{suffix}', Album, name='aalbum'),
             Route('/albumstat', Albumstat, name='albumstat'),
             Route('/pictures', Albums, name='aalbums'),

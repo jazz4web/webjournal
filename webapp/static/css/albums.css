@@ -30,8 +30,12 @@
   margin: 0 0 6px;
 }
 
-#title-change {
+#title-change, #copy-box, #copy-box-b {
   width: 100%;
   height: 100%;
   box-sizing: border-box;
+}
+
+#remove-form {
+  text-align: center;
 }

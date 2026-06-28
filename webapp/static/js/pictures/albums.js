@@ -70,6 +70,35 @@ $(function() {
     dataType: 'json'
   });
   if (ses) {
+    $('body').on('click', '#find-submit', function() {
+      $(this).blur();
+      let suffix = $('#find-input').val();
+      let tee = ses ? {
+        'x-br-ses': ses,
+        'x-auth-sestee': window.localStorage.getItem('sestee')
+      } : {};
+      $.ajax({
+        method: 'GET',
+        url: '/api/search',
+        headers: tee,
+        data: {
+          suffix: suffix
+        },
+        success: function(data) {
+          if (data.album) {
+            window.location.assign(data.album);
+          } else {
+            showError('#mc', data);
+            scrollPanel($('#ealert'));
+            setTimeout(function() { checkPC(860); }, 400);
+          }
+        },
+        dataType: 'json'
+      });
+    });
+    $('body').on('keyup', '#find-input', function(event) {
+      if (event.which === 13) $('#find-submit').trigger('click');
+    });
     $('body').on('click', '#album-first-page', function() {
       $(this).blur();
       window.location.assign(window.location.pathname);
