@@ -5,6 +5,7 @@ from datetime import datetime, UTC
 
 from passlib.hash import pbkdf2_sha256
 from starlette.endpoints import HTTPEndpoint
+from starlette.exceptions import HTTPException
 from starlette.responses import JSONResponse
 from validate_email import validate_email
 
@@ -26,6 +27,8 @@ class CreateAcc(HTTPEndpoint):
     async def get(self, request):
         res = {'aid': None}
         token = request.headers.get('x-rfp-token')
+        if token is None:
+            raise HTTPException(403)
         acc = await check_token(request.app.config, token)
         if acc is None:
             res['message'] = await fix_bad_token(request.app.config)
@@ -124,6 +127,8 @@ class ResetFP(HTTPEndpoint):
     async def get(self, request):
         res = {'aid': None}
         token = request.headers.get('x-rfp-token')
+        if token is None:
+            raise HTTPException(403)
         acc = await check_token(request.app.config, token)
         if acc is None:
             res['message'] = await fix_bad_token(request.app.config)

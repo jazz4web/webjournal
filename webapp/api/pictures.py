@@ -4,6 +4,7 @@ import functools
 from datetime import datetime, UTC
 
 from starlette.endpoints import HTTPEndpoint
+from starlette.exceptions import HTTPException
 from starlette.responses import JSONResponse
 
 from ..auth.cu import checkcu
@@ -24,9 +25,7 @@ class Search(HTTPEndpoint):
         res = {'album': None}
         token = request.headers.get('x-auth-sestee')
         if token is None:
-            res['message'] = 'Запрос оформлен неверно, отклонено.'
-            res.pop('album')
-            return JSONResponse(res)
+            raise HTTPException(403)
         conn = await get_conn(request.app.config)
         cu = await checkcu(request, conn, token)
         message = await check_g_secure(request, cu, 150)
@@ -58,9 +57,7 @@ class Picstat(HTTPEndpoint):
         res = {'picture': None}
         token = request.headers.get('x-auth-sestee')
         if token is None:
-            res['message'] = 'Запрос оформлен неверно, отклонено.'
-            res.pop('picture')
-            return JSONResponse(res)
+            raise HTTPException(403)
         conn = await get_conn(request.app.config)
         cu = await checkcu(request, conn, token)
         message = await check_g_secure(request, cu, 150)
@@ -136,9 +133,7 @@ class Album(HTTPEndpoint):
         res = {'cu': None, 'album': None}
         token = request.headers.get('x-auth-sestee')
         if token is None:
-            res['message'] = 'Запрос оформлен неверно, отклонено.'
-            res.pop('album')
-            return JSONResponse(res)
+            raise HTTPException(403)
         conn = await get_conn(request.app.config)
         cu = await checkcu(request, conn, token)
         res['cu'] = cu
@@ -311,9 +306,7 @@ class Albumstat(HTTPEndpoint):
         res = {'album': None}
         token = request.headers.get('x-auth-sestee')
         if token is None:
-            res['message'] = 'Запрос оформлен неверно, отклонено.'
-            res.pop('album')
-            return JSONResponse(res)
+            raise HTTPException(403)
         conn = await get_conn(request.app.config)
         cu = await checkcu(request, conn, token)
         message = await check_g_secure(request, cu, 150)
@@ -374,8 +367,7 @@ class Albums(HTTPEndpoint):
         res = {'cu': None}
         token = request.headers.get('x-auth-sestee')
         if token is None:
-            res['message'] = 'Запрос оформлен неверно, отклонено.'
-            return JSONResponse(res)
+            raise HTTPException(403)
         conn = await get_conn(request.app.config)
         cu = await checkcu(request, conn, token)
         res['cu'] = cu

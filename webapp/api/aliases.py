@@ -1,6 +1,7 @@
 from datetime import datetime, UTC
 
 from starlette.endpoints import HTTPEndpoint
+from starlette.exceptions import HTTPException
 from starlette.responses import JSONResponse
 
 from ..auth.cu import checkcu
@@ -55,8 +56,7 @@ class Aliases(HTTPEndpoint):
         res = {'cu': None}
         token = request.headers.get('x-auth-sestee')
         if token is None:
-            res['message'] = 'Запрос оформлен неверно, отклонено.'
-            return JSONResponse(res)
+            raise HTTPException(403)
         conn = await get_conn(request.app.config)
         cu = await checkcu(request, conn, token)
         res['cu'] = cu

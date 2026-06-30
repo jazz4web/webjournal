@@ -9,7 +9,7 @@ E404 = 'Такой страницы у нас нет.'
 
 async def show_error(request, exc):
     if exc.status_code == 403:
-        exc.detail = 'Доступ ограничен, недостаточно прав.'
+        exc.detail = 'Доступ ограничен.'
     if exc.status_code == 404:
         exc.detail = E404
     if exc.status_code == 405:

@@ -4,6 +4,7 @@ import re
 from datetime import datetime, UTC
 
 from starlette.endpoints import HTTPEndpoint
+from starlette.exceptions import HTTPException
 from starlette.responses import JSONResponse
 from validate_email import validate_email
 
@@ -66,8 +67,7 @@ class AuthAlis(HTTPEndpoint):
         res = {'cu': None}
         token = request.headers.get('x-auth-sestee')
         if token is None:
-            res['message'] = 'Запрос оформлен неверно, отклонено.'
-            return JSONResponse(res)
+            raise HTTPException(403)
         conn = await get_conn(request.app.config)
         cu = await checkcu(request, conn, token)
         res['cu'] = cu
@@ -110,8 +110,7 @@ class Alis(HTTPEndpoint):
         res = {'cu': None}
         token = request.headers.get('x-auth-sestee')
         if token is None:
-            res['message'] = 'Запрос оформлен неверно, отклонено.'
-            return JSONResponse(res)
+            raise HTTPException(403)
         conn = await get_conn(request.app.config)
         cu = await checkcu(request, conn, token)
         await conn.close()
@@ -237,8 +236,7 @@ class Admin(HTTPEndpoint):
         res = {'cu': None}
         token = request.headers.get('x-auth-sestee')
         if token is None:
-            res['message'] = 'Запрос оформлен неверно, отклонено.'
-            return JSONResponse(res)
+            raise HTTPException(403)
         conn = await get_conn(request.app.config)
         cu = await checkcu(request, conn, token)
         res['cu'] = cu
