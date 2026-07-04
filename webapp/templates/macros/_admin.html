@@ -1,3 +1,53 @@
+{% macro show_picture(blank=True) %}
+  <div class="personal-details">
+    <div class="column">Автор:</div>
+    <div class="column">
+      <a href="<% profile %>" target="_blank"><% author %></a>
+    </div>
+    <div class="column">Альбом:</div>
+    <div class="column">
+      {%- if blank -%}
+        <a href="<% album %>" target="_blank">
+          <% albumtitle %>
+        </a>
+      {%- else -%}
+        <% albumtitle %>
+      {%- endif -%}
+    </div>
+    <div class="column">Имя файла:</div>
+    <div class="column"><% filename %></div>
+    <div class="column">Формат:</div>
+    <div class="column"><% format %></div>
+    <div class="column">Размер файла:</div>
+    <div class="column"><% volume %></div>
+    <div class="column">Размер:</div>
+    <div class="column"><% width %>&times;<% height %></div>
+    <div class="column">Загружен:</div>
+    <div class="column date-field"><% uploaded %></div>
+  </div>
+  <% #canrem %>
+    <div class="picture-options">
+      <button type="button"
+              title="удалить"
+              class="btn-default btn-sm trash-button">
+        <span class="glyphicon glyphicon-trash"
+              aria-hidden="true"></span>
+      </button>
+      <button type="button"
+              title="удалить безвозвратно"
+              data-suffix="<% suffix %>"
+              class="btn-danger btn-sm remove-button hidden">
+        <span class="glyphicon glyphicon-remove-circle"
+              aria-hidden="true"></span>
+      </button>
+    </div>
+  <% /canrem %>
+  <div class="picture-body next-block">
+    <p><img src="<% url %>"
+            alt="<% filename %>"></p>
+  </div>
+{% endmacro %}
+
 {% macro show_alias() %}
   <div class="personal-details">
     <div class="column">Автор:</div>

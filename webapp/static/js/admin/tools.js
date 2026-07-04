@@ -24,6 +24,7 @@ $(function() {
         checkSelector('#select-group option', data.dgroup);
       }
     },
+    error: error403,
     dataType: 'json'
   });
   if (tee) {

@@ -1,11 +1,11 @@
 {% extends "base.html" %}
-{%- from "macros/_admin.html" import show_alias -%}
+{%- from "macros/_admin.html" import show_picture -%}
 
-{%- block title_part -%}Панель ссылок{%- endblock title_part -%}
+{%- block title_part -%}Панель хостинга картинок{%- endblock title_part -%}
 
 {%- block styles -%}
   {{- super() -}}
-  {%- assets filters='cssmin', output='generic/css/admin/aliases.css',
+  {%- assets filters='cssmin', output='generic/css/admin/pictures.css',
              'css/base.css',
              'css/menu.css',
              'css/page-content.css',
@@ -16,9 +16,8 @@
              'css/form-control.css',
              'css/inline-form.css',
              'vendor/bootstrap/css/glyphicons.css',
-             'css/admaliases.css',
-             'css/aliases.css',
              'css/personal-details.css',
+             'css/admpictures.css',
              'css/footer.css' -%}
     <link rel="stylesheet" type="text/css" href="{{ ASSET_URL }}">
   {%- endassets -%}
@@ -26,8 +25,10 @@
 
 {%- block templates -%}
   {{- super() -}}
-  <script id="aliast" type="text/template">
-    <div id="alias" class="entity-block next-block">{{- show_alias() -}}</div>
+  <script id="picturet" type="text/template">
+    <div id="picture" class="entity-block next-block">
+      {{- show_picture() -}}
+    </div>
   </script>
   <script id="searcht" type="text/template">
     <div class="entity-block">
@@ -36,7 +37,7 @@
           <input id="suffix"
                  class="form-control"
                  type="text"
-                 placeholder="найти по алиасу">
+                 placeholder="найти по url-адресу">
         </div>
         <div class="button-block">
           <button id="suffix-submit"
@@ -72,7 +73,7 @@
 {%- block scripts -%}
   {{- super() -}}
   <script>let ses="{{ cu.ses }}";</script>
-  {%- assets filters='rjsmin', output='generic/js/admin/aliasess.js',
+  {%- assets filters='rjsmin', output='generic/js/admin/pictures.js',
              'js/render-menu.js',
              'js/render-footer.js',
              'js/check-auth.js',
@@ -81,15 +82,16 @@
              'js/check-permissions.js',
              'js/check-data.js',
              'js/check-br.js',
-             'js/slide-page.js',
              'js/check-pc.js',
-             'js/format-datetime.js',
              'js/show-error.js',
              'js/scroll-panel.js',
+             'js/adjust-image.js',
+             'js/format-datetime.js',
              'js/hide-button.js',
-             'js/rem-ali.js',
+             'js/rem-pic.js',
+             'js/slide-page.js',
              'js/error-403.js',
-             'js/admin/aliases.js' -%}
+             'js/admin/pictures.js' -%}
     <script src="{{ ASSET_URL }}"></script>
   {%- endassets -%}
 {%- endblock scripts -%}

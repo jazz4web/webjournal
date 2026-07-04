@@ -40,6 +40,7 @@ $(function() {
         }
       }
     },
+    error: error403,
     dataType: 'json'
   });
   if (window.localStorage.getItem('sestee')) {

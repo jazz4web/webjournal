@@ -38,6 +38,7 @@ $(function() {
         checkPC(860);
       }
     },
+    error: error403,
     dataType: 'json'
   });
   if (ses) {
@@ -188,6 +189,7 @@ $(function() {
               setTimeout(function() { checkPC(860); }, 400);
             }
           },
+          error: error403,
           dataType: 'json'
         });
       } else {

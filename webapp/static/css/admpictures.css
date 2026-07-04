@@ -1,0 +1,34 @@
+.form-form {
+  margin: 6px 2px;
+}
+
+hr {
+  border: 2px solid gainsboro;
+}
+
+#picture .personal-details {
+  font-size: 1em;
+}
+
+.column a {
+  color: royalblue;
+  text-shadow: 0 0 3px lightgray;
+  text-decoration: none;
+}
+
+.column a:hover {
+  text-shadow: 0 0 3px skyblue;
+  text-decoration: underline;
+}
+
+.picture-options {
+  margin: 6px 0 0;
+  text-align: center;
+
+}
+
+.image-par {
+  text-align: center;
+  margin: 0;
+  padding: 0;
+}

@@ -33,6 +33,7 @@ $(function() {
         checkPC(860);
       }
     },
+    error: error403,
     dataType: 'json'
   });
   if (ses) {

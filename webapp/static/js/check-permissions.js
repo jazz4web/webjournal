@@ -18,6 +18,7 @@ function checkPermissions(ses) {
         checkPC(860);
       }
     },
+    error: error403,
     dataType: 'json'
   });
 }

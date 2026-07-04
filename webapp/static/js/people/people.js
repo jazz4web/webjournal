@@ -33,6 +33,7 @@ $(function() {
         checkPC(860);
       }
     },
+    error: error403,
     dataType: 'json'
   });
   $('body').on('click', '#next-link', {page: page}, linkNext);

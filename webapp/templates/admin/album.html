@@ -1,13 +1,13 @@
 {% extends "base.html" %}
-{%- from "macros/_admin.html" import show_alias -%}
-{%- from "macros/_common.html" import show_pv -%}
+{%- from "macros/_admin.html" import show_picture -%}
 {%- from "macros/_common.html" import show_empty -%}
+{%- from "macros/_common.html" import show_pv -%}
 
-{%- block title_part -%}Ссылки {{ author }}{%- endblock title_part -%}
+{%- block title_part -%}Панель альбома {{ album }}{%- endblock title_part -%}
 
 {%- block styles -%}
   {{- super() -}}
-  {%- assets filters='cssmin', output='generic/css/admin/auth-aliases.css',
+  {%- assets filters='cssmin', output='generic/css/admin/album.css',
              'css/base.css',
              'css/menu.css',
              'css/page-content.css',
@@ -20,7 +20,7 @@
              'css/form-control.css',
              'vendor/bootstrap/css/glyphicons.css',
              'css/personal-details.css',
-             'css/aliases.css',
+             'css/admpictures.css',
              'css/entity-pagination.css',
              'css/footer.css' -%}
     <link rel="stylesheet" type="text/css" href="{{ ASSET_URL }}">
@@ -29,15 +29,15 @@
 
 {%- block templates -%}
   {{- super() -}}
-  <script id="aliasest" type="text/template">
-    <% #pagination.aliases %>
+  <script id="picturest" type="text/template">
+    <% #pagination.pictures %>
       <div class="entity-block">
-        {{- show_alias() -}}
+        {{- show_picture(blank=False) -}}
       </div>
-    <% /pagination.aliases %>
-    <% ^pagination.aliases %>
-      {{ show_empty('У пользователя нет алиасов.') }}
-    <% /pagination.aliases %>
+    <% /pagination.pictures %>
+    <% ^pagination.pictures %>
+      {{- show_empty('В альбоме пусто.') -}}
+    <% /pagination.pictures %>
     <% #pv %>
       {{- show_pv() -}}
     <% /pv %>
@@ -46,27 +46,26 @@
 
 {%- block scripts -%}
   {{- super() -}}
-  <script>let ses="{{cu.ses}}",page={{page}},author="{{author}}";</script>
-  {%- assets filters='rjsmin', output='generic/js/admin/auth-aliases.js',
+  <script>let ses="{{cu.ses}}",page={{page}},album="{{album}}";</script>
+  {%- assets filters='rjsmin', output='generic/js/admin/album.js',
              'js/render-menu.js',
              'js/render-footer.js',
              'js/check-auth.js',
              'js/ping.js',
              'js/close-topflashed.js',
-             'js/check-data.js',
-             'js/check-br.js',
              'js/slide-page.js',
              'js/check-pc.js',
-             'js/render-tf.js',
-             'js/check-next.js',
+             'js/check-data.js',
+             'js/check-br.js',
              'js/render-pv.js',
+             'js/render-tf.js',
+             'js/adjust-image.js',
              'js/format-datetime.js',
+             'js/check-next.js',
              'js/hide-button.js',
-             'js/show-error.js',
-             'js/scroll-panel.js',
-             'js/rem-ali.js',
+             'js/rem-pic.js',
              'js/error-403.js',
-             'js/admin/auth-aliases.js' -%}
+             'js/admin/album.js' -%}
     <script src="{{ ASSET_URL }}"></script>
   {%- endassets -%}
 {%- endblock scripts -%}

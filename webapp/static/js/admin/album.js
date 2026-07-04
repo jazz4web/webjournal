@@ -7,14 +7,14 @@ $(function() {
   let tee = ses ? {
     'x-br-ses': ses,
     'x-auth-sestee': window.localStorage.getItem('sestee')
-     } : {};
+  } : {};
   $.ajax({
     method: 'GET',
-    url: '/api/admin-auth-aliases',
+    url: '/api/admin-album',
     headers: tee,
     data: {
       page: page,
-      author: author
+      album: album
     },
     success: function(data) {
       checkData(data);
@@ -23,15 +23,18 @@ $(function() {
         $('#mc').append(html);
         slidePage('#ealert');
       } else {
-        let html = Mustache.render($('#aliasest').html(), data);
+        let html = Mustache.render($('#picturest').html(), data);
         $('#mc').append(html);
+        $('.entity-block').each(checkNext);
+        setTimeout(function() {
+          checkPC(860);
+          $('.picture-body img').each(adjustImage);
+        }, 100);
+        $('.date-field').each(function() { formatDateTime($(this)); });
+        if (data.pv) renderPV(data.pagination.page);
         if ($('.today-field').length) {
           renderTF('.today-field', luxon.DateTime.now());
         }
-        $('.entity-block').each(checkNext);
-        $('.date-field').each(function() { formatDateTime($(this)); });
-        if (data.pv) renderPV(data.pagination.page);
-        checkPC(860);
       }
     },
     error: error403,
@@ -39,10 +42,10 @@ $(function() {
   });
   if (ses) {
     $('body').on('click', '.page-link', linkPage);
-    $('body').on('click', '#next-link', {page: page}, linkNext);
-    $('body').on('click', '#prev-link', {page: page}, linkPrev);
+    $('body').on('click', '#next-link', {page:page}, linkNext);
+    $('body').on('click', '#prev-link', {page:page}, linkPrev);
     $('body').on('click', '.trash-button', hideButton);
-    $('body').on('click', '.remove-button', {page: page}, remAli);
+    $('body').on('click', '.remove-button', {page:page}, remPic);
   }
   checkPC(860);
 });

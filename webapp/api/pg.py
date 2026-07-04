@@ -7,6 +7,93 @@ from validate_email import validate_email
 from ..common.aparsers import (
     iter_pages, parse_pic_filename, parse_title, parse_units, parse_url)
 from ..common.random import get_unique_s
+from ..pictures.attri import status as sta
+
+
+async def sadmin_auth_pictures(
+        request, conn, author, cu, target, page, per_page, last):
+    query = await conn.fetch(
+        '''SELECT p.uploaded, p.filename, p.width, p.height,
+                  p.volume, p.suffix, p.format, a.title,
+                  a.suffix AS album, u.username, u.weight
+             FROM pictures AS p, albums AS a, users AS u
+             WHERE p.album_id = a.id
+               AND a.author_id = u.id
+               AND a.state IN ($1, $2)
+               AND u.id = $3
+               ORDER BY p.uploaded DESC LIMIT $4 OFFSET $5''',
+        sta.pub, sta.priv, author.get('id'), per_page, per_page*(page-1))
+    if query:
+        target['page'] = page
+        target['next'] = page + 1 if page + 1 <= last else None
+        target['prev'] = page - 1 or None
+        target['pages'] = await iter_pages(page, last)
+        target['pictures'] = [
+            {'author': picture.get('username'),
+             'profile': request.url_for(
+                 'people:profile',
+                 username=picture.get('username'))._url,
+             'canrem': picture.get('weight') < cu.get('weight'),
+             'album': request.url_for(
+                 'admin:admalbum',
+                 album=picture.get('album'))._url,
+             'albumtitle': await parse_title(
+                 picture.get('title'), 100),
+             'filename': await parse_pic_filename(
+                 picture.get('filename'), 100),
+             'format': picture.get('format'),
+             'volume': await parse_units(picture.get('volume')),
+             'width': picture.get('width'),
+             'height': picture.get('height'),
+             'uploaded': picture.get('uploaded').isoformat(),
+             'suffix': picture.get('suffix'),
+             'url': request.url_for(
+                 'picture',
+                 suffix=picture.get('suffix'))._url}
+            for picture in query]
+
+
+async def sadmin_album(
+        request, conn, album, cu, target, page, per_page, last):
+    query = await conn.fetch(
+        '''SELECT p.uploaded, p.filename, p.width, p.height,
+                  p.volume, p.suffix, p.format, a.title,
+                  a.suffix AS album, u.username, u.weight
+             FROM pictures AS p, albums AS a, users AS u
+             WHERE p.album_id = a.id
+               AND a.author_id = u.id
+               AND a.state IN ($1, $2)
+               AND a.id = $3
+               ORDER BY p.uploaded DESC LIMIT $4 OFFSET $5''',
+        sta.pub, sta.priv, album.get('id'), per_page, per_page*(page-1))
+    if query:
+        target['page'] = page
+        target['next'] = page + 1 if page + 1 <= last else None
+        target['prev'] = page - 1 or None
+        target['pages'] = await iter_pages(page, last)
+        target['pictures'] = [
+            {'author': picture.get('username'),
+             'profile': request.url_for(
+                 'people:profile',
+                 username=picture.get('username'))._url,
+             'canrem': picture.get('weight') < cu.get('weight'),
+             'album': request.url_for(
+                 'admin:admalbum',
+                 album=picture.get('album'))._url,
+             'albumtitle': await parse_title(
+                 picture.get('title'), 100),
+             'filename': await parse_pic_filename(
+                 picture.get('filename'), 100),
+             'format': picture.get('format'),
+             'volume': await parse_units(picture.get('volume')),
+             'width': picture.get('width'),
+             'height': picture.get('height'),
+             'uploaded': picture.get('uploaded').isoformat(),
+             'suffix': picture.get('suffix'),
+             'url': request.url_for(
+                 'picture',
+                 suffix=picture.get('suffix'))._url}
+            for picture in query]
 
 
 async def get_pic_stat(request, conn, uid, suffix):

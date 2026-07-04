@@ -14,10 +14,12 @@ from webassets.ext.jinja2 import assets
 from .dirs import settings, static, templates
 from .errors import show_error
 
-from .admin.views import admin_aliases, admin_auth_aliases, show_tools
+from .admin.views import (
+    admin_album, admin_aliases, admin_au_pic, admin_auth_aliases,
+    admin_pictures, show_tools)
 from .aliases.views import show_aliases
 from .api.admin import (
-    Admin, Alis, AuthAlis, DGroup)
+    Admin, AdminAlbum, Alis, AuthAlis, AuthPics, DGroup, Pics)
 from .api.aliases import Aliases
 from .api.auth import CreateAcc, Login, Logout, LogoutE, ResetFP
 from .api.main import Captcha, Index
@@ -91,10 +93,15 @@ app = StApp(
             Route('/', show_tools, name='tools'),
             Route('/aliases', admin_aliases, name='admaliases'),
             Route('/aliases/{username}', admin_auth_aliases, name='adauthal'),
-            ]),
+            Route('/pictures', admin_pictures, name='admpictures'),
+            Route('/pictures/a/{album}', admin_album, name='admalbum'),
+            Route('/pictures/au/{username}', admin_au_pic, name='aapic')]),
         Mount('/aliases', name='aliases', routes=[
             Route('/', show_aliases, name='aliases')]),
         Mount('/api', name='api', routes=[
+            Route('/admin-auth-pictures', AuthPics, name='aadmauthpictures'),
+            Route('/admin-album', AdminAlbum, name='aadmalbum'),
+            Route('/admin-pictures', Pics, name='aadmpictures'),
             Route('/search', Search, name='asearch'),
             Route('/picstat', Picstat, name='apicstat'),
             Route('/pictures/{suffix}', Album, name='aalbum'),

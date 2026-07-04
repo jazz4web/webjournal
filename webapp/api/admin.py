@@ -11,11 +11,259 @@ from validate_email import validate_email
 from ..auth.attri import groups, USERNAME_PATTERN
 from ..auth.cu import checkcu
 from ..auth.pg import check_username, create_user
-from ..common.aparsers import parse_page, parse_url
+from ..common.aparsers import (
+    parse_pic_filename, parse_page, parse_title, parse_units, parse_url)
 from ..common.flashed import set_flashed
 from ..common.pg import get_conn
-from .pg import check_last, rem_session, sadmin_auth_aliases
+from ..pictures.attri import status as state
+from .pg import (
+    check_last, rem_session, sadmin_album, sadmin_auth_aliases,
+    sadmin_auth_pictures)
 from .tools import check_permissions, check_g_secure, check_secure
+
+
+class AuthPics(HTTPEndpoint):
+    async def get(self, request):
+        res = {'cu': None}
+        token = request.headers.get('x-auth-sestee')
+        if token is None:
+            raise HTTPException(403)
+        conn = await get_conn(request.app.config)
+        cu = await checkcu(request, conn, token)
+        res['cu'] = cu
+        message = await check_g_secure(request, cu, 250)
+        if message:
+            res['message'] = message
+            await conn.close()
+            return JSONResponse(res)
+        author = await conn.fetchrow(
+            'SELECT id, username, weight FROM users WHERE username = $1',
+            request.query_params.get('author', '1empty'))
+        if author is None:
+            res['message'] = 'Ничего не найдено по запросу.'
+            await conn.close()
+            return JSONResponse(res)
+        page = await parse_page(request)
+        last = await check_last(
+            conn, page,
+            request.app.config.get('PICTURES_PER_PAGE', cast=int, default=5),
+            '''SELECT count(*) FROM albums, pictures, users
+                 WHERE pictures.album_id = albums.id
+                   AND albums.author_id = users.id
+                   AND users.id = $1
+                   AND albums.state IN ($2, $3)''',
+            author.get('id'), state.pub, state.priv)
+        if page > last:
+            res['message'] = f'Всего известно страниц: {last}.'
+            await conn.close()
+            return JSONResponse(res)
+        res['pagination'] = dict()
+        await sadmin_auth_pictures(
+            request, conn, author, cu, res['pagination'], page,
+            request.app.config.get('PICTURES_PER_PAGE', cast=int, default=5),
+            last)
+        if res['pagination'] and \
+                (res['pagination']['next'] or res['pagination']['prev']):
+            res['pv'] = True
+        await conn.close()
+        return JSONResponse(res)
+
+
+class AdminAlbum(HTTPEndpoint):
+    async def get(self, request):
+        res = {'cu': None}
+        token = request.headers.get('x-auth-sestee')
+        if token is None:
+            raise HTTPException(403)
+        conn = await get_conn(request.app.config)
+        cu = await checkcu(request, conn, token)
+        res['cu'] = cu
+        message = await check_g_secure(request, cu, 250)
+        if message:
+            res['message'] = message
+            await conn.close()
+            return JSONResponse(res)
+        album = await conn.fetchrow(
+            '''SELECT id, suffix FROM albums
+                 WHERE state IN ($1, $2)
+                   AND suffix = $3''',
+            state.pub, state.priv, request.query_params.get('album', 'empty'))
+        if album is None:
+            res['message'] = 'Ничего не найдено по запросу.'
+            await conn.close()
+            return JSONResponse(res)
+        page = await parse_page(request)
+        last = await check_last(
+            conn, page,
+            request.app.config.get('PICTURES_PER_PAGE', cast=int, default=5),
+            'SELECT count(*) FROM pictures WHERE album_id = $1',
+            album.get('id'))
+        if page > last:
+            res['message'] = f'Всего известно страниц: {last}.'
+            await conn.close()
+            return JSONResponse(res)
+        res['pagination'] = dict()
+        await sadmin_album(
+            request, conn, album, cu, res['pagination'], page,
+            request.app.config.get('PICTURES_PER_PAGE', cast=int, default=5),
+            last)
+        if res['pagination'] and \
+                (res['pagination']['next'] or res['pagination']['prev']):
+            res['pv'] = True
+        await conn.close()
+        return JSONResponse(res)
+
+
+class Pics(HTTPEndpoint):
+    async def delete(self, request):
+        res = {'done': None}
+        d = await request.form()
+        suffix, page, url = (
+            d.get('suffix', ''),
+            int(d.get('page', '0')),
+            d.get('endpoint', ''))
+        if page >= 2:
+            url += f'?page={page}'
+        ses, brkey, message = await check_secure(request)
+        if message:
+            res['message'] = message
+            return JSONResponse(res)
+        conn = await get_conn(request.app.config)
+        cu = await checkcu(request, conn, d.get('auth'))
+        if message := await check_permissions(cu, 250):
+            res['message'] = message
+            await conn.close()
+            return JSONResponse(res)
+        if brkey != cu.get('brkey') or ses != cu.get('ses'):
+            res['message'] = await rem_session(conn, cu)
+            await conn.close()
+            return JSONResponse(res)
+        pic = await conn.fetchrow(
+            '''SELECT p.suffix, p.volume AS pvol, a.volume AS avol,
+                      a.id AS aid, u.weight
+                 FROM pictures AS p, albums AS a, users AS u
+                 WHERE p.album_id = a.id
+                   AND a.author_id = u.id
+                   AND p.suffix = $1
+                   AND a.state IN ($2, $3)''',
+            suffix, state.pub, state.priv)
+        if pic is None:
+            res['message'] = 'Запрос содержит неверные параметры.'
+            await conn.close()
+            return JSONResponse(res)
+        if cu.get('weight') <= pic.get('weight'):
+            res['message'] = 'У вас недостаточно прав.'
+            await conn.close()
+            return JSONResponse(res)
+        await conn.execute(
+            'UPDATE albums SET volume = $1 WHERE id = $2',
+            pic.get('avol') - pic.get('pvol'), pic.get('aid'))
+        await conn.execute(
+            'DELETE FROM pictures WHERE suffix = $1', pic.get('suffix'))
+        await conn.close()
+        await set_flashed(request, 'Изображение удалено.')
+        res['done'] = True
+        res['url'] = url
+        return JSONResponse(res)
+
+    async def post(self, request):
+        res = {'picture': None}
+        d = await request.form()
+        link = d.get('link') or 'empty'
+        if '/' in link:
+            link = link.split('/')[-1]
+        if len(link) != 14:
+            res['message'] = 'Запрос содержит неверные параметры.'
+            return JSONResponse(res)
+        ses, brkey, message = await check_secure(request)
+        if message:
+            res['message'] = message
+            return JSONResponse(res)
+        conn = await get_conn(request.app.config)
+        cu = await checkcu(request, conn, d.get('auth'))
+        if message := await check_permissions(cu, 250):
+            res['message'] = message
+            await conn.close()
+            return JSONResponse(res)
+        if brkey != cu.get('brkey') or ses != cu.get('ses'):
+            res['message'] = await rem_session(conn, cu)
+            await conn.close()
+            return JSONResponse(res)
+        target = await conn.fetchrow(
+            '''SELECT p.uploaded, p.filename, p.width, p.height,
+                      p.volume, p.suffix, p.format, a.title,
+                      a.suffix AS album, u.username, u.weight
+                 FROM pictures AS p, albums AS a, users AS u
+                 WHERE p.album_id = a.id
+                   AND a.author_id = u.id
+                   AND p.suffix = $1
+                   AND a.state IN ($2, $3)''',
+            link, state.pub, state.priv)
+        await conn.close()
+        if target is None:
+            res['message'] = 'Ничего не найдено по запросу.'
+            return JSONResponse(res)
+        res['picture'] = {'author': target.get('username'),
+                          'profile': request.url_for(
+                              'people:profile',
+                              username=target.get('username'))._url,
+                          'canrem': target.get('weight') < cu.get('weight'),
+                          'album': request.url_for(
+                              'admin:admalbum',
+                              album=target.get('album'))._url,
+                          'albumtitle': await parse_title(
+                              target.get('title'), 100),
+                          'filename': await parse_pic_filename(
+                              target.get('filename'), 100),
+                          'format': target.get('format'),
+                          'volume': await parse_units(target.get('volume')),
+                          'width': target.get('width'),
+                          'height': target.get('height'),
+                          'uploaded': target.get('uploaded').isoformat(),
+                          'suffix': target.get('suffix'),
+                          'url': request.url_for(
+                              'picture',
+                              suffix=target.get('suffix'))._url}
+        return JSONResponse(res)
+
+    async def put(self, request):
+        res = {'redirect': None}
+        d = await request.form()
+        ses, brkey, message = await check_secure(request)
+        if message:
+            res['message'] = message
+            return JSONResponse(res)
+        conn = await get_conn(request.app.config)
+        cu = await checkcu(request, conn, d.get('auth'))
+        if message := await check_permissions(cu, 250):
+            res['message'] = message
+            await conn.close()
+            return JSONResponse(res)
+        if brkey != cu.get('brkey') or ses != cu.get('ses'):
+            res['message'] = await rem_session(conn, cu)
+            await conn.close()
+            return JSONResponse(res)
+        author = await conn.fetchrow(
+            'SELECT id, weight, username FROM users WHERE username = $1',
+            d.get('username'))
+        if author is None:
+            res['message'] = 'Ничего не найдено по запросу.'
+            await conn.close()
+            return JSONResponse(res)
+        howmany = await conn.fetchval(
+            '''SELECT count(*) FROM albums, pictures, users
+                 WHERE pictures.album_id = albums.id
+                   AND albums.author_id = users.id
+                   AND users.id = $1
+                   AND albums.state IN ($2, $3)''',
+            author.get('id'), state.pub, state.priv)
+        await conn.close()
+        if howmany:
+            res['redirect'] = request.url_for(
+                'admin:aapic', username=author.get('username'))._url
+        else:
+            res['message'] = f'У {author.get("username")} нет файлов.'
+        return JSONResponse(res)
 
 
 class AuthAlis(HTTPEndpoint):
