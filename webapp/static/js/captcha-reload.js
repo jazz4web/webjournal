@@ -3,6 +3,9 @@ function captchaReload(event) {
   $.ajax({
     method: 'GET',
     url: '/api/captcha',
+    headers: {
+      'x-br-s': 'captcha'
+    },
     success: function(data) {
       $(event.data.field).attr({"style": 'background:url(' + data.url + ')'});
       $(event.data.suffix).val(data.captcha);

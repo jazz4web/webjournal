@@ -44,6 +44,10 @@ $(function() {
     dataType: 'json'
   });
   if (window.localStorage.getItem('sestee')) {
+    $('body').on('click', '#pm-message', function() {
+      $(this).blur();
+      window.location.assign($(this).data().url);
+    });
     $('body').on('click', '#blocking-button', function() {
       $(this).blur();
       $.ajax({

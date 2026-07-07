@@ -17,6 +17,7 @@ from .errors import show_error
 from .admin.views import (
     admin_album, admin_aliases, admin_au_pic, admin_auth_aliases,
     admin_pictures, show_tools)
+from .announces.views import show_announce, show_announces
 from .aliases.views import show_aliases
 from .api.admin import (
     Admin, AdminAlbum, Alis, AuthAlis, AuthPics, DGroup, Pics)
@@ -26,12 +27,16 @@ from .api.main import Captcha, Index
 from .api.people import ChangeAva, ChangeM, ChangePasswd, People, Profile
 from .api.pictures import Album, Albums, Albumstat, Picstat, Search
 from .auth.views import change_mail, reset_fp
+from .blogs.views import show_blog, show_blogs, show_lblog
 from .captcha.views import show_captcha
+from .comments.views import show_comments
+from .drafts.views import show_draft, show_drafts, show_dlabeled
 from .main.views import (
         jump, show_avatar, show_favicon, show_humans,
         show_index, show_picture)
 from .people.views import show_people, show_profile
 from .pictures.views import show_album, show_albums
+from .pm.views import show_conversation, show_conversations
 
 try:
     from .tuning import SECRET_KEY, SDESC, MAIL_PASSWORD
@@ -96,6 +101,9 @@ app = StApp(
             Route('/pictures', admin_pictures, name='admpictures'),
             Route('/pictures/a/{album}', admin_album, name='admalbum'),
             Route('/pictures/au/{username}', admin_au_pic, name='aapic')]),
+        Mount('/announces', name='announces', routes=[
+            Route('/', show_announces, name='announces'),
+            Route('/{suffix}', show_announce, name='announce')]),
         Mount('/aliases', name='aliases', routes=[
             Route('/', show_aliases, name='aliases')]),
         Mount('/api', name='api', routes=[
@@ -128,12 +136,25 @@ app = StApp(
             Route('/mail/{token}', change_mail, name='mail'),
             Route('/reg/{token}', reset_fp, name='reg'),
             Route('/rfp/{token}', reset_fp, name='rfp')]),
+        Mount('/blogs', name='blogs', routes=[
+            Route('/', show_blogs, name='blogs'),
+            Route('/{username}', show_blog, name='blog'),
+            Route('/{username}/t/{label}', show_lblog, name='lblog')]),
+        Mount('/comments', name='comments', routes=[
+            Route('/', show_comments, name='comments')]),
+        Mount('/drafts', name='drafts', routes=[
+            Route('/', show_drafts, name='drafts'),
+            Route('/{slug}', show_draft, name='draft'),
+            Route('/t/{label}', show_dlabeled, name='draft-labeled')]),
         Mount('/people', name='people', routes=[
             Route('/', show_people, name='people'),
             Route('/{username}', show_profile, name='profile'),]),
         Mount('/pictures', name='pictures', routes=[
             Route('/', show_albums, name='albums'),
             Route('/{suffix}', show_album, name='album')]),
+        Mount('/pm', name='pm', routes=[
+            Route('/', show_conversations, name='conversations'),
+            Route('/{username}', show_conversation, name='conversation')]),
         Mount('/static', app=StaticFiles(directory=static), name='static')],
     middleware=middleware,
     exception_handlers=errs)

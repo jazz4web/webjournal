@@ -75,7 +75,8 @@
               </a>
               <div class="items-box">
                 <div class="menu-list-item">
-                  <a href="" class="item-link">
+                  <a href="{{ url_for('blogs:blogs') }}"
+                     class="item-link">
                     Авторы
                   </a>
                 </div>
@@ -93,7 +94,9 @@
                   </a>
                 </div>
                 <div class="menu-list-item">
-                  <a href="" class="item-link">
+                  <a href="{{ url_for(
+                    'blogs:blog', username=cu['username']) }}"
+                     class="item-link">
                     Своё
                   </a>
                 </div>
@@ -111,7 +114,8 @@
                   </a>
                 </div>
                 <div class="menu-list-item">
-                  <a href="" class="item-link">
+                  <a href="{{ url_for('comments:comments') }}"
+                     class="item-link">
                     Комментарии
                   </a>
                 </div>
@@ -130,7 +134,7 @@
                 </div>
                 {%- if cu['weight'] >= 100 -%}
                 <div class="menu-list-item">
-                  <a href="" class="item-link">
+                  <a href="{{ url_for('drafts:drafts') }}" class="item-link">
                     Черновики
                   </a>
                 </div>
@@ -146,7 +150,8 @@
                 {%- endif -%}
                 {%- if cu['weight'] >= 100 -%}
                   <div class="menu-list-item">
-                    <a href="" class="item-link">
+                    <a href="{{ url_for('announces:announces') }}"
+                       class="item-link">
                       Объявления
                     </a>
                   </div>
@@ -221,7 +226,8 @@
                       </a>
                     </div>
                     <div class="menu-list-item">
-                      <a href="" class="item-link">
+                      <a href="{{ url_for('pm:conversations') }}"
+                         class="item-link">
                         Приваты
                       </a>
                     </div>

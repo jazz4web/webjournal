@@ -2,6 +2,9 @@ function getCaptcha(eid) {
   $.ajax({
     method: 'GET',
     url: '/api/captcha',
+    headers: {
+      'x-br-s': 'captcha'
+    },
     success: function(data) {
       let dt = luxon.DateTime.now();
       let form = Mustache.render($(eid).html(), data);

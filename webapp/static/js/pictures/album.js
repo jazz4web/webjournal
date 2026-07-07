@@ -292,4 +292,5 @@ $(function() {
     });
     $('body').on('click', '.show-rename-form', showRenameForm);
   }
+  checkPC(860);
 });

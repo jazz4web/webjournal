@@ -1,4 +1,5 @@
 from starlette.endpoints import HTTPEndpoint
+from starlette.exceptions import HTTPException
 from starlette.responses import JSONResponse
 
 from ..auth.cu import checkcu
@@ -21,6 +22,8 @@ class Index(HTTPEndpoint):
 
 class Captcha(HTTPEndpoint):
     async def get(self, request):
+        if request.headers.get('x-br-s') is None:
+            raise HTTPException(403)
         conn = await get_conn(request.app.config)
         captcha = await conn.fetchrow(
             'SELECT val, suffix FROM captchas ORDER BY random() LIMIT 1')
