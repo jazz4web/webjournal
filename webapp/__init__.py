@@ -26,6 +26,9 @@ from .api.auth import CreateAcc, Login, Logout, LogoutE, ResetFP
 from .api.main import Captcha, Index
 from .api.people import ChangeAva, ChangeM, ChangePasswd, People, Profile
 from .api.pictures import Album, Albums, Albumstat, Picstat, Search
+from .arts.views import (
+    show_art, show_arts, show_cart, show_carts,
+    show_followed, show_larts, show_lcarts, show_lfollowed)
 from .auth.views import change_mail, reset_fp
 from .blogs.views import show_blog, show_blogs, show_lblog
 from .captcha.views import show_captcha
@@ -33,7 +36,7 @@ from .comments.views import show_comments
 from .drafts.views import show_draft, show_drafts, show_dlabeled
 from .main.views import (
         jump, show_avatar, show_favicon, show_humans,
-        show_index, show_picture)
+        show_index, show_picture, show_robots, show_sitemap)
 from .people.views import show_people, show_profile
 from .pictures.views import show_album, show_albums
 from .pm.views import show_conversation, show_conversations
@@ -90,6 +93,8 @@ app = StApp(
         Route('/', show_index, name='index'),
         Route('/favicon.ico', show_favicon, name='favicon'),
         Route('/humans.txt', show_humans, name='humans.txt'),
+        Route('/robots.txt', show_robots, name='robots.txt'),
+        Route('/sitemap.xml', show_sitemap, name='sitemap'),
         Route('/{suffix}', jump, name='jump'),
         Route('/ava/{username}/{size:int}', show_avatar, name='ava'),
         Route('/captcha/{suffix}', show_captcha, name='captcha'),
@@ -132,6 +137,15 @@ app = StApp(
             Route('/login', Login, name='alogin'),
             Route('/index', Index, name='aindex'),
             Route('/captcha', Captcha, name='acaptcha')]),
+        Mount('/arts', name='arts', routes=[
+            Route('/', show_arts, name='arts'),
+            Route('/a/{slug}', show_art, name='art'),
+            Route('/c/', show_carts, name='carts'),
+            Route('/c/{slug}', show_cart, name='cart'),
+            Route('/c/t/{label}', show_lcarts, name='lcarts'),
+            Route('/l/', show_followed, name='lenta'),
+            Route('/l/t/{label}', show_lfollowed, name='llenta'),
+            Route('/t/{label}', show_larts, name='labeled-arts')]),
         Mount('/auth', name='auth', routes=[
             Route('/mail/{token}', change_mail, name='mail'),
             Route('/reg/{token}', reset_fp, name='reg'),

@@ -20,6 +20,24 @@ from .pg import check_state
 from .tools import resize
 
 
+async def show_robots(request):
+    conn = await get_conn(request.app.config)
+    text = await conn.fetchval('SELECT robots FROM settings') or \
+            request.app.jinja.get_template(
+                'main/robots.txt').render(request=request)
+    await conn.close()
+    return PlainTextResponse(text)
+
+
+async def show_sitemap(request):
+    response = request.app.jinja.TemplateResponse(
+        request, 'main/sitemap.xml',
+        {'arts': None})
+    response.media_type = 'applictation/xml'
+    response.headers['content-type'] = 'application/xml'
+    return response
+
+
 async def show_picture(request):
     conn = await get_conn(request.app.config)
     cu = await getcu(request, conn)

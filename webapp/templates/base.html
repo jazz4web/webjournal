@@ -81,7 +81,7 @@
                   </a>
                 </div>
                 <div class="menu-list-item">
-                  <a href="" class="item-link">
+                  <a href="{{ url_for('arts:arts') }}" class="item-link">
                     Паблик
                   </a>
                 </div>
@@ -101,7 +101,7 @@
                   </a>
                 </div>
                 <div class="menu-list-item">
-                  <a href="" class="item-link">
+                  <a href="{{ url_for('arts:lenta') }}" class="item-link">
                     В ленте
                   </a>
                 </div>
@@ -109,7 +109,7 @@
                 {%- if cu and cu['weight'] >= 250 -%}
                 <div role="separator" class="divider"></div>
                 <div class="menu-list-item">
-                  <a href="" class="item-link">
+                  <a href="{{ url_for('arts:carts') }}" class="item-link">
                     Закрытое
                   </a>
                 </div>

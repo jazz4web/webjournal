@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{%- block title_part -%}
+  Топ-Темы с меткой "{{ label }}"
+{%- endblock title_part -%}
+
+{%- block styles -%}
+  {{- super() -}}
+  {%- assets filters='cssmin', output='generic/css/arts/labeled-arts.css',
+             'css/base.css',
+             'css/menu.css',
+             'css/footer.css' -%}
+    <link rel="stylesheet" type="text/css" href="{{ ASSET_URL }}">
+  {%- endassets -%}
+{%- endblock styles -%}
+
+{%- block scripts -%}
+  {{- super() -}}
+  {%- assets filters='rjsmin', output='generic/js/arts/labeled-arts.js',
+             'js/render-menu.js',
+             'js/render-footer.js',
+             'js/temporary.js' -%}
+    <script src="{{ ASSET_URL }}"></script>
+  {%- endassets -%}
+{%- endblock scripts -%}
