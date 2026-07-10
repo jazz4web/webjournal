@@ -98,3 +98,37 @@ CREATE TABLE pictures (
     suffix   varchar(14)   UNIQUE,
     album_id integer       REFERENCES albums(id)
 );
+
+CREATE TABLE articles (
+    id        serial PRIMARY KEY,
+    title     varchar(100),
+    slug      varchar(128)              UNIQUE,
+    suffix    varchar(16)               UNIQUE,
+    html      text                      DEFAULT NULL,
+    summary   varchar(512)              DEFAULT NULL,
+    meta      varchar(180)              DEFAULT NULL,
+    published timestamp with time zone  DEFAULT NULL,
+    edited    timestamp with time zone,
+    state     varchar(10),
+    commented boolean                   DEFAULT TRUE,
+    viewed    integer                   DEFAULT 0,
+    author_id integer REFERENCES users(id)
+);
+
+CREATE TABLE paragraphs (
+    num        integer DEFAULT 0,
+    mdtext     text,
+    article_id integer REFERENCES articles(id),
+    CONSTRAINT article_num_uni UNIQUE (article_id, num)
+);
+
+CREATE TABLE labels (
+    id    serial PRIMARY KEY,
+    label varchar(32) UNIQUE
+);
+
+CREATE TABLE als (
+    article_id integer REFERENCES articles(id),
+    label_id   integer REFERENCES labels(id),
+    CONSTRAINT art_label_uni UNIQUE (article_id, label_id)
+);

@@ -23,6 +23,7 @@ from .api.admin import (
     Admin, AdminAlbum, Alis, AuthAlis, AuthPics, DGroup, Pics)
 from .api.aliases import Aliases
 from .api.auth import CreateAcc, Login, Logout, LogoutE, ResetFP
+from .api.drafts import Drafts
 from .api.main import Captcha, Index
 from .api.people import ChangeAva, ChangeM, ChangePasswd, People, Profile
 from .api.pictures import Album, Albums, Albumstat, Picstat, Search
@@ -112,6 +113,7 @@ app = StApp(
         Mount('/aliases', name='aliases', routes=[
             Route('/', show_aliases, name='aliases')]),
         Mount('/api', name='api', routes=[
+            Route('/drafts', Drafts, name='adrafts'),
             Route('/admin-auth-pictures', AuthPics, name='aadmauthpictures'),
             Route('/admin-album', AdminAlbum, name='aadmalbum'),
             Route('/admin-pictures', Pics, name='aadmpictures'),

@@ -7,7 +7,23 @@ from validate_email import validate_email
 from ..common.aparsers import (
     iter_pages, parse_pic_filename, parse_title, parse_units, parse_url)
 from ..common.random import get_unique_s
+from ..drafts.attri import status
 from ..pictures.attri import status as sta
+from .parse import parse_arts_query
+
+
+async def select_drafts(request, conn, uid, target, page, per_page, last):
+    query = await conn.fetch(
+        '''SELECT a.id, a.title, a.slug, a.suffix, a.summary, a.published,
+                  a.edited, a.state, a.commented, a.viewed, users.username
+             FROM articles AS a, users
+             WHERE a.author_id = users.id
+               AND a.author_id = $1
+               AND a.state IN ($2, $3)
+             ORDER BY a.edited DESC LIMIT $4 OFFSET $5''',
+        uid, status.draft, status.cens, per_page, per_page*(page-1))
+    if query:
+        await parse_arts_query(request, conn, query, target, page, last)
 
 
 async def sadmin_auth_pictures(

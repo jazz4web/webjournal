@@ -1,4 +1,6 @@
 {% extends "base.html" %}
+{%- from "macros/_common.html" import show_empty -%}
+{%- from "macros/_common.html" import show_pv -%}
 
 {%- block title_part -%}Ваши черновики{%- endblock title_part -%}
 
@@ -7,17 +9,91 @@
   {%- assets filters='cssmin', output='generic/css/drafts/drafts.css',
              'css/base.css',
              'css/menu.css',
+             'css/page-content.css',
+             'css/flashed-error.css',
+             'css/flashed-alert.css',
+             'css/empty-message.css',
+             'css/today-field.css',
+             'css/content-block.css',
+             'css/entity-block.css',
+             'css/next-block.css',
+             'css/form-help.css',
+             'css/form-control.css',
+             'css/inline-form.css',
+             'css/drafts.css',
              'css/footer.css' -%}
     <link rel="stylesheet" type="text/css" href="{{ ASSET_URL }}">
   {%- endassets -%}
 {%- endblock styles -%}
 
+{%- block templates -%}
+  {{- super() -}}
+  {%- if cu %}
+    <script id="draftst" type="text-template">
+      <% #canwrite %>
+        <% #extra %>
+          <div class="content-block entity-block">
+            <h2>Новый топик для блога</h2>
+            <div class="body-block">
+              <div class="today-field"></div>
+              <div class="form-help">
+                <p>
+                  Здесь можно создать новый топик в блог, для этого достаточно
+                  заполнить форму ниже и нажать кнопку "Создать". Имейте ввиду,
+                  что заголовок обязателен и не может быть длинее, чем 100
+                  символов. Созданный топик можно будет наполнить содержимым
+                  и опубликовать.
+                </p>
+              </div>
+              <div class="form-form inline-form">
+                <div class="input-block input-field">
+                  <input id="title"
+                         class="form-control"
+                         type="text"
+                         placeholder="введите заголовок топика">
+                </div>
+                <div class="button-block">
+                  <button id="title-submit"
+                          class="btn btn-primary"
+                          type="button">Создать</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        <% /extra %>
+      <% /canwrite %>
+      <% ^canwrite %>
+        {{ show_empty(
+          'Разрешение вести свой блог можно получить у администратора.') }}
+      <% /canwrite %>
+      <% ^pagination.articles %>
+        <div class="flashed-alert next-block">
+          На текущий момент у вас нет неопубликованных черновиков.
+        </div>
+      <% /pagination.articles %>
+      <% #pv %>
+        {{- show_pv() -}}
+      <% /pv %>
+    </script>
+  {%- endif -%}
+{%- endblock templates -%}
+
 {%- block scripts -%}
   {{- super() -}}
+  <script>let ses="{{cu.ses}}",page={{page}};</script>
   {%- assets filters='rjsmin', output='generic/js/drafts/drafts.js',
              'js/render-menu.js',
              'js/render-footer.js',
-             'js/temporary.js' -%}
+             'js/check-auth.js',
+             'js/ping.js',
+             'js/close-topflashed.js',
+             'js/show-drafts.js',
+             'js/check-data.js',
+             'js/slide-page.js',
+             'js/check-pc.js',
+             'js/check-br.js',
+             'js/render-tf.js',
+             'js/drafts/drafts.js' -%}
     <script src="{{ ASSET_URL }}"></script>
   {%- endassets -%}
 {%- endblock scripts -%}
