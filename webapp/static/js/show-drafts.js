@@ -22,8 +22,13 @@ function showDrafts(url, page, ses) {
         if ($('.today-field').length) {
           renderTF('.today-field', luxon.DateTime.now());
         }
+        $('.date-field').each(function() { formatDateTime($(this)); });
+        $('.entity-block').each(checkNext);
+        if (data.pv) renderPV(data.pagination.page);
+        checkPC(860);
       }
     },
+    error: error403,
     dataType: 'json'
   });
 }

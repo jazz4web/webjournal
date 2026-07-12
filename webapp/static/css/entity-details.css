@@ -1,0 +1,38 @@
+.entity-details {
+  display: flex;
+  column-gap: 4px;
+  margin: 4px auto;
+  width: max-content;
+}
+
+.labeled {
+  border-radius: 4px;
+  padding: 3px 8px;
+  font-size: 0.8em;
+  font-style: italic;
+  width: max-content;
+}
+
+.value {
+  margin-left: 6px;
+}
+
+.labeled-info {
+  background-color: #5bc0de;
+  color: white;
+}
+
+.labeled-success {
+  background-color: #5db85d;
+  color: white;
+}
+
+.labeled-danger {
+  background-color: #d9534f;
+  color: white;
+}
+
+.labeled-warning {
+  background-color: #f0ad4e;
+  color: white;
+}

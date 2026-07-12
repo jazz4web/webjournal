@@ -1,0 +1,21 @@
+.entity-labels-block {
+  display: flex;
+  column-gap: 6px;
+  margin: 6px 0 0;
+  text-align: justify;
+  font-style: italic;
+  text-shadow: 0 0 3px lightgray;
+}
+
+.labels-label {
+  width: min-content;
+}
+
+.label-link {
+  color: steelblue;
+  text-decoration: none;
+}
+
+.label-link:hover {
+  text-decoration: underline;
+}

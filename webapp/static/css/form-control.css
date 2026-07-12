@@ -190,14 +190,14 @@ textarea {
 }
 
 .form-control:focus {
-  border: thin solid lightblue;
+  border: thin solid deepskyblue;
   outline: 0;
-  box-shadow: 0 0 4px skyblue;
+  box-shadow: 0 0 6px dodgerblue;
 }
 
 .has-error .form-control {
   border: thin solid salmon;
-  box-shadow: 0 0 4px crimson;
+  box-shadow: 0 0 6px crimson;
 }
 
 .custom-checkbox {

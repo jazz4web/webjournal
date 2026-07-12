@@ -1,0 +1,17 @@
+.entity-summary {
+  text-align: justify;
+}
+
+.entity-summary p {
+  margin: 0;
+  margin: 0;
+  line-height: 1.28;
+}
+
+.draft-empty {
+  margin: 4px 0 0 0;
+  text-align: center;
+  font-style: italic;
+  text-shadow: 0 0 2px tan;
+  color: firebrick;
+}

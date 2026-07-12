@@ -4,10 +4,11 @@ from starlette.responses import JSONResponse
 
 from ..auth.cu import checkcu
 from ..common.aparsers import parse_page
+from ..common.flashed import set_flashed
 from ..common.pg import get_conn
 from ..drafts.attri import status
-from .pg import check_last, select_drafts
-from .tools import check_g_secure
+from .pg import check_last, create_d, rem_session, select_drafts
+from .tools import check_g_secure, check_permissions, check_secure
 
 
 class Drafts(HTTPEndpoint):
@@ -46,4 +47,31 @@ class Drafts(HTTPEndpoint):
                 (res['pagination'] and res['pagination']['page'] == 1)
         res['canwrite'] = cu.get('weight') >= 100
         await conn.close()
+        return JSONResponse(res)
+
+    async def post(self, request):
+        res = {'done': None}
+        d = await request.form()
+        title = d.get('title', '')
+        if not title or len(title.strip()) > 100:
+            res['message'] = 'Запрос содержит неверные параметры, отменено.'
+            return JSONResponse(res)
+        ses, brkey, message = await check_secure(request)
+        if message:
+            res['message'] = message
+            return JSONResponse(res)
+        conn = await get_conn(request.app.config)
+        cu = await checkcu(request, conn, d.get('auth'))
+        if message := await check_permissions(cu, 100):
+            res['message'] = message
+            await conn.close()
+            return JSONResponse(res)
+        if brkey != cu.get('brkey') or ses != cu.get('ses'):
+            res['message'] = await rem_session(conn, cu)
+            await conn.close()
+            return JSONResponse(res)
+        slug = await create_d(conn, title.strip(), cu.get('id'))
+        await conn.close()
+        res['draft'] = request.url_for('drafts:draft', slug=slug)._url
+        await set_flashed(request, 'Черновик создан, можно спокойно работать.')
         return JSONResponse(res)
