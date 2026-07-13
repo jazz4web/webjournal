@@ -7,8 +7,37 @@ from ..common.aparsers import parse_page
 from ..common.flashed import set_flashed
 from ..common.pg import get_conn
 from ..drafts.attri import status
-from .pg import check_last, create_d, rem_session, select_drafts
+from .pg import check_draft, check_last, create_d, rem_session, select_drafts
 from .tools import check_g_secure, check_permissions, check_secure
+
+
+class Draft(HTTPEndpoint):
+    async def get(self, request):
+        res = {'draft': None}
+        token = request.headers.get('x-auth-sestee')
+        if token is None:
+            raise HTTPException(403)
+        conn = await get_conn(request.app.config)
+        cu = await checkcu(request, conn, token)
+        res['cu'] = cu
+        message = await check_g_secure(request, cu, 0)
+        if message:
+            res['message'] = message
+            await conn.close()
+            return JSONResponse(res)
+        slug = request.query_params.get('slug', '')
+        target = dict()
+        await check_draft(request, conn, slug, cu.get('id'), target)
+        if not target:
+            res['message'] = 'Ничего не найдено по запросу.'
+            await conn.close()
+            return JSONResponse(res)
+        res['length'] = await conn.fetchval(
+            'SELECT count(*) FROM paragraphs WHERE article_id = $1',
+            target.get('id'))
+        res['draft'] = target
+        await conn.close()
+        return JSONResponse(res)
 
 
 class Drafts(HTTPEndpoint):

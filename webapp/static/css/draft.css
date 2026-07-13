@@ -1,0 +1,19 @@
+#forms-block {
+  margin: 0 0 6px 0;
+}
+
+#paragraph-editor {
+  margin: 6px;
+}
+
+#html-text-edit, #labels-edit, #metadesc-edit,
+#summary-edit, #paragraph-text-edit {
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+}
+
+#editor-opts {
+  padding: 0;
+  margin: 0 0 4px 0;
+}

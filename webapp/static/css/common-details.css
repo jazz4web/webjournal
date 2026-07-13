@@ -1,0 +1,25 @@
+.common-details {
+  margin: 4px 0 0 0;
+  font-style: italic;
+  text-align: center;
+  text-shadow: 0 0 3px lightgray;
+}
+
+.entity-blog-link {
+  margin: 0;
+}
+
+.entity-blog-link a {
+  color: royalblue;
+  text-decoration: none;
+}
+
+.entity-blog-link a:hover {
+  text-decoration: underline;
+  text-shadow: 0 0 3px skyblue;
+}
+
+.entity-copy-link {
+  width: 40%;
+  margin: 0 auto;
+}
