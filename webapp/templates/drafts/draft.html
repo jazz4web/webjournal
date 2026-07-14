@@ -10,6 +10,7 @@
              'css/flashed-error.css',
              'css/flashed-alert.css',
              'css/content-block.css',
+             'css/entity-block.css',
              'css/topic-head.css',
              'css/entity-attributes.css',
              'css/avatar.css',
@@ -21,8 +22,10 @@
              'vendor/bootstrap/css/glyphicons.css',
              'css/draft.css',
              'css/form-control.css',
+             'css/form-help.css',
+             'css/inline-form.css',
+             'css/length-marker.css',
              'css/entity-labels.css',
-             'css/options-panel.css',
              'css/next-block.css',
              'css/footer.css' -%}
     <link rel="stylesheet" type="text/css" href="{{ ASSET_URL }}">
@@ -142,7 +145,7 @@
             </div>
           <% /cens %>
         </div>
-        <div id="options-block" class="options-panel">
+        <div id="options-block" class="tools-panel">
           <button id="move-screen-up"
                   type="button"
                   class="btn-default btn-sm"
@@ -338,6 +341,12 @@
              'js/check-selector.js',
              'js/show-copy-form.js',
              'js/copy-this.js',
+             'js/move-screen-up.js',
+             'js/scroll-panel.js',
+             'js/change-form.js',
+             'js/check-br.js',
+             'js/show-error.js',
+             'js/fix-comma.js',
              'js/drafts/draft.js' -%}
     <script src="{{ ASSET_URL }}"></script>
   {%- endassets -%}

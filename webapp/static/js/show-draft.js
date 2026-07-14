@@ -26,6 +26,10 @@ function showDraft(slug) {
         $('#mc').after(ed);
         $('.date-field').each(function() { formatDateTime($(this)); });
         $('#copy-button').on('click', {cls:'#link-copy-form'}, copyThis);
+        let labels = $('#labels-edit').val().trim();
+        if (labels.slice(-1) === ',') labels = labels.slice(0, -1);
+        $('#labels-edit').val(labels);
+        $('.labels').each(fixComma);
         checkSelector('#select-status option', data.draft.state);
         checkPC(860);
       }
