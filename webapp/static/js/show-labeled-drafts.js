@@ -1,4 +1,4 @@
-function showDrafts(url, page, ses) {
+function showLabeledDrafts(url, page, label, ses) {
   let tee = ses ? {
     'x-br-ses': ses,
     'x-auth-sestee': window.localStorage.getItem('sestee')
@@ -8,7 +8,8 @@ function showDrafts(url, page, ses) {
     url: url,
     headers: tee,
     data: {
-      page: page
+      page: page,
+      label: label
     },
     success: function(data) {
       checkData(data);

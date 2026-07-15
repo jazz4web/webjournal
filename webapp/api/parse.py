@@ -61,4 +61,5 @@ async def parse_arts_query(request, conn, query, target, page, last):
              'likes': 0,
              'dislikes': 0,
              'commentaries': 0,
-             'labels': None} for record in query]
+             'labels': [label.get('label') for label in await conn.fetch(
+                 LABELS, record.get('id'))]} for record in query]
