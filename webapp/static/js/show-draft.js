@@ -30,6 +30,11 @@ function showDraft(slug) {
         if (labels.slice(-1) === ',') labels = labels.slice(0, -1);
         $('#labels-edit').val(labels);
         $('.labels').each(fixComma);
+        if (!data.draft.meta) {
+          $('#d-length-value').text(180);
+        } else {
+          $('#d-length-value').text(180 - data.draft.meta.length);
+        }
         checkSelector('#select-status option', data.draft.state);
         checkPC(860);
       }

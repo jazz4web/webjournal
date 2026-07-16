@@ -6,6 +6,16 @@ $(function() {
   $('body').on('click', '.closeable', closeTopFlashed);
   showDraft(slug);
   if (ses) {
+    $('body').on(
+      'keyup blur', '#metadesc-edit',
+      {len:180,marker:'#d-length-value',block:'#d-length-marker'},
+      trackMarker);
+    $('body').on('click', '#metadesc-submit', {slug:slug}, function(event) {
+      $(this).blur();
+      if (!$('#metadesc-edit').parents('.form-group').hasClass('has-error')) {
+        changeDraft('meta', $('#metadesc-edit').val(), event.data.slug);
+      }
+    });
     $('body').on('click', '#labels-submit', {slug:slug}, function(event) {
       $(this).blur();
       let e = $('#labels-edit').parents('.form-group-a');

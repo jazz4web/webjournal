@@ -10,8 +10,8 @@ from ..common.flashed import set_flashed
 from ..common.pg import get_conn
 from ..drafts.attri import status
 from .pg import (
-    check_draft, check_last, create_d, rem_session,
-    select_drafts, select_labeled_drafts)
+    change_draft, check_draft, check_last, create_d,
+    rem_session, select_drafts, select_labeled_drafts)
 from .tools import check_g_secure, check_permissions, check_secure
 
 
@@ -148,6 +148,48 @@ class Draft(HTTPEndpoint):
         res['cens'] = target['state'] == status.cens
         res['keeper'] = cu.get('weight') >= 200
         res['draft'] = target
+        await conn.close()
+        return JSONResponse(res)
+
+    async def put(self, request):
+        res = {'done': None}
+        d = await request.form()
+        ses, brkey, message = await check_secure(request)
+        if message:
+            res['message'] = message
+            return JSONResponse(res)
+        conn = await get_conn(request.app.config)
+        cu = await checkcu(request, conn, d.get('auth'))
+        if message := await check_permissions(cu, 100):
+            res['message'] = message
+            await conn.close()
+            return JSONResponse(res)
+        if brkey != cu.get('brkey') or ses != cu.get('ses'):
+            res['message'] = await rem_session(conn, cu)
+            await conn.close()
+            return JSONResponse(res)
+        field, value, slug = (
+            d.get('field', ''), d.get('value', ''), d.get('slug', ''))
+        if not all((field, value, slug)):
+            res['message'] = 'Запрос содержит неверные параметры.'
+            await conn.close()
+            return JSONResponse(res)
+        if field not in ('meta', 'summary'):
+            res['message'] = 'Запрос содержит неверные параметры.'
+            await conn.close()
+            return JSONResponse(res)
+        draft = await conn.fetchval(
+            'SELECT id FROM articles WHERE slug = $1 AND author_id = $2',
+            d.get('slug', ''), cu.get('id'))
+        if draft is None:
+            res['message'] = 'Черновик не существует.'
+            await conn.close()
+            return JSONResponse(res)
+        s = await change_draft(request, conn, draft, field, value)
+        res['done'] = True
+        if s:
+            res['slug'] = s
+        await set_flashed(request, 'Изменено успешно.')
         await conn.close()
         return JSONResponse(res)
 
