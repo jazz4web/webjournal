@@ -6,6 +6,21 @@ $(function() {
   $('body').on('click', '.closeable', closeTopFlashed);
   showDraft(slug);
   if (ses) {
+    $('body').on('click', '#comments-state', {slug:slug}, function(event) {
+      $(this).blur();
+      changeDraft('commented', 'empty', event.data.slug);
+    });
+    $('body').on(
+      'keyup blur', '#title',
+      {min:3, max: 100, block: '.input-field'}, markInputError);
+    $('body').on('click', '#title-submit', {slug: slug}, function(event) {
+      $(this).blur();
+      let prev = $(this).data().prev;
+      let cur = $('#title').val().trim();
+      if (!$('.input-field').hasClass('has-error') && cur !== prev) {
+        changeDraft('title', $('#title').val(), event.data.slug);
+      }
+    });
     $('body').on(
       'keyup blur', '#metadesc-edit',
       {len:180,marker:'#d-length-value',block:'#d-length-marker'},

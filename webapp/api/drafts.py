@@ -174,7 +174,7 @@ class Draft(HTTPEndpoint):
             res['message'] = 'Запрос содержит неверные параметры.'
             await conn.close()
             return JSONResponse(res)
-        if field not in ('meta', 'summary'):
+        if field not in ('commented', 'meta', 'summary', 'title'):
             res['message'] = 'Запрос содержит неверные параметры.'
             await conn.close()
             return JSONResponse(res)
