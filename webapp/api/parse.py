@@ -48,7 +48,8 @@ async def parse_arts_query(request, conn, query, target, page, last):
              'title': record.get('title'),
              'title80': await parse_title(record.get('title'), 80),
              'slug': record.get('slug'),
-             'suffix': record.get('summary'),
+             'suffix': record.get('suffix'),
+             'summary': record.get('summary'),
              'published': record.get('published').isoformat()
              if record.get('published') else None,
              'edited': record.get('edited').isoformat(),

@@ -6,6 +6,32 @@ $(function() {
   $('body').on('click', '.closeable', closeTopFlashed);
   showDraft(slug);
   if (ses) {
+    $('body').on('click', '#summary-from-text', function() {
+      $(this).blur();
+      let l = $('.entity-text-block').children('p');
+      let w = '';
+      for (let n = 0; n < l.length && w.length < 512; n++) {
+        w = w + ' ' + $(l[n]).text();
+      }
+      let t = w.trim().split(' ');
+      let res = '';
+      let i = 0;
+      while ((res + '...').length <= 384 && i < t.length) {
+        res = res + ' ' + t[i];
+        i++;
+      }
+      $('#summary-edit').val(res.trim() + '...').trigger('blur');
+    });
+    $('body').on('click', '#summary-submit', {slug: slug}, function(event) {
+      $(this).blur();
+      if (!$('#summary-edit').parents('.form-group').hasClass('has-error')) {
+        changeDraft('summary', $('#summary-edit').val(), event.data.slug);
+      }
+    });
+    $('body').on(
+      'keyup blur', '#summary-edit',
+      {len: 512, marker: '#s-length-value', block: '#s-length-marker'},
+      trackMarker);
     $('body').on('click', '#comments-state', {slug:slug}, function(event) {
       $(this).blur();
       changeDraft('commented', 'empty', event.data.slug);
