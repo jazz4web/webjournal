@@ -11,8 +11,49 @@ from ..common.pg import get_conn
 from ..drafts.attri import status
 from .pg import (
     change_draft, check_draft, check_last, create_d,
-    rem_session, select_drafts, select_labeled_drafts)
+    rem_session,
+    save_par, select_drafts, select_labeled_drafts)
 from .tools import check_g_secure, check_permissions, check_secure
+
+
+class Paragraph(HTTPEndpoint):
+    async def post(self, request):
+        res = {'done': None}
+        d = await request.form()
+        ses, brkey, message = await check_secure(request)
+        if message:
+            res['message'] = message
+            return JSONResponse(res)
+        conn = await get_conn(request.app.config)
+        cu = await checkcu(request, conn, d.get('auth'))
+        if message := await check_permissions(cu, 100):
+            res['message'] = message
+            await conn.close()
+            return JSONResponse(res)
+        if brkey != cu.get('brkey') or ses != cu.get('ses'):
+            res['message'] = await rem_session(conn, cu)
+            await conn.close()
+            return JSONResponse(res)
+        slug, text, code = (
+            d.get('slug', ''), d.get('text', ''), int(d.get('code', '0')))
+        if not slug or not text:
+            res['message'] = 'Запрос содержит неверные параметры.'
+            await conn.close()
+            return JSONResponse(res)
+        draft = await conn.fetchval(
+            'SELECT id FROM articles WHERE slug = $1 AND author_id = $2',
+            slug, cu.get('id'))
+        if draft is None:
+            res['message'] = 'Черновик не обнаружен.'
+            await conn.close()
+            return JSONResponse(res)
+        res['html'] = await save_par(conn, draft, text, code)
+        res['length'] = await conn.fetchval(
+            'SELECT count(*) FROM paragraphs WHERE article_id = $1',
+            draft)
+        res['done'] = True
+        await conn.close()
+        return JSONResponse(res)
 
 
 class Labels(HTTPEndpoint):
