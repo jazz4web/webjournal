@@ -6,6 +6,64 @@ $(function() {
   $('body').on('click', '.closeable', closeTopFlashed);
   showDraft(slug);
   if (ses) {
+    $('body').on('click', '.remove-button', {slug: slug}, function(event) {
+      $(this).blur();
+      let num = $(this).data().num;
+      $.ajax({
+        method: 'DELETE',
+        url: '/api/send-par',
+        headers: {
+          'x-br-ses': ses,
+          'x-br-tee': checkBR()
+        },
+        data: {
+          auth: window.localStorage.getItem('sestee'),
+          slug: event.data.slug,
+          num: num
+        },
+        success: function(data) {
+          if (data.done) {
+            if (data.html) {
+              $('.entity-text-block').empty()
+                .append(data.html).data('len', data.length);
+              parseDraft();
+              $('#html-text-edit').val('');
+            } else {
+              window.location.reload();
+            }
+          } else {
+            showError('#mc', data);
+            $('#editor-opts').remove();
+            scrollPanel($('#ealert'));
+            setTimeout(function() { checkPC(860); }, 400);
+          }
+        },
+        dataType: 'json'
+      });
+    });
+    $('body').on('mouseleave', '.entity-text-block', function() {
+      if (!$('#paragraph-editor').length) {
+        $('#editor-opts').remove();
+      }
+    });
+    $('body').on('click', '.trash-button', hideButton);
+    $('body').on('mouseenter', '.editable', function() {
+      if(!$('#paragraph-editor').length && !$('#p-block').length) {
+        $('#editor-opts').remove();
+        let th = $(this);
+        let d = {num: th.data().num};
+        let html = Mustache.render($('#eoptst').html(), d);
+        if (th[0].nodeName === 'LI') {
+          if (th.find('p').length) {
+            th.find('p').before(html);
+          } else {
+            th.before(html);
+          }
+        } else {
+          th.before(html);
+        }
+      }
+    });
     $('body').on('click', '.entity-text-block img', clickImage);
     $('body').on('keyup', '#html-text-edit', {slug: slug}, function(event) {
       let val = $(this).val().trim();

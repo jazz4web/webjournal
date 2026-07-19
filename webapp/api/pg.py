@@ -16,6 +16,35 @@ from .parse import parse_art_query, parse_arts_query
 from .slugs import check_max, make, parse_match
 
 
+async def remove_par(conn, did, num):
+    aft = await conn.fetch(
+        '''SELECT num FROM paragraphs WHERE article_id = $1 AND num > $2
+             ORDER BY num ASC''', did, num)
+    await conn.execute(
+        'DELETE FROM paragraphs WHERE num = $1 AND article_id = $2', num, did)
+    if aft:
+        for each in aft:
+            await conn.execute(
+                '''UPDATE paragraphs SET num = num - 1
+                     WHERE num = $1 AND article_id = $2''',
+                each.get('num'), did)
+    pars = await conn.fetch(
+        '''SELECT mdtext FROM paragraphs
+             WHERE article_id = $1 ORDER BY num ASC''', did)
+    if pars:
+        loop = asyncio.get_running_loop()
+        html = await loop.run_in_executor(
+            None, functools.partial(parse_md, pars))
+        await conn.execute(
+            'UPDATE articles SET html = $1 WHERE id = $2', html, did)
+        return html
+    else:
+        await conn.execute(
+            '''UPDATE articles SET html = null, edited = $1,
+                                   state = $2, published = null
+                 WHERE id = $3''', datetime.now(UTC), status.draft, did)
+
+
 async def save_par(conn, did, text, code):
     loop = asyncio.get_running_loop()
     text, spec = await loop.run_in_executor(

@@ -37,6 +37,37 @@
 {%- block templates -%}
   {{- super() -}}
   {%- if cu -%}
+    <script id="eoptst" type="text/template">
+      <div id="editor-opts">
+        <button type="button"
+                class=" btn-primary btn-xs edit-par"
+                title="редактировать"
+                data-num="<% num %>">
+          <span class="glyphicon glyphicon-edit"
+                aria-hidden="true"></span>
+        </button>
+        <button type="button"
+                class="btn-primary btn-xs add-before"
+                title="добавить абзац выше"
+                data-num="<% num %>">
+          <span class="glyphicon glyphicon-upload"
+                aria-hidden="true"></span>
+        </button>
+        <button type="button"
+                class="btn-default btn-xs trash-button"
+                title="удалить абзац">
+          <span class="glyphicon glyphicon-trash"
+                aria-hidden="true"></span>
+        </button>
+        <button type="button"
+                class="btn-danger btn-xs remove-button hidden"
+                title="удалить"
+                data-num="<% num %>">
+          <span class="glyphicon glyphicon-remove-circle"
+                aria-hidden="true"></span>
+        </button>
+      </div>
+    </script>
     <script id="editort" type="text/template">
       <div id="editor-block" class="entity-block next-block">
         <div id="forms-block">
@@ -361,6 +392,7 @@
              'js/adjust-frame.js',
              'js/set-margin.js',
              'js/click-image.js',
+             'js/hide-button.js',
              'js/drafts/draft.js' -%}
     <script src="{{ ASSET_URL }}"></script>
   {%- endassets -%}

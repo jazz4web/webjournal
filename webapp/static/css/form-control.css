@@ -16,8 +16,8 @@
 
 .btn-xs {
   cursor: pointer;
-  border-radius: 3px;
-  padding: 3px 6px;
+  border-radius: 4px;
+  padding: 4px 6px;
   color: dimgray;
   font-size: 0.8em;
 }
