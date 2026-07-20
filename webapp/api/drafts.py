@@ -11,7 +11,7 @@ from ..common.pg import get_conn
 from ..drafts.attri import status
 from .pg import (
     change_draft, check_draft, check_last, create_d,
-    rem_session, remove_par,
+    insert_par, edit_par, rem_session, remove_par,
     save_par, select_drafts, select_labeled_drafts)
 from .tools import check_g_secure, check_permissions, check_secure
 
@@ -54,6 +54,34 @@ class Paragraph(HTTPEndpoint):
         await conn.close()
         return JSONResponse(res)
 
+    async def get(self, request):
+        res = {'text': None}
+        slug = request.query_params.get('slug', '')
+        num = request.query_params.get('num', None)
+        token = request.headers.get('x-auth-sestee')
+        if not slug or num is None or token is None:
+            raise HTTPException(403)
+        conn = await get_conn(request.app.config)
+        cu = await checkcu(request, conn, token)
+        message = await check_g_secure(request, cu, 100)
+        if message:
+            res['message'] = message
+            await conn.close()
+            return JSONResponse(res)
+        text = await conn.fetchval(
+            '''SELECT par.mdtext FROM paragraphs AS par, articles AS arts
+                 WHERE par.num = $1
+                   AND arts.author_id = $2
+                   AND arts.slug = $3
+                   AND par.article_id = arts.id''',
+            int(num), cu.get('id'), slug)
+        await conn.close()
+        if text is None:
+            res['message'] = 'Запрос содержит неверные параметры.'
+            return JSONResponse(res)
+        res['text'] = text
+        return JSONResponse(res)
+
     async def post(self, request):
         res = {'done': None}
         d = await request.form()
@@ -90,6 +118,57 @@ class Paragraph(HTTPEndpoint):
             draft)
         res['done'] = True
         await conn.close()
+        return JSONResponse(res)
+
+    async def put(self, request):
+        res = {'done': None}
+        d = await request.form()
+        ses, brkey, message = await check_secure(request)
+        if message:
+            res['message'] = message
+            return JSONResponse(res)
+        conn = await get_conn(request.app.config)
+        cu = await checkcu(request, conn, d.get('auth'))
+        if message := await check_permissions(cu, 100):
+            res['message'] = message
+            await conn.close()
+            return JSONResponse(res)
+        if brkey != cu.get('brkey') or ses != cu.get('ses'):
+            res['message'] = await rem_session(conn, cu)
+            await conn.close()
+            return JSONResponse(res)
+        slug, num, insert, text, code = (
+            d.get('slug', ''), d.get('num', None), d.get('insert', None),
+            d.get('text', ''), d.get('code', None))
+        if not all((slug, num, insert, text, code)):
+            res['message'] = 'Запрос содержит неверные параметры.'
+            await conn.close()
+            return JSONResponse(res)
+        draft = await conn.fetchval(
+            'SELECT id FROM articles WHERE slug = $1 AND author_id = $2',
+            slug, cu.get('id'))
+        if draft is None:
+            res['message'] = 'Черновик не обнаружен.'
+            await conn.close()
+            return JSONResponse(res)
+        last = await conn.fetchval(
+            '''SELECT num FROM paragraphs
+                 WHERE article_id = $1 ORDER BY num DESC''', draft)
+        if int(num) > last:
+            res['message'] = 'Запрос содержит неверные параметры.'
+            await conn.close()
+            return JSONResponse(res)
+        if int(insert):
+            res['html'] = await insert_par(
+                conn, draft, text.strip(), int(num), int(code))
+        else:
+            res['html'] = await edit_par(
+                conn, draft, text.strip(), int(num), int(code))
+        res['length'] = await conn.fetchval(
+            'SELECT count(*) FROM paragraphs WHERE article_id = $1',
+            draft)
+        await conn.close()
+        res['done'] = True
         return JSONResponse(res)
 
 

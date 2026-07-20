@@ -16,6 +16,51 @@ from .parse import parse_art_query, parse_arts_query
 from .slugs import check_max, make, parse_match
 
 
+async def edit_par(conn, did, text, num, code):
+    cur = await conn.fetchval(
+        'SELECT mdtext FROM paragraphs WHERE num = $1 AND article_id = $2',
+        num, did)
+    if text == cur:
+        return None
+    loop = asyncio.get_running_loop()
+    text, spec = await loop.run_in_executor(
+        None, functools.partial(check_text, text, code))
+    if spec and text:
+        if await conn.fetchrow(
+                '''SELECT num FROM paragraphs
+                     WHERE mdtext = $1 AND article_id = $2''', text, did):
+            text = None
+    if text:
+        await conn.execute(
+            '''UPDATE paragraphs SET mdtext = $1
+                 WHERE num = $2 AND article_id = $3''', text, num, did)
+        return await update_art(conn, did, loop)
+
+
+async def insert_par(conn, did, text, num, code):
+    loop = asyncio.get_running_loop()
+    text, spec = await loop.run_in_executor(
+        None, functools.partial(check_text, text, code))
+    if spec and text:
+        if await conn.fetchrow(
+                '''SELECT num FROM paragraphs
+                     WHERE mdtext = $1 AND article_id = $2''', text, did):
+            text = None
+    if text:
+        aft = await conn.fetch(
+            '''SELECT num FROM paragraphs WHERE article_id = $1 AND num >= $2
+                 ORDER BY num DESC''', did, num)
+        for each in aft:
+            await conn.execute(
+                '''UPDATE paragraphs SET num = num + 1
+                     WHERE num = $1 AND article_id = $2''',
+                each.get('num'), did)
+        await conn.execute(
+            '''INSERT INTO paragraphs (num, mdtext, article_id)
+                 VALUES ($1, $2, $3)''', num, text, did)
+        return await update_art(conn, did, loop, withdate=False)
+
+
 async def remove_par(conn, did, num):
     aft = await conn.fetch(
         '''SELECT num FROM paragraphs WHERE article_id = $1 AND num > $2

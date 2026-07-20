@@ -37,6 +37,28 @@
 {%- block templates -%}
   {{- super() -}}
   {%- if cu -%}
+    <script id="peditort" type="text/template">
+      <div id="paragraph-editor"
+           class="hidden">
+        <div class="form-group-a">
+          <textarea id="paragraph-text-edit"
+                    placeholder="отредактируйте абзац топика"
+                    data-num="<% num %>"
+                    data-insert="<% insert %>"
+                    class="form-control"
+                    rows="5"><% text %></textarea>
+        </div>
+        <div class="form-group-a">
+          <button id="cancel-edit"
+                  type="button"
+                  title="отменить"
+                  class="btn-info btn-sm btn-block">
+            <span class="glyphicon glyphicon-refresh"
+                  aria-hidden="true"></span>
+          </button>
+        </div>
+      </div>
+    </script>
     <script id="eoptst" type="text/template">
       <div id="editor-opts">
         <button type="button"
@@ -393,6 +415,7 @@
              'js/set-margin.js',
              'js/click-image.js',
              'js/hide-button.js',
+             'js/send-edit.js',
              'js/drafts/draft.js' -%}
     <script src="{{ ASSET_URL }}"></script>
   {%- endassets -%}

@@ -6,6 +6,75 @@ $(function() {
   $('body').on('click', '.closeable', closeTopFlashed);
   showDraft(slug);
   if (ses) {
+    $('body').on('click', '.edit-par', {slug: slug}, function(event) {
+      $(this).blur();
+      let par = $(this).parent().next();
+      let num = $(this).data().num;
+      let tee = ses ? {
+        'x-br-ses': ses,
+        'x-auth-sestee': window.localStorage.getItem('sestee')
+      } : {};
+      $.ajax({
+        method: 'GET',
+        url: '/api/send-par',
+        headers: tee,
+        data: {
+          slug: event.data.slug,
+          num: num
+        },
+        success: function(data) {
+          if (data.text) {
+            let d = {num: num, insert: 0, text: data.text};
+            let html = Mustache.render($('#peditort').html(), d);
+            par.after(html).slideUp('slow');
+            $('#editor-opts').slideUp('slow');
+            $('#paragraph-editor').slideDown('slow').css({'margin': 0});
+            $('#editor-block').slideUp('slow');
+          } else {
+            showError('#mc', data);
+            scrollPanel($('#ealert'));
+            setTimeout(function() { checkPC(860); }, 400);
+          }
+        },
+        dataType: 'json'
+      });
+    });
+    $('body')
+      .on('keyup', '#paragraph-text-edit', {slug:slug}, function(event) {
+        if (event.which == 13) {
+          let val = $(this).val().trim();
+          let insert = $(this).data().insert;
+          let num = $(this).data().num;
+          const F = '```';
+          if (val.startsWith(F)) {
+            if (val.indexOf(F, 1) >= 4 && val.endsWith(F)) {
+              sendEdit(event.data.slug, num, insert, val, 1);
+            }
+          } else {
+            sendEdit(event.data.slug, num, insert, val.replace('\n', ''), 0);
+          }
+        }
+      });
+    $('body').on('click', '#cancel-edit', function() {
+      $(this).blur();
+      if (!$('#paragraph-text-edit').data().insert) {
+        $('#paragraph-editor').prev().slideDown('slow');
+      }
+      $('#paragraph-editor').slideUp('slow', function() {
+        $(this).remove();
+      });
+      $('#editor-block').slideDown('slow');
+    });
+    $('body').on('click', '.add-before', {slug: slug}, function(event) {
+      $(this).blur();
+      let par = $(this).parent();
+      let num = $(this).data().num;
+      let html = Mustache.render($('#peditort').html(), {num:num, insert:1});
+      par.before(html).fadeOut('slow');
+      $('#paragraph-editor').slideDown('slow').css({'margin': 0});
+      $('#paragraph-text-edit').focus();
+      $('#editor-block').slideUp('slow');
+    });
     $('body').on('click', '.remove-button', {slug: slug}, function(event) {
       $(this).blur();
       let num = $(this).data().num;
