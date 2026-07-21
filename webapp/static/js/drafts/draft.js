@@ -6,6 +6,10 @@ $(function() {
   $('body').on('click', '.closeable', closeTopFlashed);
   showDraft(slug);
   if (ses) {
+    $('body').on('click', '#special-case', {slug:slug}, function(event) {
+      $(this).blur();
+      undressLinks(event.data.slug);
+    });
     $('body').on('click', '.edit-par', {slug: slug}, function(event) {
       $(this).blur();
       let par = $(this).parent().next();

@@ -4,6 +4,7 @@ from starlette.endpoints import HTTPEndpoint
 from starlette.exceptions import HTTPException
 from starlette.responses import JSONResponse
 
+from ..auth.attri import groups
 from ..auth.cu import checkcu
 from ..common.aparsers import parse_page
 from ..common.flashed import set_flashed
@@ -12,7 +13,7 @@ from ..drafts.attri import status
 from .pg import (
     change_draft, check_draft, check_last, create_d,
     insert_par, edit_par, rem_session, remove_par,
-    save_par, select_drafts, select_labeled_drafts)
+    save_par, select_drafts, select_labeled_drafts, undress_art_links)
 from .tools import check_g_secure, check_permissions, check_secure
 
 
@@ -305,6 +306,43 @@ class Draft(HTTPEndpoint):
         res['cens'] = target['state'] == status.cens
         res['keeper'] = cu.get('weight') >= 200
         res['draft'] = target
+        await conn.close()
+        return JSONResponse(res)
+
+    async def patch(self, request):
+        res = {'done': None}
+        d = await request.form()
+        ses, brkey, message = await check_secure(request)
+        if message:
+            res['message'] = message
+            return JSONResponse(res)
+        conn = await get_conn(request.app.config)
+        cu = await checkcu(request, conn, d.get('auth'))
+        if message := await check_permissions(cu, 100):
+            res['message'] = message
+            await conn.close()
+            return JSONResponse(res)
+        if brkey != cu.get('brkey') or ses != cu.get('ses'):
+            res['message'] = await rem_session(conn, cu)
+            await conn.close()
+            return JSONResponse(res)
+        draft = await conn.fetchrow(
+            'SELECT id, author_id FROM articles WHERE slug = $1',
+            d.get('slug', ''))
+        if draft is None:
+            res['message'] = 'Ничего не нашлось по запросу.'
+            await conn.close()
+            return JSONResponse(res)
+        if (cu.get('id') == draft.get('author_id') and
+            cu. get('weight') < 200) or \
+                    (cu.get('id') != draft.get('author_id') and
+                     cu.get('group') != groups.root):
+            res['message'] = 'Доступ ограничен, у вас недостаточно прав.'
+            await conn.close()
+            return JSONResponse(res)
+        res['done'] = True
+        await undress_art_links(conn, draft.get('id'))
+        await set_flashed(request, 'Атрибут у ссылок удалён.')
         await conn.close()
         return JSONResponse(res)
 

@@ -8,7 +8,7 @@ function parseDraft() {
       let l = lch.length;
       let j = 0;
       while (j < lch.length) {
-        $(lch[j]).attr({'date-num': m});
+        $(lch[j]).attr({'data-num': m});
         $(lch[j]).addClass('editable');
         j++;
         m++;
