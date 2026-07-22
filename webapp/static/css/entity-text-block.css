@@ -14,6 +14,7 @@
   text-shadow: 0 0 3px lightgray;
   text-decoration: none;
 }
+
 .entity-text-block a:hover {
   text-decoration: underline;
   text-shadow: 0 0 3px skyblue;
@@ -33,15 +34,19 @@
   font-family: Menlo, Monaco,Consolas, "Courier New", monospace;
 }
 
-.entity-text-block ul, .entity-text-block ol {
-  margin: 2px 0 6px;
-  padding: 0 0 0 20px;
+.entity-text-block ul {
+  margin: 0 12px 6px 12px;
+  padding: 0 0 0 26px;
+}
+
+.entity-text-block ol {
+  padding: 0 0 0 26px;
+  margin: 0 20px 6px 26px;
 }
 
 .entity-text-block li {
   text-align: justify;
   margin: 0 0 6px 0;
-  padding-right: 8px;
 }
 
 .entity-text-block li p {
@@ -65,9 +70,9 @@
 .entity-text-block blockquote {
   font-style: italic;
   font-size: 1.1em;
-  font-color: #d9dcec;
   text-align: justify;
-  border-left: 6px solid #d9dcec;
+  color: slategray;
+  border-left: 6px solid lightslategray;
   padding: 6px 12px 6px 6px;
   margin: 2px 0 8px;
 }
@@ -115,4 +120,123 @@
   left: 0;
   width: 100%;
   height: 100%;
+}
+
+.bold {
+  font-weight: 600;
+}
+
+.italic {
+  font-style: italic;
+}
+
+.center {
+  text-align: center;
+}
+
+.coral {
+  color: coral;
+}
+
+.tomato {
+  color: tomato;
+}
+
+.orangered {
+  color: orangered;
+}
+
+.salmon {
+  color: salmon;
+}
+
+.firebrick {
+  color: firebrick;
+}
+
+.red {
+  color: red;
+}
+
+.crimson {
+  color: crimson;
+}
+
+.gold {
+  color: gold;
+}
+.chocolate {
+  color: chocolate;
+}
+
+.saddlebrown {
+  color: saddlebrown;
+}
+
+.sienna {
+  color: sienna;
+}
+
+.maroon {
+  color: maroon;
+}
+
+.purple {
+  color: purple;
+}
+
+.indigo {
+  color: indigo;
+}
+
+.deepskyblue {
+  color: deepskyblue;
+}
+
+.dodgerblue {
+  color: dodgerblue;
+}
+
+.slateblue {
+  color: slateblue;
+}
+
+.steelblue {
+  color: steelblue;
+}
+
+.royalblue {
+  color: royalblue;
+}
+
+.blue {
+  color: blue;
+}
+
+.mediumblue {
+  color: mediumblue;
+}
+
+.slategray {
+  color: slategray;
+}
+
+.darkslategray {
+  color: darkslategray;
+}
+
+.lightseagreen {
+  color: lightseagreen;
+}
+
+.darkcyan {
+  color: darkcyan;
+}
+
+.darkgreen {
+  color: darkgreen;
+}
+
+.seagreen {
+  color: seagreen;
 }

@@ -36,7 +36,7 @@ class Paragraph(HTTPEndpoint):
             await conn.close()
             return JSONResponse(res)
         slug, num = d.get('slug', ''), d.get('num', None)
-        if not slug or num is None:
+        if not all((slug, num)):
             res['message'] = 'Запрос содержит неверные параметры.'
             await conn.close()
             return JSONResponse(res)
@@ -47,7 +47,11 @@ class Paragraph(HTTPEndpoint):
             res['message'] = 'Черновик не обнаружен.'
             await conn.close()
             return JSONResponse(res)
-        res['html'] = await remove_par(conn, draft, int(num))
+        if await conn.fetchval(
+                '''SELECT num FROM paragraphs
+                     WHERE article_id = $1 AND num = $2''',
+                draft, int(num)) is not None:
+            res['html'] = await remove_par(conn, draft, int(num))
         res['length'] = await conn.fetchval(
             'SELECT count(*) FROM paragraphs WHERE article_id = $1',
             draft)
