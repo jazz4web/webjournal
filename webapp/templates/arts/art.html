@@ -168,14 +168,26 @@
         </button>
       <% /follow %>
       <% #like %>
+        <% #liked %>
         <button id="like-button"
                 type="button"
-                title="нравится"
-                class="btn-success btn-sm">
+                title="уже нравится"
+                class="btn-danger btn-sm">
           <span class="glyphicon glyphicon-thumbs-up white-space"
                 aria-hidden="true"></span><span
                 class="value"><% art.likes %></span>
         </button>
+        <% /liked %>
+        <% ^liked %>
+          <button id="like-button"
+                  type="button"
+                  title="нравится"
+                  class="btn-success btn-sm">
+            <span class="glyphicon glyphicon-thumbs-up white-space"
+                  aria-hidden="true"></span><span
+                  class="value"><% art.likes %></span>
+          </button>
+        <% /liked %>
       <% /like %>
       <% #dislike %>
         <button id="dislike-button"
@@ -266,6 +278,7 @@
              'js/count-clicks.js',
              'js/move-screen-up.js',
              'js/scroll-panel.js',
+             'js/show-error.js',
              'js/arts/art.js' -%}
     <script src="{{ ASSET_URL }}"></script>
   {%- endassets -%}

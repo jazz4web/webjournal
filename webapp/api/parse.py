@@ -31,8 +31,12 @@ async def parse_art_query(request, conn, query, target):
     target['ava'] = request.url_for(
         'ava', username=query.get('username'), size=98)._url
     target['jump'] = request.url_for('jump', suffix=query.get('suffix'))._url
-    target['likes'] = 0
-    target['dislikes'] = 0
+    target['likes'] = await conn.fetchval(
+        'SELECT count(*) FROM likes WHERE article_id = $1',
+        query.get('id'))
+    target['dislikes'] = await conn.fetchval(
+        'SELECT count(*) FROM dislikes WHERE article_id = $1',
+        query.get('id'))
     target['commentaries'] = 0
     target['labels'] = [label.get('label') for label in await conn.fetch(
         LABELS, query.get('id'))]
@@ -59,8 +63,12 @@ async def parse_arts_query(request, conn, query, target, page, last):
              'author': record.get('username'),
              'ava': request.url_for(
                  'ava', username=record.get('username'), size=98)._url,
-             'likes': 0,
-             'dislikes': 0,
+             'likes': await conn.fetchval(
+                 'SELECT count(*) FROM likes WHERE article_id = $1',
+                 record.get('id')),
+             'dislikes': await conn.fetchval(
+                 'SELECT count(*) FROM dislikes WHERE article_id = $1',
+                 record.get('id')),
              'commentaries': 0,
              'labels': [label.get('label') for label in await conn.fetch(
                  LABELS, record.get('id'))]} for record in query]

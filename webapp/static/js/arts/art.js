@@ -10,6 +10,78 @@ $(function() {
   showArt('/api/art', slug, ses);
   pingUser(300000, 12);
   if (ses) {
+    $('body').on('click', '#dislike-button', {slug:slug}, function(event) {
+      $(this).blur();
+      $.ajax({
+        method: 'PUT',
+        url: '/api/dislike',
+        headers: {
+          'x-br-ses': ses,
+          'x-br-tee': checkBR()
+        },
+        data: {
+          auth: window.localStorage.getItem('sestee'),
+          slug: event.data.slug
+        },
+        success: function(data) {
+          if (data.message) {
+            showError('#mc', data);
+            scrollPanel($('#ealert'));
+            setTimeout(function() { checkPC(860); }, 400);
+          } else {
+            if (data.done) {
+              $('.like-block .value').text(data.likes);
+              $('.dislike-block .value').text(data.dislikes);
+              $('#like-button .value').text(data.likes);
+              $('#dislike-button .value').text(data.dislikes);
+              if (data.liked) {
+                console.log(data.liked);
+                $('#like-button').removeClass('btn-danger')
+                                 .addClass('btn-success');
+
+              }
+            }
+          }
+        },
+        dataType: 'json'
+      });
+    });
+    $('body').on('click', '#like-button', {slug:slug}, function(event) {
+      $(this).blur()
+      $.ajax({
+        method: 'PUT',
+        url: '/api/like',
+        headers: {
+          'x-br-ses': ses,
+          'x-br-tee': checkBR()
+        },
+        data: {
+          auth: window.localStorage.getItem('sestee'),
+          slug: event.data.slug
+        },
+        success: function(data) {
+          if (data.message) {
+            showError('#mc', data);
+            scrollPanel($('#ealert'));
+            setTimeout(function() { checkPC(860); }, 400);
+          } else {
+            $('.like-block .value').text(data.likes);
+            $('.dislike-block .value').text(data.dislikes);
+            $('#like-button .value').text(data.likes);
+            $('#dislike-button .value').text(data.dislikes);
+            if (data.liked) {
+              $('#like-button').removeClass('btn-danger')
+                               .addClass('btn-success');
+
+            } else {
+              $('#like-button').removeClass('btn-success')
+                               .addClass('btn-danger');
+            }
+          }
+        },
+        dataType: 'json'
+      });
+    });
     $('body').on('click', '#editor-button', function() {
       $(this).blur();
       window.location.assign($(this).data().link);

@@ -132,3 +132,15 @@ CREATE TABLE als (
     label_id   integer REFERENCES labels(id),
     CONSTRAINT art_label_uni UNIQUE (article_id, label_id)
 );
+
+CREATE TABLE likes (
+    article_id integer REFERENCES articles(id),
+    user_id    integer REFERENCES users(id),
+    CONSTRAINT article_l_user_uni UNIQUE (article_id, user_id)
+);
+
+CREATE TABLE dislikes (
+    article_id integer REFERENCES articles(id),
+    user_id    integer REFERENCES users(id),
+    CONSTRAINT article_d_user_uni UNIQUE (article_id, user_id)
+);
