@@ -1,0 +1,181 @@
+{% extends "base.html" %}
+
+{%- block metas -%}
+  <meta name="description" content="{{topic['meta']}}">
+  <meta name="keywords" content="{%- for label in topic['labels'] -%}
+        {{- label -}}{%- if not loop.last -%}{{", "}}
+        {%- endif -%}{%- endfor -%}">
+{%- endblock metas -%}
+
+{%- block title_part -%}{{ topic['title'] }}{%- endblock title_part -%}
+
+{%- block styles -%}
+  {{- super() -}}
+  {%- assets filters='cssmin', output='generic/css/main/show-public.css',
+             'css/base.css',
+             'css/menu.css',
+             'css/page-content.css',
+             'css/mc.css',
+             'css/content-block.css',
+             'css/topic-head.css',
+             'css/entity-attributes.css',
+             'css/avatar.css',
+             'css/personal-details.css',
+             'css/entity-details.css',
+             'css/common-details.css',
+             'vendor/bootstrap/css/glyphicons.css',
+             'vendor/pygments/css/pygments.css',
+             'css/entity-copy-link.css',
+             'css/form-control.css',
+             'css/entity-text-block.css',
+             'css/entity-labels.css',
+             'css/entity-block.css',
+             'css/public.css',
+             'css/cookies-alert.css',
+             'css/next-block.css',
+             'css/footer.css' -%}
+    <link rel="stylesheet" type="text/css" href="{{ASSET_URL}}">
+  {%- endassets -%}
+  <link rel="canonical" href="{{ url_for('public', slug=topic['slug']) }}">
+{%- endblock styles -%}
+
+{%- block page_body -%}
+  <div id="topic-head" class="content-block">
+    <h1 title="{{ topic['title'] }}">
+      {{ topic['title'] }}
+    </h1>
+    <div class="entity-attributes">
+      <div class="author-avatar avatar"
+           style="background:url({{ topic['ava'] }})"></div>
+      <div class="entity-info">
+        <h3>
+          <a class="author-profile-link"
+             href="{{ url_for(
+             'people:profile', username=topic['author']) }}">
+            {{ topic['author'] }}
+          </a>
+        </h3>
+        <div class="personal-details">
+          {%- if topic['published'] -%}
+            <div class="column">Опубликован:</div>
+            <div class="column date-field">{{ topic['published'] }}</div>
+          {%- endif -%}
+          <div class="column">Отредактирован:</div>
+          <div class="column date-field">{{ topic['edited'] }}</div>
+          <div class="column">Статус:</div>
+          <div class="column">{{ topic['state'] }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="common-details">
+    <div class="entity-blog-link">
+      <a href="{{ url_for('blogs:blog', username=topic['author']) }}">
+        {{ topic['author'] }}&nbsp;блог
+      </a>
+    </div>
+    <div class="entity-details">
+      <div class="labeled labeled-text labeled-info viewed-ind"
+           title="количество просмотров">
+        <span class="glyphicon glyphicon-eye-open"
+              aria-hidden="true"></span><span
+              class="value">{{ topic['viewed'] }}</span>
+      </div>
+      <div class="labeled labeled-text labeled-success like-block"
+           title="количество нра">
+        <span class="glyphicon glyphicon-thumbs-up"
+              aria-hidden="true"></span><span
+              class="value">{{ topic['likes'] }}</span>
+      </div>
+      <div class="labeled labeled-text labeled-danger dislike-block"
+           title="количество ненра">
+        <span class="glyphicon glyphicon-thumbs-down"
+              aria-hidden="true"></span><span
+              class="value">{{ topic['dislikes'] }}</span>
+      </div>
+      <div class="labeled labeled-text
+                  {% if topic['commented'] %}labeled-info{% else %}
+                  labeled-warning{% endif %}"
+           title="количество комментариев">
+        <span class="glyphicon glyphicon-comment"
+              aria-hidden="true"></span><span
+              class="value">{{ topic['commentaries'] }}</span>
+      </div>
+    </div>
+    <div class="entity-copy-link">
+      <button type="button"
+              class="btn-xs btn-default btn-block copy-link">
+        поделиться ссылкой
+      </button>
+      <div id="link-copy-form" class="hidden">
+        <div class="form-group-a">
+          <input id="copy-box"
+                 class="form-control"
+                 type="text"
+                 name="copy-box"
+                 value="{{ topic['jump'] }}">
+        </div>
+        <div class="form-group-a">
+          <button id="copy-button"
+                  type="button"
+                  data-clipboard-target="#copy-box"
+                  class="btn-xs btn-primary btn-block">
+            скопировать в буфер обмена
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="text-block entity-text-block">
+    {{ topic['html']|safe }}
+  </div>
+  <div class="entity-labels-block">
+    <div class="labels-label">Метки:</div>
+    <div class="labels">
+      {%- if topic['labels'] -%}
+        {%- for label in topic['labels'] -%}
+          <a class="label-link" href="{{ url_for(
+             'blogs:lblog', username=topic['author'], label=label) }}">
+            {{- label -}}</a>{%- if not loop.last -%}, {% endif %}
+        {%- endfor -%}
+      {%- else -%}
+        не забудьте установить метки.
+      {%- endif -%}
+    </div>
+  </div>
+{%- endblock page_body -%}
+
+{%- block option_block -%}
+  <div class="entity-block options-block next-block">
+    <button type="button"
+            id="get-more"
+            title="хочу ещё..."
+            data-link="{{ url_for('arts:arts') }}"
+            class="btn-success btn">
+      Хочу ещё...
+    </button>
+  </div>
+{%- endblock option_block -%}
+
+{%- block scripts -%}
+  {{- super() -}}
+  <script>let suffix="{{topic['suffix']}}",slug="{{slug}}";</script>
+  {%- assets filters='rjsmin', output='generic/js/main/show-public.js',
+             'js/render-menu.js',
+             'js/render-footer.js',
+             'js/set-cookies.js',
+             'js/check-pc.js',
+             'js/format-datetime.js',
+             'js/show-copy-form.js',
+             'js/copy-this.js',
+             'js/adjust-frame.js',
+             'js/set-margin.js',
+             'js/adjust-image.js',
+             'js/click-image.js',
+             'js/count-clicks.js',
+             'js/ping.js',
+             'js/ping-user.js',
+             'js/main/show-public.js' -%}
+    <script src="{{ ASSET_URL }}"></script>
+  {%- endassets -%}
+{%- endblock scripts -%}

@@ -22,6 +22,7 @@ from .aliases.views import show_aliases
 from .api.admin import (
     Admin, AdminAlbum, Alis, AuthAlis, AuthPics, DGroup, Pics)
 from .api.aliases import Aliases
+from .api.arts import Art
 from .api.auth import CreateAcc, Login, Logout, LogoutE, ResetFP
 from .api.drafts import Draft, Drafts, Labels, Paragraph
 from .api.main import Captcha, Index
@@ -37,7 +38,8 @@ from .comments.views import show_comments
 from .drafts.views import show_draft, show_drafts, show_dlabeled
 from .main.views import (
         jump, show_avatar, show_favicon, show_humans,
-        show_index, show_picture, show_robots, show_sitemap)
+        show_index, show_picture, show_public, show_robots,
+        show_sitemap)
 from .people.views import show_people, show_profile
 from .pictures.views import show_album, show_albums
 from .pm.views import show_conversation, show_conversations
@@ -100,6 +102,7 @@ app = StApp(
         Route('/ava/{username}/{size:int}', show_avatar, name='ava'),
         Route('/captcha/{suffix}', show_captcha, name='captcha'),
         Route('/picture/{suffix}', show_picture, name='picture'),
+        Route('/public/{slug}', show_public, name='public'),
         Mount('/admin', name='admin', routes=[
             Route('/', show_tools, name='tools'),
             Route('/aliases', admin_aliases, name='admaliases'),
@@ -113,6 +116,7 @@ app = StApp(
         Mount('/aliases', name='aliases', routes=[
             Route('/', show_aliases, name='aliases')]),
         Mount('/api', name='api', routes=[
+            Route('/art', Art, name='aart'),
             Route('/send-par', Paragraph, name='aparagraph'),
             Route('/labels', Labels, name='alabels'),
             Route('/draft', Draft, name='adraft'),

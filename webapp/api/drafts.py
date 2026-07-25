@@ -1,5 +1,7 @@
 import re
 
+from datetime import datetime, UTC
+
 from starlette.endpoints import HTTPEndpoint
 from starlette.exceptions import HTTPException
 from starlette.responses import JSONResponse
@@ -347,6 +349,64 @@ class Draft(HTTPEndpoint):
         res['done'] = True
         await undress_art_links(conn, draft.get('id'))
         await set_flashed(request, 'Атрибут у ссылок удалён.')
+        await conn.close()
+        return JSONResponse(res)
+
+    async def post(self, request):
+        res = {'done': None}
+        d = await request.form()
+        ses, brkey, message = await check_secure(request)
+        if message:
+            res['message'] = message
+            return JSONResponse(res)
+        conn = await get_conn(request.app.config)
+        cu = await checkcu(request, conn, d.get('auth'))
+        if message := await check_permissions(cu, 100):
+            res['message'] = message
+            await conn.close()
+            return JSONResponse(res)
+        if brkey != cu.get('brkey') or ses != cu.get('ses'):
+            res['message'] = await rem_session(conn, cu)
+            await conn.close()
+            return JSONResponse(res)
+        value, slug = d.get('value', ''), d.get('slug', '')
+        if not all((value, slug)) or value not in status:
+            res['message'] = 'Запрос содержит неверные параметры.'
+            await conn.close()
+            return JSONResponse(res)
+        draft = await conn.fetchrow(
+            '''SELECT id, meta, summary
+                 FROM articles WHERE slug = $1 AND author_id = $2''',
+            d.get('slug'), cu.get('id'))
+        if draft is None:
+            res['message'] = 'Черновик не существует.'
+            await conn.close()
+            return JSONResponse(res)
+        if draft.get('summary') is None:
+            res['message'] = 'Сначала отредактируйте аннотацию.'
+            await conn.close()
+            return JSONResponse(res)
+        if value == status.pub and draft.get('meta') is None:
+            res['message'] = 'Напишите описание для поисковиков.'
+            await conn.close()
+            return JSONResponse(res)
+        await conn.execute(
+            'UPDATE articles SET state = $1 WHERE id = $2',
+            value, draft.get('id'))
+        published = await conn.fetchrow(
+            'SELECT published, author_id FROM articles WHERE id = $1',
+            draft.get('id'))
+        if published.get('published') is None and \
+                value in (status.pub, status.priv, status.ffo):
+            now = datetime.now(UTC)
+            await conn.execute(
+                '''UPDATE articles SET published = $1, edited = $1
+                     WHERE id = $2''', now, draft.get('id'))
+            await conn.execute(
+                'UPDATE users SET last_published = $1 WHERE id = $2',
+                now, published.get('author_id'))
+        res['done'] = True
+        await set_flashed(request, f'Статус черновика изменён на "{value}".')
         await conn.close()
         return JSONResponse(res)
 

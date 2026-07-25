@@ -15,9 +15,28 @@ from ..auth.cu import getcu
 from ..common.flashed import get_flashed
 from ..common.pg import get_conn
 from ..common.random import randomize, samples
+from ..drafts.attri import status as statusd
 from ..pictures.attri import status
-from .pg import check_state
+from .pg import check_state, check_topic
 from .tools import resize
+
+
+async def show_public(request):
+    slug = request.path_params.get('slug')
+    conn = await get_conn(request.app.config)
+    cu = await getcu(request, conn)
+    if cu:
+        return RedirectResponse(request.url_for('arts:art', slug=slug), 301)
+    topic = dict()
+    await check_topic(request, conn, slug, topic)
+    await conn.close()
+    if not topic:
+        raise HTTPException(404)
+    return request.app.jinja.TemplateResponse(
+        request, 'main/show_public.html',
+        {'topic': topic,
+         'slug': slug,
+         'listed': False})
 
 
 async def show_robots(request):
@@ -30,9 +49,15 @@ async def show_robots(request):
 
 
 async def show_sitemap(request):
+    conn = await get_conn(request.app.config)
+    arts = await conn.fetch(
+        '''SELECT slug, published, edited FROM articles
+             WHERE state = $1 ORDER BY published DESC LIMIT 250''',
+        statusd.pub)
+    await conn.close()
     response = request.app.jinja.TemplateResponse(
         request, 'main/sitemap.xml',
-        {'arts': None})
+        {'arts': arts})
     response.media_type = 'applictation/xml'
     response.headers['content-type'] = 'application/xml'
     return response
@@ -101,6 +126,16 @@ async def jump(request):
                 request.session['jumps'] = jumps
             await conn.close()
             return RedirectResponse(alias.get('url'), 301)
+    elif len(suffix) in (8, 11, 12, 13):
+        art = await conn.fetchrow(
+            'SELECT suffix, slug FROM articles WHERE suffix = $1', suffix)
+        await conn.close()
+        if art:
+            curl = request.url_for('public', slug=art.get('slug'))
+            rurl = request.url_for('arts:art', slug=art.get('slug'))
+            response = RedirectResponse(rurl, 301)
+            response.headers.append('Link', f'<{curl}>; rel="canonical"')
+            return response
     await conn.close()
     raise HTTPException(status_code=404, detail='Такой страницы у нас нет.')
 

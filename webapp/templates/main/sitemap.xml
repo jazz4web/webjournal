@@ -4,7 +4,7 @@
     {% for art in arts %}
       <url>
         <loc>{{ url_for('public', slug=art.get('slug')) }}</loc>
-        <lastmod>{{ art.get('edited').isoformat() + 'Z' }}</lastmod>
+        <lastmod>{{ art.get('edited').isoformat() }}</lastmod>
         <changefreq>weekly</changefreq>
         <priority>1</priority>
       </url>
