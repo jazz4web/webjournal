@@ -22,7 +22,7 @@ from .aliases.views import show_aliases
 from .api.admin import (
     Admin, AdminAlbum, Alis, AuthAlis, AuthPics, DGroup, Pics)
 from .api.aliases import Aliases
-from .api.arts import Art, Dislike, Like
+from .api.arts import Art, CArt, Dislike, Lenta, Like
 from .api.auth import CreateAcc, Login, Logout, LogoutE, ResetFP
 from .api.drafts import Draft, Drafts, Labels, Paragraph
 from .api.main import Captcha, Index
@@ -116,6 +116,8 @@ app = StApp(
         Mount('/aliases', name='aliases', routes=[
             Route('/', show_aliases, name='aliases')]),
         Mount('/api', name='api', routes=[
+            Route('/cart', CArt, name='acart'),
+            Route('/follow', Lenta, name='afollow'),
             Route('/dislike', Dislike, name='adislike'),
             Route('/like', Like, name='alike'),
             Route('/art', Art, name='aart'),

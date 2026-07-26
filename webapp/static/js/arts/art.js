@@ -10,6 +10,13 @@ $(function() {
   showArt('/api/art', slug, ses);
   pingUser(300000, 12);
   if (ses) {
+    $('body').on('click', '#censor-this', {slug: slug}, censorThis);
+    $('body').on('click', '#special-case', {slug: slug}, function(event) {
+      $(this).blur();
+      undressLinks(event.data.slug);
+    });
+    $('body').on('click', '#tape-out', {slug: slug}, follow);
+    $('body').on('click', '#tape-in', {slug: slug}, follow);
     $('body').on('click', '#dislike-button', {slug:slug}, function(event) {
       $(this).blur();
       $.ajax({
@@ -35,9 +42,9 @@ $(function() {
               $('#like-button .value').text(data.likes);
               $('#dislike-button .value').text(data.dislikes);
               if (data.liked) {
-                console.log(data.liked);
                 $('#like-button').removeClass('btn-danger')
-                                 .addClass('btn-success');
+                                 .addClass('btn-success')
+                                 .attr('title', 'нравится');
 
               }
             }
@@ -71,11 +78,12 @@ $(function() {
             $('#dislike-button .value').text(data.dislikes);
             if (data.liked) {
               $('#like-button').removeClass('btn-danger')
-                               .addClass('btn-success');
-
+                               .addClass('btn-success')
+                               .attr('title', 'нравится');
             } else {
               $('#like-button').removeClass('btn-success')
-                               .addClass('btn-danger');
+                               .addClass('btn-danger')
+                               .attr('title', 'уже нравится');
             }
           }
         },
