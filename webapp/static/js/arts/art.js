@@ -6,6 +6,7 @@ $(function() {
   $('body').on('click', '.closeable', closeTopFlashed);
   $('body').on('click', '.copy-link', showCopyForm);
   $('body').on('click', '.entity-text-block img', clickImage);
+  $('body').on('click', '.slidable', hideAnnounce);
   $('body').on('click', '#move-screen-up', moveScreenUp);
   showArt('/api/art', slug, ses);
   pingUser(300000, 12);

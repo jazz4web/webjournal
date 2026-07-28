@@ -16,6 +16,65 @@ from .parse import parse_art_query, parse_arts_query
 from .slugs import check_max, make, parse_match
 
 
+async def select_broadcast(conn, aid):
+    res = list()
+    adm = await conn.fetchrow(
+        '''SELECT a.headline, a.html, a.published
+             FROM announces AS a
+             WHERE adm = true
+               AND pub = true
+               AND a.author_id != $1
+             ORDER BY random() LIMIT 1''', aid)
+    if adm:
+        res.append({'headline': adm.get('headline'),
+                    'html': adm.get('html'),
+                    'published': adm.get('published').isoformat()})
+    auth = await conn.fetchrow(
+        '''SELECT a.headline, a.html, a.published
+             FROM announces AS a, users AS u
+             WHERE a.author_id = $1
+               AND u.id = a.author_id
+               AND pub = true ORDER BY random() LIMIT 1''', aid)
+    if auth:
+        res.append({'headline': auth.get('headline'),
+                    'html': auth.get('html'),
+                    'published': auth.get('published').isoformat()})
+    return res
+
+
+async def check_ann(conn, suffix, uid, target):
+    query = await conn.fetchrow(
+        'SELECT * FROM announces WHERE suffix = $1 AND author_id = $2',
+        suffix, uid)
+    if query:
+        target['headline'] = query.get('headline')
+        target['body'] = query.get('body')
+        target['html'] = query.get('html')
+        target['suffix'] = query.get('suffix')
+        target['pub'] = query.get('pub')
+        target['published'] = query.get('published').isoformat()
+
+
+async def select_announces(conn, uid, target, page, per_page, last):
+    query = await conn.fetch(
+        '''SELECT headline, html, suffix, pub, published, author_id
+             FROM announces WHERE author_id = $1
+             ORDER BY published DESC LIMIT $2 OFFSET $3''',
+        uid, per_page, per_page*(page-1))
+    if query:
+        target['page'] = page
+        target['next'] = page + 1 if page + 1 <= last else None
+        target['prev'] = page - 1 or None
+        target['pages'] = await iter_pages(page, last)
+        target['announces'] = [
+                {'headline': record.get('headline'),
+                 'html': record.get('html'),
+                 'suffix': record.get('suffix'),
+                 'pub': record.get('pub'),
+                 'published': record.get("published").isoformat()}
+                for record in query]
+
+
 async def check_article(request, conn, slug, target):
     query = await conn.fetchrow(
         '''SELECT a.id, a.title, a.slug, a.suffix, a.html, a.summary,

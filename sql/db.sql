@@ -144,3 +144,14 @@ CREATE TABLE dislikes (
     user_id    integer REFERENCES users(id),
     CONSTRAINT article_d_user_uni UNIQUE (article_id, user_id)
 );
+
+CREATE TABLE announces (
+    headline  varchar(50),
+    body      text         DEFAULT NULL,
+    html      text         DEFAULT NULL,
+    suffix    varchar(6)   UNIQUE,
+    pub       boolean      DEFAULT FALSE,
+    adm       boolean      DEFAULT FALSE,
+    published timestamp with time zone,
+    author_id integer REFERENCES users(id)
+);

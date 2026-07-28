@@ -7,6 +7,32 @@ from markdown.extensions.codehilite import CodeHiliteExtension
 from markdown_del_ins import DelInsExtension
 
 
+def clean_ann(html):
+    callbacks = [target_blank, prevent_py, prevent_md]
+    tags = ['a', 'blockquote', 'br', 'code', 'del', 'div',
+            'em', 'iframe', 'img', 'ins', 'hr', 'li',
+            'ol', 'pre', 'span', 'strong', 'ul', 'p']
+    attrs = {'*': ['class'],
+             'a': ['href', 'title'],
+             'iframe': ['src'],
+             'img': ['src', 'alt', 'data-link']}
+    return linkify(
+        clean(html, tags=tags, attributes=attrs),
+        callbacks=callbacks, skip_tags=['pre', 'code', 'iframe'])
+
+
+def html_ann(md_text):
+    html = markdown(
+        md_text,
+        extensions=['markdown.extensions.fenced_code',
+                    'markdown.extensions.nl2br',
+                    'markdown.extensions.md_in_html',
+                    CodeHiliteExtension(use_pygments=True),
+                    DelInsExtension()],
+        output_format='html5')
+    return clean_ann(html).replace('&amp;', '&')
+
+
 def prevent_py(attrs, new=False):
     if not new:
         return attrs

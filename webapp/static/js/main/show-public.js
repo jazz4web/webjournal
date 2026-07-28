@@ -11,6 +11,8 @@ $(function() {
   $('.entity-text-block').children().each(setMargin);
   $('.entity-text-block img').each(adjustImage);
   $('body').on('click', '.entity-text-block img', clickImage);
+  $('body').on('click', '.slidable', hideAnnounce);
+  showAnns(suffix);
   $('#get-more').on('click', function() {
     $(this).blur();
     window.location.assign($(this).data().link);

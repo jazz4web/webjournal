@@ -21,6 +21,7 @@ from .announces.views import show_announce, show_announces
 from .aliases.views import show_aliases
 from .api.admin import (
     Admin, AdminAlbum, Alis, AuthAlis, AuthPics, DGroup, Pics)
+from .api.announces import Announce, Announces, Broadcast
 from .api.aliases import Aliases
 from .api.arts import Art, CArt, Dislike, Lenta, Like
 from .api.auth import CreateAcc, Login, Logout, LogoutE, ResetFP
@@ -116,6 +117,9 @@ app = StApp(
         Mount('/aliases', name='aliases', routes=[
             Route('/', show_aliases, name='aliases')]),
         Mount('/api', name='api', routes=[
+            Route('/broadcast', Broadcast, name='abroadcast'),
+            Route('/announce', Announce, name='aannounce'),
+            Route('/announces', Announces, name='aannounces'),
             Route('/cart', CArt, name='acart'),
             Route('/follow', Lenta, name='afollow'),
             Route('/dislike', Dislike, name='adislike'),

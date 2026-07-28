@@ -33,7 +33,7 @@ async def show_public(request):
     if not topic:
         raise HTTPException(404)
     return request.app.jinja.TemplateResponse(
-        request, 'main/show_public.html',
+        request, 'main/show-public.html',
         {'topic': topic,
          'slug': slug,
          'listed': False})

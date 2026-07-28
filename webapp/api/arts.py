@@ -6,7 +6,7 @@ from ..auth.cu import checkcu
 from ..common.flashed import set_flashed
 from ..common.pg import get_conn
 from ..drafts.attri import status
-from .pg import check_article, check_rel, rem_session
+from .pg import check_article, check_rel, rem_session, select_broadcast
 from .tools import check_g_secure, check_secure, check_permissions
 
 
@@ -282,6 +282,7 @@ class Art(HTTPEndpoint):
                     art.get('weight') < 255
             res['follower'] = rel['follower']
         res['art'] = art
+        res['anns'] = await select_broadcast(conn, art.get('author_id'))
         await conn.close()
         return JSONResponse(res)
 

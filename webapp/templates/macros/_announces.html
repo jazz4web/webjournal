@@ -1,0 +1,33 @@
+{% macro show_announce(link=True) %}
+  <div class="entity-block ann-block">
+    <h2>
+      {% if link %}
+        <a class="title-link"
+           title="редактировать"
+           href="/announces/<% suffix %>">
+          <% headline %>
+        </a>
+      {% else %}
+        <% headline %>
+      {% endif %}
+    </h2>
+    <div class="block-body">
+      <div class="info-line-block personal-details">
+        <div class="column">Опубликовано:</div>
+        <div class="column date-field"><% published %></div>
+        <div class="column">Статус:</div>
+        <div class="column">
+          <% #pub %>
+            публичное
+          <% /pub %>
+          <% ^pub %>
+            скрытое
+          <% /pub %>
+        </div>
+      </div>
+      <div class="text-block entity-text-block">
+        <%{ html }%>
+      </div>
+    </div>
+  </div>
+{% endmacro %}
