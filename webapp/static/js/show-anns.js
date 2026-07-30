@@ -2,6 +2,9 @@ function showAnns(suffix) {
   $.ajax({
     method: 'GET',
     url: '/api/broadcast',
+    headers: {
+      'x-br-s': 'empty'
+    },
     data: {
       suffix: suffix
     },

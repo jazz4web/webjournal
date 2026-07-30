@@ -20,6 +20,8 @@ from .tools import check_g_secure, check_permissions, check_secure
 class Broadcast(HTTPEndpoint):
     async def get(self, request):
         res = {'anns': None}
+        if request.headers.get('x-br-s') is None:
+            raise HTTPException(403)
         suffix = request.query_params.get('suffix')
         if suffix:
             conn = await get_conn(request.app.config)
