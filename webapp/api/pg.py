@@ -16,6 +16,29 @@ from .parse import parse_art_query, parse_arts_query
 from .slugs import check_max, make, parse_match
 
 
+async def select_authors(request, conn, target, page, per_page, last):
+    query = await conn.fetch(
+        '''SELECT id, username, registered, description, last_published
+             FROM users WHERE last_published IS NOT NULL
+               AND description IS NOT NULL
+             ORDER BY last_published DESC LIMIT $1 OFFSET $2''',
+        per_page, per_page*(page-1))
+    if query:
+        target['page'] = page
+        target['next'] = page + 1 if page + 1 <= last else None
+        target['prev'] = page - 1 or None
+        target['pages'] = await iter_pages(page, last)
+        target['blogs'] = [
+            {'id': record.get('id'),
+             'username': record.get('username'),
+             'registered': record.get('registered').isoformat(),
+             'description': record.get('description'),
+             'last_published': record.get('last_published').isoformat(),
+             'ava': request.url_for(
+                 'ava', username=record.get('username'), size=98)._url}
+             for record in query]
+
+
 async def select_broadcast(conn, aid):
     res = list()
     adm = await conn.fetchrow(
