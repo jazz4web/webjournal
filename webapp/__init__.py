@@ -25,7 +25,7 @@ from .api.announces import Announce, Announces, Broadcast
 from .api.aliases import Aliases
 from .api.arts import Art, CArt, Dislike, Lenta, Like
 from .api.auth import CreateAcc, Login, Logout, LogoutE, ResetFP
-from .api.blogs import Authors
+from .api.blogs import Authors, Blog
 from .api.drafts import Draft, Drafts, Labels, Paragraph
 from .api.main import Captcha, Index
 from .api.people import ChangeAva, ChangeM, ChangePasswd, People, Profile
@@ -118,6 +118,7 @@ app = StApp(
         Mount('/aliases', name='aliases', routes=[
             Route('/', show_aliases, name='aliases')]),
         Mount('/api', name='api', routes=[
+            Route('/blog', Blog, name='ablog'),
             Route('/blogs', Authors, name='ablogs'),
             Route('/broadcast', Broadcast, name='abroadcast'),
             Route('/announce', Announce, name='aannounce'),
