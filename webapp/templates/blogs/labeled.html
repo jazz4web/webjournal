@@ -1,4 +1,7 @@
 {% extends "base.html" %}
+{%- from "macros/_common.html" import show_empty -%}
+{%- from "macros/_common.html" import show_pv -%}
+{%- from "macros/_drafts.html" import show_arts -%}
 
 {%- block title_part -%}
   {{ username }} с меткой {{ label }}
@@ -9,17 +12,72 @@
   {%- assets filters='cssmin', output='generic/css/blogs/labeled.css',
              'css/base.css',
              'css/menu.css',
+             'css/page-content.css',
+             'css/flashed-error.css',
+             'css/flashed-alert.css',
+             'css/today-field.css',
+             'css/empty-message.css',
+             'css/content-block.css',
+             'css/entity-block.css',
+             'css/next-block.css',
+             'css/entity-attributes.css',
+             'css/avatar.css',
+             'css/personal-details.css',
+             'css/entity-attributes.css',
+             'css/entity-details.css',
+             'css/entity-summary.css',
+             'css/form-control.css',
+             'vendor/bootstrap/css/glyphicons.css',
+             'css/entity-labels.css',
+             'css/drafts.css',
+             'css/cookies-alert.css',
+             'css/entity-pagination.css',
              'css/footer.css' -%}
     <link rel="stylesheet" type="text/css" href="{{ ASSET_URL }}">
   {%- endassets -%}
 {%- endblock styles -%}
 
+{%- block templates -%}
+  {{- super() -}}
+  <script id="draftst" type="text/template">
+    <% #pagination.articles %>
+      {{ show_arts('/arts/a/', '/blogs/' + username + '/t/') }}
+    <% /pagination.articles %>
+    <% ^pagination.articles %>
+      {%- if cu['username'] == username %}
+        {{ show_empty('У вас пока нет такой метки.') }}
+      {%- else -%}
+        {{ show_empty(
+          'У автора нет такой метки, попробуйте зайти позже.') }}
+      {%- endif -%}
+    <% /pagination.articles %>
+    <% #pv %>
+      {{- show_pv() -}}
+    <% /pv %>
+  </script>
+{%- endblock templates -%}
+
 {%- block scripts -%}
   {{- super() -}}
+  <script>let ses="{{cu.ses}}",page={{page}},username="{{username}}",label="{{label}}";</script>
   {%- assets filters='rjsmin', output='generic/js/blogs/labeled.js',
              'js/render-menu.js',
              'js/render-footer.js',
-             'js/temporary.js' -%}
+             'js/check-auth.js',
+             'js/ping.js',
+             'js/close-topflashed.js',
+             'js/error-403.js',
+             'js/slide-page.js',
+             'js/check-pc.js',
+             'js/check-data.js',
+             'js/check-br.js',
+             'js/check-next.js',
+             'js/format-datetime.js',
+             'js/fix-comma.js',
+             'js/render-pv.js',
+             'js/render-tf.js',
+             'js/set-cookies.js',
+             'js/blogs/labeled.js' -%}
     <script src="{{ ASSET_URL }}"></script>
   {%- endassets -%}
 {%- endblock scripts -%}
