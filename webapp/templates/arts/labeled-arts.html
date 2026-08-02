@@ -1,4 +1,7 @@
 {% extends "base.html" %}
+{%- from "macros/_common.html" import show_empty -%}
+{%- from "macros/_common.html" import show_pv -%}
+{%- from "macros/_drafts.html" import show_arts -%}
 
 {%- block title_part -%}
   Топ-Темы с меткой "{{ label }}"
@@ -9,17 +12,67 @@
   {%- assets filters='cssmin', output='generic/css/arts/labeled-arts.css',
              'css/base.css',
              'css/menu.css',
+             'css/page-content.css',
+             'css/flashed-error.css',
+             'css/flashed-alert.css',
+             'css/today-field.css',
+             'css/empty-message.css',
+             'css/content-block.css',
+             'css/entity-block.css',
+             'css/entity-attributes.css',
+             'css/avatar.css',
+             'css/personal-details.css',
+             'css/entity-details.css',
+             'css/entity-summary.css',
+             'css/form-control.css',
+             'vendor/bootstrap/css/glyphicons.css',
+             'css/entity-labels.css',
+             'css/next-block.css',
+             'css/drafts.css',
+             'css/entity-pagination.css',
+             'css/cookies-alert.css',
              'css/footer.css' -%}
     <link rel="stylesheet" type="text/css" href="{{ ASSET_URL }}">
   {%- endassets -%}
 {%- endblock styles -%}
 
+{%- block templates -%}
+  {{- super() -}}
+  <script id="draftst" type="text/template">
+    <% #pagination.articles %>
+      {{ show_arts('/arts/a/', '/arts/t/') }}
+    <% /pagination.articles %>
+    <% ^pagination.articles %>
+      {{ show_empty('С такой меткой ничего не найдено.') }}
+    <% /pagination.articles %>
+    <% #pv %>
+      {{- show_pv() -}}
+    <% /pv %>
+  </script>
+{%- endblock templates -%}
+
 {%- block scripts -%}
   {{- super() -}}
+  <script>let ses="{{cu.ses}}",page={{page}},label="{{label}}";</script>
   {%- assets filters='rjsmin', output='generic/js/arts/labeled-arts.js',
              'js/render-menu.js',
              'js/render-footer.js',
-             'js/temporary.js' -%}
+             'js/check-auth.js',
+             'js/ping.js',
+             'js/close-topflashed.js',
+             'js/show-labeled-drafts.js',
+             'js/error-403.js',
+             'js/slide-page.js',
+             'js/check-pc.js',
+             'js/set-cookies.js',
+             'js/check-data.js',
+             'js/check-br.js',
+             'js/format-datetime.js',
+             'js/check-next.js',
+             'js/fix-comma.js',
+             'js/render-pv.js',
+             'js/render-tf.js',
+             'js/arts/labeled-arts.js' -%}
     <script src="{{ ASSET_URL }}"></script>
   {%- endassets -%}
 {%- endblock scripts -%}

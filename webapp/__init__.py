@@ -23,7 +23,7 @@ from .api.admin import (
     Admin, AdminAlbum, Alis, AuthAlis, AuthPics, DGroup, Pics)
 from .api.announces import Announce, Announces, Broadcast
 from .api.aliases import Aliases
-from .api.arts import Art, Arts, CArt, Dislike, Lenta, Like
+from .api.arts import Art, Arts, Alabels, CArt, Dislike, Lenta, Like
 from .api.auth import CreateAcc, Login, Logout, LogoutE, ResetFP
 from .api.blogs import Authors, Blog, LBlog
 from .api.drafts import Draft, Drafts, Labels, Paragraph
@@ -118,6 +118,7 @@ app = StApp(
         Mount('/aliases', name='aliases', routes=[
             Route('/', show_aliases, name='aliases')]),
         Mount('/api', name='api', routes=[
+            Route('/alabels', Alabels, name='alabels'),
             Route('/arts', Arts, name='aarts'),
             Route('/lblog', LBlog, name='alblog'),
             Route('/blog', Blog, name='ablog'),
