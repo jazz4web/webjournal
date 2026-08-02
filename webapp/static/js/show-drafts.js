@@ -2,7 +2,9 @@ function showDrafts(url, page, ses) {
   let tee = ses ? {
     'x-br-ses': ses,
     'x-auth-sestee': window.localStorage.getItem('sestee')
-  } : {};
+  } : {
+    'x-auth-sestee': 'empty'
+  };
   $.ajax({
     method: 'GET',
     url: url,

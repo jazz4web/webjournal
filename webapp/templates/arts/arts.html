@@ -1,23 +1,80 @@
 {% extends "base.html" %}
+{%- from "macros/_common.html" import show_empty -%}
+{%- from "macros/_common.html" import show_pv -%}
+{%- from "macros/_drafts.html" import show_arts -%}
 
 {%- block title_part -%}Топ-Темы{%- endblock title_part -%}
+
+{%- block metas -%}
+  {{- super() -}}
+  <meta name="description" content="{{ config.get('SDESC')}} На странице представлен топ публичных тем по количеству просмотров.">
+{%- endblock metas -%}
 
 {%- block styles -%}
   {{- super() -}}
   {%- assets filters='cssmin', output='generic/css/arts/arts.css',
              'css/base.css',
              'css/menu.css',
+             'css/page-content.css',
+             'css/flashed-alert.css',
+             'css/flashed-error.css',
+             'css/today-field.css',
+             'css/empty-message.css',
+             'css/content-block.css',
+             'css/entity-block.css',
+             'css/next-block.css',
+             'css/entity-attributes.css',
+             'css/avatar.css',
+             'css/personal-details.css',
+             'css/entity-details.css',
+             'css/entity-summary.css',
+             'vendor/bootstrap/css/glyphicons.css',
+             'css/entity-labels.css',
+             'css/drafts.css',
+             'css/entity-pagination.css',
+             'css/cookies-alert.css',
+             'css/form-control.css',
              'css/footer.css' -%}
     <link rel="stylesheet" type="text/css" href="{{ ASSET_URL }}">
   {%- endassets -%}
 {%- endblock styles -%}
 
+{%- block templates -%}
+  {{- super() -}}
+  <script id="draftst" type="text/template">
+    <% #pagination.articles %>
+      {{ show_arts('/arts/a/', '/arts/t/') }}
+    <% /pagination.articles %>
+    <% ^pagination.articles %>
+      {{ show_empty('Сайт в стадии разработки, попробуйте зайти позже.') }}
+    <% /pagination.articles %>
+    <% #pv %>
+      {{- show_pv() -}}
+    <% /pv %>
+  </script>
+{%- endblock templates -%}
+
 {%- block scripts -%}
   {{- super() -}}
+  <script>let ses="{{cu.ses}}",page={{page}};</script>
   {%- assets filters='rjsmin', output='generic/js/arts/arts.js',
              'js/render-menu.js',
              'js/render-footer.js',
-             'js/temporary.js' -%}
+             'js/check-auth.js',
+             'js/ping.js',
+             'js/close-topflashed.js',
+             'js/set-cookies.js',
+             'js/show-drafts.js',
+             'js/error-403.js',
+             'js/check-data.js',
+             'js/check-br.js',
+             'js/check-pc.js',
+             'js/format-datetime.js',
+             'js/check-next.js',
+             'js/fix-comma.js',
+             'js/render-pv.js',
+             'js/slide-page.js',
+             'js/arts/arts.js' -%}
     <script src="{{ ASSET_URL }}"></script>
   {%- endassets -%}
 {%- endblock scripts -%}
