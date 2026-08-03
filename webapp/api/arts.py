@@ -9,7 +9,7 @@ from ..common.pg import get_conn
 from ..drafts.attri import status
 from .pg import (
     check_article, check_last, check_rel, rem_session,
-    select_arts, select_broadcast, select_labeled_arts)
+    select_arts, select_broadcast, select_followed, select_labeled_arts)
 from .tools import check_g_secure, check_secure, check_permissions
 
 
@@ -127,6 +127,41 @@ class CArt(HTTPEndpoint):
 
 
 class Lenta(HTTPEndpoint):
+    async def get(self, request):
+        res = {'cu': None}
+        token = request.headers.get('x-auth-sestee')
+        if token is None:
+            raise HTTPException(403)
+        conn = await get_conn(request.app.config)
+        cu = await checkcu(request, conn, token)
+        res['cu'] = cu
+        message = await check_g_secure(request, cu, 0)
+        if message:
+            res['message'] = message
+            await conn.close()
+            return JSONResponse(res)
+        page = await parse_page(request)
+        last = await check_last(
+            conn, page,
+            request.app.config.get('ARTS_PER_PAGE', cast=int, default=3),
+            '''SELECT count(*) FROM articles AS a, followers AS f
+                 WHERE a.author_id = f.author_id
+                   AND a.state IN ($1, $2, $3) AND f.follower_id = $4''',
+            status.pub, status.priv, status.ffo, cu.get('id'))
+        if page > last:
+            res['message'] = f'Всего найдено страниц: {last}.'
+            await conn.close()
+            return JSONResponse(res)
+        res['pagination'] = dict()
+        await select_followed(
+            request, conn, res['pagination'], cu.get('id'), page,
+            request.app.config.get('ARTS_PER_PAGE', cast=int, default=3), last)
+        if res['pagination']:
+            if res['pagination']['next'] or res['pagination']['prev']:
+                res['pv'] = True
+        await conn.close()
+        return JSONResponse(res)
+
     async def put(self, request):
         res = {'done': None}
         d = await request.form()
