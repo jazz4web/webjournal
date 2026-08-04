@@ -9,8 +9,51 @@ from ..common.pg import get_conn
 from ..drafts.attri import status
 from .pg import (
     check_article, check_last, check_rel, rem_session,
-    select_arts, select_broadcast, select_followed, select_labeled_arts)
+    select_arts, select_broadcast, select_followed, select_labeled_arts,
+    select_l_followed)
 from .tools import check_g_secure, check_secure, check_permissions
+
+
+class LLenta(HTTPEndpoint):
+    async def get(self, request):
+        label = request.query_params.get('label')
+        res = {'cu': None}
+        token = request.headers.get('x-auth-sestee')
+        if token is None:
+            raise HTTPException(403)
+        conn = await get_conn(request.app.config)
+        cu = await checkcu(request, conn, token)
+        res['cu'] = cu
+        message = await check_g_secure(request, cu, 0)
+        if message:
+            res['message'] = message
+            await conn.close()
+            return JSONResponse(res)
+        page = await parse_page(request)
+        last = await check_last(
+            conn, page,
+            request.app.config.get('ARTS_PER_PAGE', cast=int, default=3),
+            '''SELECT count(*) FROM articles AS a, followers AS f, labels, als
+                 WHERE a.author_id = f.author_id
+                   AND f.follower_id = $1
+                   AND a.id = als.article_id
+                   AND labels.label = $2
+                   AND labels.id = als.label_id
+                   AND a.state IN ($3, $4, $5)''',
+            cu.get('id'), label, status.pub, status.priv, status.ffo)
+        if page > last:
+            res['message'] = f'Всего известно страниц: {last}.'
+            await conn.close()
+            return JSONResponse(res)
+        res['pagination'] = dict()
+        await select_l_followed(
+            request, conn, cu.get('id'), label, res['pagination'], page,
+            request.app.config.get('ARTS_PER_PAGE', cast=int, default=3), last)
+        if res['pagination']:
+            if res['pagination']['next'] or res['pagination']['prev']:
+                res['pv'] = True
+        await conn.close()
+        return JSONResponse(res)
 
 
 class Alabels(HTTPEndpoint):
