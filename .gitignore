@@ -8,4 +8,5 @@ vendor
 generic
 fonts
 tuning.py
+webapp/static/images
 *.old.txt
