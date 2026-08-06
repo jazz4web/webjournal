@@ -8,10 +8,84 @@ from ..common.flashed import set_flashed
 from ..common.pg import get_conn
 from ..drafts.attri import status
 from .pg import (
-    check_article, check_last, check_rel, rem_session,
-    select_arts, select_broadcast, select_followed, select_labeled_arts,
-    select_l_followed)
+    check_article, check_cart, check_last, check_rel,
+    rem_session, select_arts, select_broadcast, select_carts,
+    select_followed, select_labeled_arts, select_l_carts, select_l_followed)
 from .tools import check_g_secure, check_secure, check_permissions
+
+
+class LCArts(HTTPEndpoint):
+    async def get(self, request):
+        res = {'cu': None}
+        token = request.headers.get('x-auth-sestee')
+        if token is None:
+            raise HTTPException(403)
+        conn = await get_conn(request.app.config)
+        cu = await checkcu(request, conn, token)
+        res['cu'] = cu
+        message = await check_g_secure(request, cu, 250)
+        if message:
+            res['message'] = message
+            await conn.close()
+            return JSONResponse(res)
+        label = request.query_params.get('label')
+        page = await parse_page(request)
+        last = await check_last(
+            conn, page,
+            request.app.config.get('ARTS_PER_PAGE', cast=int, default=3),
+            '''SELECT count(*) FROM articles, labels, als
+                 WHERE articles.id = als.article_id
+                   AND labels.label = $1
+                   AND labels.id = als.label_id
+                   AND articles.state = $2''',
+            label, status.cens)
+        if page > last:
+            res['message'] = f'Всего известно страниц: {last}.'
+            await conn.close()
+            return JSONResponse(res)
+        res['pagination'] = dict()
+        await select_l_carts(
+            request, conn, label, res['pagination'], page,
+            request.app.config.get('ARTS_PER_PAGE', cast=int, default=3), last)
+        if res['pagination']:
+            if res['pagination']['next'] or res['pagination']['prev']:
+                res['pv'] = True
+        await conn.close()
+        return JSONResponse(res)
+
+
+class CArts(HTTPEndpoint):
+    async def get(self, request):
+        res = {'cu': None}
+        token = request.headers.get('x-auth-sestee')
+        if token is None:
+            raise HTTPException(403)
+        conn = await get_conn(request.app.config)
+        cu = await checkcu(request, conn, token)
+        res['cu'] = cu
+        message = await check_g_secure(request, cu, 250)
+        if message:
+            res['message'] = message
+            await conn.close()
+            return JSONResponse(res)
+        page = await parse_page(request)
+        last = await check_last(
+            conn, page,
+            request.app.config.get('ARTS_PER_PAGE', cast=int, default=3),
+            'SELECT count(*) FROM articles WHERE state = $1', status.cens)
+        if page > last:
+            res['message'] = f'Всего известно страниц: {last}.'
+            await conn.close()
+            return JSONResponse(res)
+        res['pagination'] = dict()
+        await select_carts(
+            request, conn, res['pagination'], page,
+            request.app.config.get('ARTS_PER_PAGE', cast=int, default=3), last)
+        if res['pagination']:
+            if res['pagination']['next'] or res['pagination']['prev']:
+                res['pv'] = True
+        await conn.close()
+        return JSONResponse(res)
 
 
 class LLenta(HTTPEndpoint):
@@ -122,6 +196,31 @@ class Arts(HTTPEndpoint):
 
 
 class CArt(HTTPEndpoint):
+    async def get(self, request):
+        res = {'art': None, 'cu': None}
+        token = request.headers.get('x-auth-sestee')
+        if token is None:
+            raise HTTPException(403)
+        conn = await get_conn(request.app.config)
+        cu = await checkcu(request, conn, token)
+        res['cu'] = cu
+        message = await check_g_secure(request, cu, 250)
+        if message:
+            res['message'] = message
+            await conn.close()
+            return JSONResponse(res)
+        slug = request.query_params.get('slug', '')
+        art = dict()
+        await check_cart(request, conn, slug, art)
+        await conn.close()
+        if not art:
+            res['message'] = 'Ничего не найдено, проверьте ссылку.'
+            await conn.close()
+            return JSONResponse(res)
+        res['art'] = art
+        res['admin'] = cu.get('weight') == 255
+        return JSONResponse(res)
+
     async def put(self, request):
         res = {'done': None}
         d = await request.form()
