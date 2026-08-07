@@ -2,20 +2,21 @@ User-agent: *
 Disallow: /?realm=*
 Disallow: /captcha/
 Disallow: /admin/
-Disallow: /aliases/
 Disallow: /announces/
+Disallow: /aliases/
 Disallow: /api/
 Disallow: /arts/?page=*
 Disallow: /arts/a/
 Disallow: /arts/t/
 Disallow: /arts/l/
 Disallow: /arts/c/
+Disallow: /auth/
 Disallow: /blogs/
 Disallow: /comments/
 Disallow: /drafts/
-Disallow: /humans.txt
 Disallow: /people/
 Disallow: /pictures/
 Disallow: /pm/
+Disallow: /humans.txt
 
 Sitemap: {{ url_for('sitemap') }}

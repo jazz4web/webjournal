@@ -28,6 +28,61 @@ $(function() {
     dataType: 'json'
   });
   if (tee) {
+    $('body').on('click', '#robots-submit', function() {
+      $(this).blur();
+      $.ajax({
+        method: 'PUT',
+        url: '/api/chrobots',
+        headers: {
+          'x-br-ses': ses,
+          'x-br-tee': checkBR()
+        },
+        data: {
+          auth: window.localStorage.getItem('sestee'),
+          value: $('#reditor').val()
+        },
+        success: function(data) {
+          if (data.done) {
+            window.location.assign('/robots.txt');
+          } else {
+            showError('#mc', data);
+            scrollPanel($('#ealert'));
+            setTimeout(function() {checkPC(860);}, 400);
+          }
+        },
+        dataType: 'json'
+      });
+    });
+    $('body').on('click', '#edit-li-stat', function() {
+      $(this).blur();
+      let l = $('#li-editor');
+      if (l.is(':hidden')) {
+        l.siblings().each(function() {
+          if (!$(this).is(':hidden')) $(this).slideUp('slow');
+        });
+        l.slideDown('slow');
+      }
+    });
+    $('body').on('click', '#edit-index', function() {
+      $(this).blur();
+      let i = $('#index-editor');
+      if (i.is(':hidden')) {
+        i.siblings().each(function() {
+          if (!$(this).is(':hidden')) $(this).slideUp('slow');
+        });
+        i.slideDown('slow');
+      }
+    });
+    $('body').on('click', '#edit-robots', function() {
+      $(this).blur();
+      let r = $('#robots-editor');
+      if (r.is(':hidden')) {
+        r.siblings().each(function() {
+          if (!$(this).is(':hidden')) $(this).slideUp('slow');
+        });
+        r.slideDown('slow');
+      }
+    });
     $('body').on('click', '#edit-perms', function() {
       $(this).blur();
       let p = $('#default-perms-editor');

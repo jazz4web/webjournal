@@ -20,7 +20,7 @@ from .admin.views import (
 from .announces.views import show_announce, show_announces
 from .aliases.views import show_aliases
 from .api.admin import (
-    Admin, AdminAlbum, Alis, AuthAlis, AuthPics, DGroup, Pics)
+    Admin, AdminAlbum, Alis, AuthAlis, AuthPics, DGroup, Pics, Robots)
 from .api.announces import Announce, Announces, Broadcast
 from .api.aliases import Aliases
 from .api.arts import (
@@ -119,6 +119,7 @@ app = StApp(
         Mount('/aliases', name='aliases', routes=[
             Route('/', show_aliases, name='aliases')]),
         Mount('/api', name='api', routes=[
+            Route('/chrobots', Robots, name='arobots'),
             Route('/lcarts', LCArts, name='alcarts'),
             Route('/carts', CArts, name='acarts'),
             Route('/llenta', LLenta, name='allenta'),

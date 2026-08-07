@@ -22,6 +22,31 @@ from .pg import (
 from .tools import check_permissions, check_g_secure, check_secure
 
 
+class Robots(HTTPEndpoint):
+    async def put(self, request):
+        res = {'done': None}
+        d = await request.form()
+        ses, brkey, message = await check_secure(request)
+        if message:
+            res['message'] = message
+            return JSONResponse(res)
+        conn = await get_conn(request.app.config)
+        cu = await checkcu(request, conn, d.get('auth'))
+        if message := await check_permissions(cu, 255):
+            res['message'] = message
+            await conn.close()
+            return JSONResponse(res)
+        if brkey != cu.get('brkey') or ses != cu.get('ses'):
+            res['message'] = await rem_session(conn, cu)
+            await conn.close()
+            return JSONResponse(res)
+        val = d.get('value', '')
+        await conn.execute('UPDATE settings SET robots = $1', val or None)
+        res['done'] = True
+        await conn.close()
+        return JSONResponse(res)
+
+
 class AuthPics(HTTPEndpoint):
     async def get(self, request):
         res = {'cu': None}
@@ -496,6 +521,9 @@ class Admin(HTTPEndpoint):
         res['groups'] = groups.default_groups()
         res['dgroup'] = await conn.fetchval(
             'SELECT dgroup FROM settings') or groups.default_group()
+        res['robots'] = await conn.fetchval('SELECT robots FROM settings') or \
+            request.app.jinja.get_template(
+                'main/robots.txt').render(request=request)
         await conn.close()
         return JSONResponse(res)
 

@@ -17,6 +17,7 @@
              'vendor/bootstrap/css/glyphicons.css',
              'css/options-panel.css',
              'css/next-block.css',
+             'css/tools.css',
              'css/footer.css' -%}
     <link rel="stylesheet" type="text/css" href="{{ ASSET_URL }}">
   {%- endassets -%}
@@ -129,6 +130,77 @@
           </select>
         </div>
       </div>
+      <div id="robots-editor" class="hidden">
+        <div class="form-help">
+          <p>
+            Здесь можно создать и отредактировать файл <i>robots.txt</i>, для
+            этого следует заполнить форму ниже, вписать все необходимые
+            директивы в поле ввода и нажать кнопку "Сохранить". Имейте ввиду,
+            что файл уже существует и доступен в состоянии по-умолчанию.
+            Отменить все правки можно, удалив весть текст из формы и нажав
+            кнопку "Сохранить", тогда будет восстановлено состояние файла
+            по-умолчанию.
+          </p>
+        </div>
+        <div class="form-group ta-group">
+          <textarea id="reditor"
+                    class="form-control"
+                    placeholder="введите или отредактируйте текст файла"
+                    rows="10"><% robots %></textarea>
+        </div>
+        <div class="form-group">
+          <button id="robots-submit"
+                  type="button"
+                  class="btn btn-primary btn-block"
+                  title="сохранить">
+            Сохранить
+          </button>
+        </div>
+      </div>
+      <div id="index-editor" class="hidden">
+        <div class="form-help">
+          <p>
+            Если создать черновик и скопировать в поле ввода ниже
+            восьмизначный суффикс этого черновика, заголовок и текст черновика
+            будут показаны на стартовой странице сайта.
+          </p>
+        </div>
+        <div class="form-group ta-group">
+          <input id="ipage-suffix"
+                 type="text"
+                 class="form-control"
+                 name="ipage-suffix"
+                 value="<% index %>"
+                 placeholder="введите суффикс приватной статьи">
+        </div>
+        <div class="form-group">
+          <button id="ipage-submit"
+                  type="button"
+                  class="btn btn-primary btn-block"
+                  title="задать">Задать</button>
+        </div>
+      </div>
+      <div id="li-editor" class="hidden">
+        <div class="form-help">
+          <p>
+            Здесь можно подключить на сайт счётчики статистики,
+            для этого нужно скопировать код счётчика в форму ниже и нажать
+            кнопку "Установить", счётчик будет подключен автоматически на все
+            ключевые страницы сервиса.
+          </p>
+        </div>
+        <div class="form-group ta-group">
+          <textarea id="li-edit"
+                    class="form-control"
+                    placeholder="введите или отредактируйте код счётчика"
+                    rows="10"><% li_counter %></textarea>
+        </div>
+        <div class="form-group">
+          <button id="li-submit"
+                  type="button"
+                  class="btn btn-primary btn-block">Установить</button>
+        </div>
+      </div>
     </div>
     <div id="options-block" class="options-panel next-block">
       <button id="create-user"
@@ -143,6 +215,27 @@
               class="btn-sm btn-primary"
               title="установить группу по-умолчанию">
         <span class="glyphicon glyphicon-wrench"
+              aria-hidden="true"></span>
+      </button>
+      <button id="edit-robots"
+              type="button"
+              class="btn-success btn-sm"
+              title="править robots.txt">
+        <span class="glyphicon glyphicon-globe"
+              aria-hidden="true"></span>
+      </button>
+      <button id="edit-index"
+              type="button"
+              class="btn-info btn-sm"
+              title="index page">
+        <span class="glyphicon glyphicon-info-sign"
+              aria-hidden="true"></span>
+      </button>
+      <button id="edit-li-stat"
+              type="button"
+              class="btn-danger btn-sm"
+              title="счётчики статистики">
+        <span class="glyphicon glyphicon-grain"
               aria-hidden="true"></span>
       </button>
     </div>
