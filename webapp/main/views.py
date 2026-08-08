@@ -10,6 +10,7 @@ from starlette.responses import (
 from ..dirs import images
 from ..errors import E404
 
+from ..api.parse import LABELS
 from ..api.tasks import check_swapped
 from ..auth.cu import getcu
 from ..common.flashed import get_flashed
@@ -214,6 +215,22 @@ async def show_index(request):
                 {'perm': request.app.config.get('REGPERM', cast=bool),
                  'listed': False})
     out, oute = 0, 0
+    art = await conn.fetchval('SELECT indexpage FROM settings')
+    if art:
+        art = await conn.fetchrow(
+            '''SELECT a.id, a.suffix, a.title,
+                      a.html, a.edited, u.username
+                 FROM articles AS a, users AS u
+                 WHERE a.author_id = u.id AND a.suffix = $1''', art)
+        if art:
+            art = {'id': art.get('id'),
+                   'suffix': art.get('suffix'),
+                   'title': art.get('title'),
+                   'html': art.get('html'),
+                   'edited': art.get('edited').isoformat(),
+                   'kws': [label.get('label') for label in await conn.fetch(
+                       LABELS, art.get('id'))],
+                   'author': art.get('username')}
     if cu and realm == 'logout':
         out = 1
     if cu and realm == 'logoute':
@@ -225,4 +242,5 @@ async def show_index(request):
          'cu': cu,
          'out': out,
          'oute': oute,
+         'art': art,
          'flashed': await get_flashed(request)})

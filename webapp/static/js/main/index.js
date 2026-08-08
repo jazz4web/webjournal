@@ -8,6 +8,12 @@ $(function() {
   let dt = luxon.DateTime.now();
   if ($('.today-field').length) renderTF('.today-field', dt);
   $('body').on('click', '.closeable', closeTopFlashed);
+  $('.date-field').each(function() {formatDateTime($(this));});
+  $('.entity-text-block img').on('click', clickImage);
   checkPC(860);
+  $('.entity-text-block iframe').each(adjustFrame);
+  $('.entity-text-block').children().each(setMargin);
+  $('.entity-text-block img').each(adjustImage);
+  pingUser(300000, 8);
   setTimeout(setCookies, 900);
 });

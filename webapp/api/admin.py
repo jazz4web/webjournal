@@ -15,11 +15,50 @@ from ..common.aparsers import (
     parse_pic_filename, parse_page, parse_title, parse_units, parse_url)
 from ..common.flashed import set_flashed
 from ..common.pg import get_conn
+from ..drafts.attri import status
 from ..pictures.attri import status as state
 from .pg import (
     check_last, rem_session, sadmin_album, sadmin_auth_aliases,
     sadmin_auth_pictures)
 from .tools import check_permissions, check_g_secure, check_secure
+
+
+class IndexPage(HTTPEndpoint):
+    async def put(self, request):
+        res = {'done': None}
+        d = await request.form()
+        ses, brkey, message = await check_secure(request)
+        if message:
+            res['message'] = message
+            return JSONResponse(res)
+        conn = await get_conn(request.app.config)
+        cu = await checkcu(request, conn, d.get('auth'))
+        if message := await check_permissions(cu, 255):
+            res['message'] = message
+            await conn.close()
+            return JSONResponse(res)
+        if brkey != cu.get('brkey') or ses != cu.get('ses'):
+            res['message'] = await rem_session(conn, cu)
+            await conn.close()
+            return JSONResponse(res)
+        val = d.get('value', '')
+        if val:
+            if '/' in val:
+                val = val.split('/')[-1]
+            d = await conn.fetchval(
+                'SELECT suffix FROM articles WHERE suffix = $1 AND state = $2',
+                val, status.draft)
+            if d:
+                await conn.execute('UPDATE settings SET indexpage = $1', d)
+            else:
+                res['message'] = 'Ничего не найдено по запросу.'
+                await conn.close()
+                return JSONResponse(res)
+        else:
+            await conn.execute('UPDATE settings SET indexpage = NULL')
+        await conn.close()
+        res['done'] = True
+        return JSONResponse(res)
 
 
 class Robots(HTTPEndpoint):
@@ -524,6 +563,7 @@ class Admin(HTTPEndpoint):
         res['robots'] = await conn.fetchval('SELECT robots FROM settings') or \
             request.app.jinja.get_template(
                 'main/robots.txt').render(request=request)
+        res['index'] = await conn.fetchval('SELECT indexpage FROM settings')
         await conn.close()
         return JSONResponse(res)
 

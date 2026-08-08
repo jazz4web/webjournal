@@ -6,13 +6,15 @@
 {%- endblock title_part -%}
 
 {%- block metas -%}
-{{- super() -}}
-<meta name="description" content="{{ config.get('SDESC') }}">
+  {{- super() -}}
+  <meta name="description" content="{{ config.get('SDESC') }}">
+  {%- if art -%}
+  <meta name="keywords"
+        content="{%- for label in art.get('kws') -%}
+                   {{- label -}}{%- if not loop.last -%}{{ ", " }}{%- endif -%}
+                 {%- endfor -%}">
+  {%- endif -%}
 {%- endblock metas -%}
-
-{%- block page_body -%}
-  {{-show_empty('Сайт в стадии разработки, попробуйте зайти позже...') -}}
-{%- endblock page_body -%}
 
 {%- block styles -%}
 {{- super() -}}
@@ -24,12 +26,33 @@
            'css/flashed-alert.css',
            'css/empty-message.css',
            'css/today-field.css',
+           'css/content-block.css',
+           'css/entity-block.css',
+           'css/topic-head.css',
+           'css/entity-text-block.css',
+           'css/colors.css',
+           'vendor/pygments/css/pygments.css',
+           'css/index.css',
            'css/cookies-alert.css',
            'css/form-control.css',
            'css/footer.css' -%}
   <link rel="stylesheet" href="{{ ASSET_URL }}">
 {%- endassets -%}
 {%- endblock styles -%}
+
+{%- block page_body -%}
+  {%- if art -%}
+    <div id="topic-head" class="content-block entity-block">
+      <h1 title="{{ art['title'] }}">{{ art['title'] }}</h1>
+      <div class="text-block entity-text-block">
+        {{ art['html']|safe }}
+      </div>
+      <div class="date-field">{{ art['edited'] }}</div>
+    </div>
+  {%- else -%}
+    {{-show_empty('Сайт в стадии разработки, попробуйте зайти позже...') -}}
+  {%- endif -%}
+{%- endblock page_body -%}
 
 {%- block scripts -%}
 {{- super() -}}
@@ -45,6 +68,12 @@
            'js/check-br.js',
            'js/render-footer.js',
            'js/set-cookies.js',
+           'js/format-datetime.js',
+           'js/click-image.js',
+           'js/adjust-frame.js',
+           'js/adjust-image.js',
+           'js/set-margin.js',
+           'js/ping-user.js',
            'js/main/index.js' -%}
   <script src="{{ ASSET_URL }}"></script>
 {%- endassets -%}
