@@ -12,6 +12,6 @@ body {
   grid-template-rows: 1fr auto;
 }
 
-.hidden {
+#counters, .hidden {
   display: none;
 }

@@ -3,6 +3,13 @@ from ..drafts.attri import status as statusd
 from ..pictures.attri import status
 
 
+async def get_counters(conn, cu):
+    if cu is None or (cu and cu.get('weight') < 250):
+        return await conn.fetchval('SELECT counters FROM settings')
+    return None
+
+
+
 async def check_topic(request, conn, slug, target):
     query = await conn.fetchrow(
         '''SELECT a.id, a.title, a.slug, a.suffix, a.html, a.summary,

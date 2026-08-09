@@ -23,6 +23,32 @@ from .pg import (
 from .tools import check_permissions, check_g_secure, check_secure
 
 
+class Counter(HTTPEndpoint):
+    async def put(self, request):
+        res = {'done': None}
+        d = await request.form()
+        ses, brkey, message = await check_secure(request)
+        if message:
+            res['messsage'] = message
+            return JRONResponse(res)
+        conn = await get_conn(request.app.config)
+        cu = await checkcu(request, conn, d.get('auth'))
+        if message := await check_permissions(cu, 255):
+            res['message'] = message
+            await conn.close()
+            return JSONResponse(res)
+        if brkey != cu.get('brkey') or ses != cu.get('ses'):
+            res['message'] = await rem_session(conn, cu)
+            await conn.close()
+            return JSONResponse(res)
+        val = d.get('value', '')
+        await conn.execute('UPDATE settings SET counters = $1', val or None)
+        res['done'] = True
+        await set_flashed(request, 'Счётчики отредактированы.')
+        await conn.close()
+        return JSONResponse(res)
+
+
 class IndexPage(HTTPEndpoint):
     async def put(self, request):
         res = {'done': None}
@@ -564,6 +590,8 @@ class Admin(HTTPEndpoint):
             request.app.jinja.get_template(
                 'main/robots.txt').render(request=request)
         res['index'] = await conn.fetchval('SELECT indexpage FROM settings')
+        res['li_counter'] = await conn.fetchval(
+            'SELECT counters FROM settings')
         await conn.close()
         return JSONResponse(res)
 

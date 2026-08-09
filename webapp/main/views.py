@@ -18,7 +18,7 @@ from ..common.pg import get_conn
 from ..common.random import randomize, samples
 from ..drafts.attri import status as statusd
 from ..pictures.attri import status
-from .pg import check_state, check_topic
+from .pg import check_state, check_topic, get_counters
 from .tools import resize
 
 
@@ -30,6 +30,7 @@ async def show_public(request):
         return RedirectResponse(request.url_for('arts:art', slug=slug), 301)
     topic = dict()
     await check_topic(request, conn, slug, topic)
+    counters = await get_counters(conn, cu)
     await conn.close()
     if not topic:
         raise HTTPException(404)
@@ -37,6 +38,7 @@ async def show_public(request):
         request, 'main/show-public.html',
         {'topic': topic,
          'slug': slug,
+         'counters': counters,
          'listed': False})
 
 
@@ -235,6 +237,7 @@ async def show_index(request):
         out = 1
     if cu and realm == 'logoute':
         oute = 1
+    counters = await get_counters(conn, cu)
     await conn.close()
     return request.app.jinja.TemplateResponse(
         request, 'main/index.html',
@@ -243,4 +246,5 @@ async def show_index(request):
          'out': out,
          'oute': oute,
          'art': art,
+         'counters': counters,
          'flashed': await get_flashed(request)})

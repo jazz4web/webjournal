@@ -28,6 +28,31 @@ $(function() {
     dataType: 'json'
   });
   if (tee) {
+    $('body').on('click', '#li-submit', function() {
+      $(this).blur();
+      $.ajax({
+        method: 'PUT',
+        url: '/api/setcounter',
+        headers: {
+          'x-br-ses': ses,
+          'x-br-tee': checkBR()
+        },
+        data: {
+          auth: window.localStorage.getItem('sestee'),
+          value: $('#li-edit').val()
+        },
+        success: function(data) {
+          if (data.done) {
+            window.location.reload();
+          } else {
+            showError('#mc', data);
+            scrollPanel($('#ealert'));
+            setTimeout(function() {checkPC(860);}, 400);
+          }
+        },
+        dataType: 'json'
+      });
+    });
     $('body').on('click', '#ipage-submit', function() {
       $(this).blur();
       $.ajax({
