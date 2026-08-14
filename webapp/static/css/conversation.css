@@ -1,0 +1,17 @@
+#pm-editor, #pm-editor-edit {
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+}
+
+.form-group {
+  margin: 6px 0 0;
+}
+
+.pm-text {
+  margin: 6px 0 0;
+}
+
+.pm-options {
+  margin: 6px 0 0;
+}

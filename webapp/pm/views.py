@@ -13,7 +13,7 @@ async def show_conversation(request):
     counters = await get_counters(conn, cu)
     await conn.close()
     username = request.path_params.get('username')
-    if username == cu.get('username'):
+    if cu and username == cu.get('username'):
         raise HTTPException(404)
     return request.app.jinja.TemplateResponse(
         request, 'pm/conversation.html',

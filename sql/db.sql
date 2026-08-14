@@ -155,3 +155,27 @@ CREATE TABLE announces (
     published timestamp with time zone,
     author_id integer REFERENCES users(id)
 );
+
+CREATE TABLE messages (
+    id                   serial     PRIMARY KEY,
+    sent                 timestamp with time zone,
+    received             timestamp with time zone,
+    body                 text       DEFAULT NULL,
+    html                 text       DEFAULT NULL,
+    postponed            boolean    DEFAULT FALSE,
+    removed_by_sender    boolean    DEFAULT FALSE,
+    removed_by_recipient boolean    DEFAULT FALSE,
+    sender_id            integer REFERENCES users(id),
+    recipient_id         integer REFERENCES users(id)
+);
+
+CREATE TABLE commentaries (
+    id         serial     PRIMARY KEY,
+    created    timestamp with time zone,
+    deleted    boolean    DEFAULT FALSE,
+    admined    boolean    DEFAULT FALSE,
+    html       text       DEFAULT NULL,
+    author_id  integer REFERENCES users(id),
+    article_id integer REFERENCES articles(id),
+    parent_id  integer REFERENCES commentaries(id)
+);
