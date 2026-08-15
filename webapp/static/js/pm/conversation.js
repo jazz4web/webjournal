@@ -89,6 +89,38 @@ $(function() {
     dataType: 'json'
   });
   if (ses) {
+    $('body').on('click', '.remove-button', function() {
+      $(this).blur();
+      let mid = $(this).data().id;
+      let p = 1;
+      if ($('.entity-pagination').length) {
+        p = parseInt($('.entity-pagination .page-current').text());
+      }
+      $.ajax({
+        method: 'DELETE',
+        url: '/api/conv',
+        headers: {
+          'x-br-ses': ses,
+          'x-br-tee': checkBR()
+        },
+        data: {
+          page: p,
+          mid: mid,
+          last: $('.pm-block').length,
+          auth: window.localStorage.getItem('sestee')
+        },
+        success: function(data) {
+          if (data.done) {
+            window.location.replace(data.redirect);
+          } else {
+            showError('#mc', data);
+            scrollPanel($('#ealert'));
+            setTimeout(function() {checkPC(860);}, 400);
+          }
+        },
+        dataType: 'json'
+      });
+    });
     $('body').on('click', '.entity-text-block img', clickImage);
     $('body').on('click', '.page-link', linkPage);
     $('body').on('click', '#next-link', {page: page}, linkNext);
