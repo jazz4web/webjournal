@@ -92,7 +92,7 @@ $(function() {
     $('body').on('click', '.remove-button', function() {
       $(this).blur();
       let mid = $(this).data().id;
-      let p = 1;
+      let p = 0;
       if ($('.entity-pagination').length) {
         p = parseInt($('.entity-pagination .page-current').text());
       }
@@ -233,7 +233,7 @@ $(function() {
           },
           success: function(data) {
             if (data.done) {
-              window.location.reload();
+              window.location.assign(data.redirect);
             } else {
               showError('#mc', data);
               scrollPanel($('#ealert'));

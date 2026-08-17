@@ -33,7 +33,7 @@ from .api.drafts import Draft, Drafts, Labels, Paragraph
 from .api.main import Captcha, Index
 from .api.people import ChangeAva, ChangeM, ChangePasswd, People, Profile
 from .api.pictures import Album, Albums, Albumstat, Picstat, Search
-from .api.pm import Conversation
+from .api.pm import Conversation, Conversations
 from .arts.views import (
     show_art, show_arts, show_cart, show_carts,
     show_followed, show_larts, show_lcarts, show_lfollowed)
@@ -122,6 +122,7 @@ app = StApp(
         Mount('/aliases', name='aliases', routes=[
             Route('/', show_aliases, name='aliases')]),
         Mount('/api', name='api', routes=[
+            Route('/convs', Conversations, name='aconvs'),
             Route('/conv', Conversation, name='aconv'),
             Route('/setcounter', Counter, name='acounter'),
             Route('/chindex', IndexPage, name='aindex'),

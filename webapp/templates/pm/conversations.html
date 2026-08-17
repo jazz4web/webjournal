@@ -1,4 +1,6 @@
 {% extends "base.html" %}
+{%- from "macros/_common.html" import show_empty -%}
+{%- from "macros/_common.html" import show_pv -%}
 
 {%- block title_part -%}Ваши приваты{%- endblock title_part -%}
 
@@ -7,17 +9,96 @@
   {%- assets filters='cssmin', output='generic/css/pm/conversations.css',
              'css/base.css',
              'css/menu.css',
+             'css/page-content.css',
+             'css/flashed-alert.css',
+             'css/flashed-error.css',
+             'css/today-field.css',
+             'css/empty-message.css',
+             'css/entity-block.css',
+             'css/next-block.css',
+             'css/entity-attributes.css',
+             'css/avatar.css',
+             'css/personal-details.css',
+             'vendor/bootstrap/css/glyphicons.css',
+             'css/conversations.css',
+             'css/entity-pagination.css',
              'css/footer.css' -%}
     <link rel="stylesheet" type="text/css" href="{{ ASSET_URL }}">
   {%- endassets -%}
 {%- endblock styles -%}
 
+{%- block templates -%}
+  {{- super() -}}
+  <script id="convst" type="text/template">
+    <% #pagination.conversations %>
+      <div class="entity-block <% #new_input %>new-input<% /new_input %>
+                  <% #new_output %>new-output<% /new_output %>">
+        <div class="entity-attributes">
+          <div class="author-avatar avatar"
+               style="background:url(<% ava %>)"></div>
+          <div class="entity-info">
+            <h3>
+              <a class="author-profile-link" href="/pm/<% company %>">
+                <% company %>
+              </a>
+            </h3>
+            <div class="personal-details">
+              <div class="column">Есть входящие:</div>
+              <div class="column">
+                <% #new_input %>
+                  <span class="glyphicon glyphicon-ok-sign"
+                        aria-hidden="true"></span>
+                <% /new_input %>
+                <% ^new_input %>
+                  <span class="glyphicon glyphicon-minus-sign"
+                        aria-hidden="true"></span>
+                <% /new_input %>
+              </div>
+              <div class="column">Есть исходящие:</div>
+              <div class="column">
+                <% #new_output %>
+                  <span class="glyphicon glyphicon-ok-sign"
+                        aria-hidden="true"></span>
+                <% /new_output %>
+                <% ^new_output %>
+                  <span class="glyphicon glyphicon-minus-sign"
+                        aria-hidden="true"></span>
+                <% /new_output %>
+              </div>
+              <div class="column">Последняя активность:</div>
+              <div class="column date-field"><% sent %></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    <% /pagination.conversations %>
+    <% ^pagination.conversations %>
+      {{ show_empty('В настоящий момент у вас нет открытых приватов.') }}
+    <% /pagination.conversations %>
+    <% #pv %>
+      {{- show_pv() -}}
+    <% /pv %>
+  </script>
+{%- endblock templates -%}
+
 {%- block scripts -%}
   {{- super() -}}
+  <script>let ses="{{cu.ses}}",page={{page}};</script>
   {%- assets filters='rjsmin', output='generic/js/pm/conversations.js',
              'js/render-menu.js',
              'js/render-footer.js',
-             'js/temporary.js' -%}
+             'js/check-auth.js',
+             'js/ping.js',
+             'js/close-topflashed.js',
+             'js/error-403.js',
+             'js/slide-page.js',
+             'js/check-pc.js',
+             'js/check-data.js',
+             'js/check-br.js',
+             'js/check-next.js',
+             'js/format-datetime.js',
+             'js/render-pv.js',
+             'js/pm/conversations.js' -%}
     <script src="{{ ASSET_URL }}"></script>
   {%- endassets -%}
 {%- endblock scripts -%}
