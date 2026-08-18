@@ -6,6 +6,7 @@ $(function() {
   $('body').on('click', '.closeable', closeTopFlashed);
   showLabeledDrafts('/api/llenta', page, label, ses);
   if (ses) {
+    checkIncomming(ses);
     $('body').on('click', '.alias-link', function() {
       $(this).blur();
       window.location.assign($(this).data().link);

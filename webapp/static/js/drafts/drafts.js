@@ -6,6 +6,7 @@ $(function() {
   $('body').on('click', '.closeable', closeTopFlashed);
   showDrafts('/api/drafts', page, ses);
   if (ses) {
+    checkIncomming(ses);
     $('body').on('click', '#next-link', {page:page}, linkNext);
     $('body').on('click', '#prev-link', {page:page}, linkPrev);
     $('body').on('click', '.page-link', linkPage);

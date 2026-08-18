@@ -6,6 +6,7 @@ $(function() {
   $('body').on('click', '.closeable', closeTopFlashed);
   checkPermissions(ses);
   if (ses) {
+    checkIncomming(ses);
     $('body').on('click', '.trash-button', hideButton);
     $('body').on('click', '.remove-button', {page: 1}, remAli);
     $('body').on('keyup', '#username', function(event) {

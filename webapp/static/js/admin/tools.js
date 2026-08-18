@@ -27,7 +27,8 @@ $(function() {
     error: error403,
     dataType: 'json'
   });
-  if (tee) {
+  if (ses) {
+    checkIncomming(ses);
     $('body').on('click', '#li-submit', function() {
       $(this).blur();
       $.ajax({

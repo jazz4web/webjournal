@@ -6,6 +6,7 @@ $(function() {
   $('body').on('click', '.closeable', closeTopFlashed);
   showArt('/api/cart', slug, ses);
   if (ses) {
+    checkIncomming(ses);
     $('body').on('click', '.copy-link', showCopyForm);
     $('body').on('click', '.entity-text-block img', clickImage);
     $('body').on('click', '#move-screen-up', function() {

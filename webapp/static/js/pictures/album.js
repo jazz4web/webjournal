@@ -42,6 +42,7 @@ $(function() {
     dataType: 'json'
   });
   if (ses) {
+    checkIncomming(ses);
     $('body').on('click', '.remove-album', function() {
       $(this).blur();
       let suffix = $(this).data().suffix;

@@ -30,13 +30,14 @@ $(function() {
         $('.date-field').each(function() { formatDateTime($(this)); });
         $('.copy-button').on('click', copyAlias);
         if (data.pv) renderPV(data.pagination.page);
-        checkPC(860);
+        setTimeout(function() {checkPC(860);}, 400);
       }
     },
     error: error403,
     dataType: 'json'
   });
   if (ses) {
+    checkIncomming(ses);
     $('body').on('click', '.remove-button', {page: page}, function(event) {
       $(this).blur();
       let p = ($('.remove-button').length > 1) ?

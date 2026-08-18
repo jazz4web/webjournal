@@ -15,5 +15,6 @@ $(function() {
   $('.entity-text-block').children().each(setMargin);
   $('.entity-text-block img').each(adjustImage);
   pingUser(300000, 8);
+  if (ses) checkIncomming(ses);
   setTimeout(setCookies, 900);
 });

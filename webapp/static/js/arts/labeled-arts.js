@@ -12,6 +12,7 @@ $(function() {
   $('body').on('click', '.page-link', linkPage);
   $('body').on('click', '#next-link', {page:page}, linkNext);
   $('body').on('click', '#prev-link', {page:page}, linkPrev);
+  if (ses) checkIncomming(ses);
   checkPC(860);
   setTimeout(setCookies, 900);
 });

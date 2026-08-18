@@ -6,6 +6,7 @@ $(function() {
   $('body').on('click', '.closeable', closeTopFlashed);
   showDraft(slug);
   if (ses) {
+    checkIncomming(ses);
     $('body').on('change', '#select-status', {slug: slug}, function(event) {
       let state = $('#select-status').val();
       $.ajax({

@@ -34,7 +34,7 @@ $(function() {
         $('.date-field').each(function() {formatDateTime($(this));});
         $('.labels').each(fixComma);
         if (data.pv) renderPV(data.pagination.page);
-        checkPC(860);
+        setTimeout(function() {checkPC(860);}, 400);
       }
     },
     error: error403,
@@ -47,6 +47,7 @@ $(function() {
   $('body').on('click', '.page-link', linkPage);
   $('body').on('click', '#next-link', {page:page}, linkNext);
   $('body').on('click', '#prev-link', {page:page}, linkPrev);
+  if (ses) checkIncomming(ses);
   checkPC(860);
   setTimeout(setCookies, 900);
 });

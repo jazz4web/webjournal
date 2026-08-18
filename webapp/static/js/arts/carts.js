@@ -7,6 +7,7 @@ $(function() {
   showDrafts('/api/carts', page, ses);
   checkPC(860);
   if (ses) {
+    checkIncomming(ses);
     $('body').on('click', '.alias-link', function(event) {
       $(this).blur();
     });

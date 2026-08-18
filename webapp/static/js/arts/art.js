@@ -11,6 +11,7 @@ $(function() {
   showArt('/api/art', slug, ses);
   pingUser(300000, 12);
   if (ses) {
+    checkIncomming(ses);
     $('body').on('click', '#censor-this', {slug: slug}, censorThis);
     $('body').on('click', '#special-case', {slug: slug}, function(event) {
       $(this).blur();

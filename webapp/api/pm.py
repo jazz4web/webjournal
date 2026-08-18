@@ -48,6 +48,17 @@ class Conversations(HTTPEndpoint):
             res['message'] = message
             await conn.close()
             return JSONResponse(res)
+        if request.query_params.get('justcount', None):
+            n = await conn.fetchval(
+                '''SELECT count(*) FROM messages
+                     WHERE recipient_id = $1
+                       AND received IS NULL
+                       AND postponed = false
+                       AND removed_by_sender = false
+                       AND removed_by_recipient = false''', cu.get('id'))
+            await conn.close()
+            res['pm'] = n
+            return JSONResponse(res)
         page = await parse_page(request)
         last = await check_last(
             conn, page,

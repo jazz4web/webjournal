@@ -39,6 +39,7 @@ $(function() {
   });
   checkPC(860);
   if (ses) {
+    checkIncomming(ses);
     $('body').on('click', '#remove-button', function() {
       $(this).blur();
       $.ajax({

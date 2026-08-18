@@ -33,7 +33,6 @@ $(function() {
           renderTF('.today-field', luxon.DateTime.now());
         }
         formatDateTime($('.date-field'));
-        checkPC(860);
         let pub = $('#pub-f');
         pub.on('change', function() {
           if ($(this).is(':checked')) {
@@ -65,12 +64,14 @@ $(function() {
         $('.items-row-block').each(function() {
           if (!$(this).next().length) $(this).removeClass('bordered');
         });
+        setTimeout(function() {checkPC(860);}, 400);
       }
     },
     error: error403,
     dataType: 'json'
   });
   if (ses) {
+    checkIncomming(ses);
     $('body').on('click', '#find-submit', function() {
       $(this).blur();
       let suffix = $('#find-input').val();

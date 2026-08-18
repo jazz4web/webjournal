@@ -5,3 +5,13 @@
 .new-output {
   background-color: lightcyan;
 }
+
+#pmlink {
+  color: inherit;
+}
+
+#pmlink:hover {
+  color: gray;
+  text-decoration: none;
+  text-shadow: none;
+}

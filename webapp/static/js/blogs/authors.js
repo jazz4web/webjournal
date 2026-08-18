@@ -43,6 +43,7 @@ $(function() {
     error: error403,
     dataType: 'json'
   });
+  if (ses) checkIncomming(ses);
   checkPC(860);
   $('body').on('click', '#next-link', {page:page}, linkNext);
   $('body').on('click', '#prev-link', {page:page}, linkPrev);

@@ -38,6 +38,7 @@ $(function() {
     dataType: 'json'
   });
   if (ses) {
+    checkIncomming(ses);
     $('body').on('click', '.page-link', linkPage);
     $('body').on('click', '#next-link', {page: page}, linkNext);
     $('body').on('click', '#prev-link', {page: page}, linkPrev);

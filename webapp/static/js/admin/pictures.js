@@ -7,6 +7,7 @@ $(function() {
   checkPC(860);
   checkPermissions(ses);
   if (ses) {
+    checkIncomming(ses);
     $('body').on('click', '.trash-button', hideButton);
     $('body').on('click', '.remove-button', {page: 1}, remPic);
     $('body').on('keyup', '#username', function(event) {

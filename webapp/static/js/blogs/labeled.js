@@ -35,12 +35,13 @@ $(function() {
         $('.date-field').each(function() {formatDateTime($(this));});
         $('.labels').each(fixComma);
         if (data.pv) renderPV(data.pagination.page);
-        checkPC(860);
+        setTimeout(function() {checkPC(860);}, 400);
       }
     },
     error: error403,
     dataType: 'json'
   });
+  if (ses) checkIncomming(ses);
   checkPC(860);
   $('body').on('click', '.alias-link', function() {
     $(this).blur();

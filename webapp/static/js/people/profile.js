@@ -330,5 +330,6 @@ $(function() {
       }
     });
   }
+  if (ses) checkIncomming(ses);
   checkPC(860);
 });

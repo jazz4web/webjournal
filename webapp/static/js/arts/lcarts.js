@@ -6,6 +6,7 @@ $(function() {
   $('body').on('click', '.closeable', closeTopFlashed);
   showLabeledDrafts('/api/lcarts', page, label, ses);
   if (ses) {
+    checkIncomming(ses);
     $('body').on('click', '.alias-link', function(event) {
       $(this).blur();
     });

@@ -40,6 +40,10 @@ $(function() {
     $('body').on('click', '.page-link', linkPage);
     $('body').on('click', '#next-link', {page:page}, linkNext);
     $('body').on('click', '#prev-link', {page:page}, linkPrev);
+    checkIncomming(ses);
+    $('body').on('click', '#pmlink', function(event) {
+      event.preventDefault();
+    });
   }
   checkPC(860);
 });
