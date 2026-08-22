@@ -1,0 +1,54 @@
+#entity-commentaries {
+  margin-left: -12px;
+}
+
+.commentaries-branch {
+  margin-left: 12px;
+}
+
+.root-commentary {
+  background-color: snow;
+  border-radius: 3px;
+  border: thin solid mistyrose;
+  box-shadow: 0 0 5px lightsalmon;
+  padding: 6px;
+  margin 6px 0 0;
+}
+
+.deleted-root-commentary {
+  margin: 6px 0;
+  text-align: left;
+  text-shadow: 0 0 3px lightgray;
+  font-style: italic;
+}
+
+.commentary-head {
+  display: flex;
+  column-gap: 8px;
+}
+
+.commentary-author-avatar {
+  width: 48px;
+  height: 48px;
+}
+
+.commentary-author-name {
+  margin: 0;
+  font-weight: 500;
+  font-size: 1em;
+}
+
+.commentary-info-line {
+  font-size: 0.9em;
+  font-style: italic;
+  text-shadow: 0 0 3px lightgray;
+}
+
+.commentary-body {
+  text-align: justify;
+  margin: 6px 0 0;
+}
+
+.commentary-options {
+  margin: 6px 0 0;
+}

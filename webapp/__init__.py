@@ -29,6 +29,7 @@ from .api.arts import (
     Art, Arts, Alabels, CArt, CArts, Dislike, LCArts, Lenta, Like, LLenta)
 from .api.auth import CreateAcc, Login, Logout, LogoutE, ResetFP
 from .api.blogs import Authors, Blog, LBlog
+from .api.comments import Answer, Comment
 from .api.drafts import Draft, Drafts, Labels, Paragraph
 from .api.main import Captcha, Index
 from .api.people import ChangeAva, ChangeM, ChangePasswd, People, Profile
@@ -122,6 +123,8 @@ app = StApp(
         Mount('/aliases', name='aliases', routes=[
             Route('/', show_aliases, name='aliases')]),
         Mount('/api', name='api', routes=[
+            Route('/answer', Answer, name='aanswer'),
+            Route('/comment', Comment, name='acomment'),
             Route('/convs', Conversations, name='aconvs'),
             Route('/conv', Conversation, name='aconv'),
             Route('/setcounter', Counter, name='acounter'),

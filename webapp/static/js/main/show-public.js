@@ -13,6 +13,7 @@ $(function() {
   $('body').on('click', '.entity-text-block img', clickImage);
   $('body').on('click', '.slidable', hideAnnounce);
   showAnns(suffix);
+  showCommentaries(slug, null);
   $('#get-more').on('click', function() {
     $(this).blur();
     window.location.assign($(this).data().link);

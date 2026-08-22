@@ -35,6 +35,7 @@
              'css/public.css',
              'css/cookies-alert.css',
              'css/next-block.css',
+             'css/commentaries.css',
              'css/footer.css' -%}
     <link rel="stylesheet" type="text/css" href="{{ASSET_URL}}">
   {%- endassets -%}
@@ -43,6 +44,67 @@
 
 {%- block templates -%}
   {{- super() -}}
+  <script id="brancht" type="text/template">
+    <div id="branch-<% id %>" class="commentaries-branch">
+      <% #deleted %>
+        <div class="deleted-root-commentary next-block">
+          Комментарий удалён
+        </div>
+      <% /deleted %>
+      <% ^deleted %>
+        <div class="root-commentary next-block">
+          <div class="commentary-head">
+            <div class="commentary-author-avatar avatar"
+                 style="background: url(<% author.ava %>)"></div>
+            <div class="commentary-attributes">
+              <h4 class="commentary-author-name">
+                <a class="author-profile-link"
+                   href="/people/<% author.username %>">
+                  <% author.username %>
+                </a>
+              </h4>
+              <div class="commentary-info-line date-field">
+                <% created %>
+              </div>
+            </div>
+          </div>
+          <div class="commentary-body entity-text-block">
+            <%{ html }%>
+          </div>
+          <% #tools %>
+            <div class="commentary-options">
+              <% #answer %>
+              <button type="button"
+                      title="ответить"
+                      data-id="<% id %>"
+                      class="btn-sm btn-primary answer-button">
+                <span class="glyphicon glyphicon-comment"
+                      aria-hidden="true"></span>
+              </button>
+              <% /answer %>
+              <% #rem %>
+              <button type="button"
+                      title="удалить"
+                      class="btn-sm btn-default trash-button">
+                <span class="glyphicon glyphicon-trash"
+                      aria-hidden="true"></span>
+              </button>
+              <button type="button"
+                      title="удалить безвозвратно"
+                      data-id="<% id %>"
+                      class="btn-sm btn-danger hidden
+                             remove-commentary
+                             remove-button">
+                <span class="glyphicon glyphicon-trash"
+                      aria-hidden="true"></span>
+              </button>
+              <% /rem %>
+            </div>
+          <% /tools %>
+        </div>
+      <% /deleted %>
+    </div>
+  </script>
   <script id="announcet" type="text/template">
     <% #anns %>
       <div class="announce-block">
@@ -196,6 +258,9 @@
              'js/ping-user.js',
              'js/show-anns.js',
              'js/hide-announce.js',
+             'js/show-commentaries.js',
+             'js/show-children.js',
+             'js/error-403.js',
              'js/main/show-public.js' -%}
     <script src="{{ ASSET_URL }}"></script>
   {%- endassets -%}

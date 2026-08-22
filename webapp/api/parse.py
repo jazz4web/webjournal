@@ -37,7 +37,10 @@ async def parse_art_query(request, conn, query, target):
     target['dislikes'] = await conn.fetchval(
         'SELECT count(*) FROM dislikes WHERE article_id = $1',
         query.get('id'))
-    target['commentaries'] = 0
+    target['commentaries'] = await conn.fetchval(
+        '''SELECT count(*) FROM commentaries
+             WHERE article_id = $1 AND deleted = false''',
+        query.get('id'))
     target['labels'] = [label.get('label') for label in await conn.fetch(
         LABELS, query.get('id'))]
 
@@ -69,6 +72,9 @@ async def parse_arts_query(request, conn, query, target, page, last):
              'dislikes': await conn.fetchval(
                  'SELECT count(*) FROM dislikes WHERE article_id = $1',
                  record.get('id')),
-             'commentaries': 0,
+             'commentaries': await conn.fetchval(
+                 '''SELECT count(*) FROM commentaries
+                      WHERE article_id = $1 AND deleted = false''',
+                 record.get('id')),
              'labels': [label.get('label') for label in await conn.fetch(
                  LABELS, record.get('id'))]} for record in query]

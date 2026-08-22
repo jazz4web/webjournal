@@ -23,10 +23,12 @@
              'css/entity-text-block.css',
              'css/colors.css',
              'vendor/pygments/css/pygments.css',
+             'css/entity-block.css',
              'css/entity-labels.css',
              'css/art.css',
              'css/next-block.css',
              'css/options-block.css',
+             'css/commentaries.css',
              'css/cookies-alert.css',
              'css/footer.css' -%}
     <link rel="stylesheet" type="text/css" href="{{ ASSET_URL }}">
@@ -34,6 +36,126 @@
 {%- endblock styles -%}
 {%- block templates -%}
   {{- super() -}}
+  <script id="sanswert" type= "text/template">
+    <% #perm %>
+      <div class="entity-block next-block new-answer-block hidden">
+        <div class="new-answer-form">
+          <div class="form-group">
+            <textarea id="answer-editor"
+                      class="form-control"
+                      placeholder="введите текст комментария"
+                      rows="8"></textarea>
+          </div>
+          <div class="form-group submit-group">
+            <button class="btn btn-primary"
+                    type="button"
+                    id="answer-submit"
+                    data-pid="<% parent_id %>">
+              Отправить
+            </button>
+            <button class="btn btn-default"
+                    type="button"
+                    id="cancel-answer">
+              Отменить
+            </button>
+          </div>
+        </div>
+      </div>
+    <% /perm %>
+    <% ^perm %>
+      <div class="flashed-error to-be-hidden comment-alert">
+        <% message %>
+      </div>
+    <% /perm %>
+  </script>
+  <script id="brancht" type="text/template">
+    <div id="branch-<% id %>" class="commentaries-branch">
+      <% #deleted %>
+        <div class="deleted-root-commentary next-block">
+          Комментарий удалён
+        </div>
+      <% /deleted %>
+      <% ^deleted %>
+        <div class="root-commentary next-block">
+          <div class="commentary-head">
+            <div class="commentary-author-avatar avatar"
+                 style="background: url(<% author.ava %>)"></div>
+            <div class="commentary-attributes">
+              <h4 class="commentary-author-name">
+                <a class="author-profile-link"
+                   href="/people/<% author.username %>">
+                  <% author.username %>
+                </a>
+              </h4>
+              <div class="commentary-info-line date-field">
+                <% created %>
+              </div>
+            </div>
+          </div>
+          <div class="commentary-body entity-text-block">
+            <%{ html }%>
+          </div>
+          <% #tools %>
+            <div class="commentary-options">
+              <% #answer %>
+              <button type="button"
+                      title="ответить"
+                      data-id="<% id %>"
+                      class="btn-sm btn-primary answer-button">
+                <span class="glyphicon glyphicon-comment"
+                      aria-hidden="true"></span>
+              </button>
+              <% /answer %>
+              <% #rem %>
+              <button type="button"
+                      title="удалить"
+                      class="btn-sm btn-default trash-button">
+                <span class="glyphicon glyphicon-trash"
+                      aria-hidden="true"></span>
+              </button>
+              <button type="button"
+                      title="удалить безвозвратно"
+                      data-id="<% id %>"
+                      class="btn-sm btn-danger hidden
+                             remove-commentary
+                             remove-button">
+                <span class="glyphicon glyphicon-trash"
+                      aria-hidden="true"></span>
+              </button>
+              <% /rem %>
+            </div>
+          <% /tools %>
+        </div>
+      <% /deleted %>
+    </div>
+  </script>
+  <script id="scommentt" type="text/template">
+    <% #perm %>
+      <div class="entity-block next-block new-comment-block hidden">
+        <div class="new-comment-form">
+          <div class="form-group">
+            <textarea id="comment-editor"
+                      class="form-control"
+                      placeholder="введите текст комментария"
+                      rows="8"></textarea>
+          </div>
+          <div class="form-group">
+            <button class="btn btn-primary"
+                    type="button"
+                    id="comment-submit"
+                    data-aid="<% article_id %>">
+              Отправить
+            </button>
+          </div>
+        </div>
+      </div>
+    <% /perm %>
+    <% ^perm %>
+      <div class="flashed-error hidden comment-alert">
+        <% message %>
+      </div>
+    <% /perm %>
+  </script>
   <script id="artt" type="text/template">
     <div id="topic-head" class="content-block">
       <h1 title="<% art.title %>">
@@ -285,7 +407,11 @@
              'js/undress-links.js',
              'js/censor-this.js',
              'js/hide-announce.js',
+             'js/hide-button.js',
              'js/check-incomming.js',
+             'js/show-commentaries.js',
+             'js/show-children.js',
+             'js/error-403.js',
              'js/arts/art.js' -%}
     <script src="{{ ASSET_URL }}"></script>
   {%- endassets -%}
