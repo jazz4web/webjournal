@@ -3,12 +3,52 @@ from starlette.exceptions import HTTPException
 from starlette.responses import JSONResponse
 
 from ..auth.cu import checkcu
+from ..common.aparsers import parse_page
 from ..common.flashed import set_flashed
 from ..common.pg import get_conn
 from .pg import (
-    can_remove, check_art, check_rel, delete_commentary,
-    rem_session, select_commentaries, send_comment)
-from .tools import check_permissions, check_secure
+    can_remove, check_art, check_last, check_rel,
+    delete_commentary, rem_session, select_commentaries, select_comments,
+    send_comment)
+from .tools import check_g_secure, check_permissions, check_secure
+
+
+class Comments(HTTPEndpoint):
+    async def get(self, request):
+        res = {'cu': None}
+        token = request.headers.get('x-auth-sestee')
+        if token is None:
+            raise HTTPException(403)
+        conn = await get_conn(request.app.config)
+        cu = await checkcu(request, conn, token)
+        res['cu'] = cu
+        message = await check_g_secure(request, cu, 200)
+        if message:
+            res['message'] = message
+            await conn.close()
+            return JSONResponse(res)
+        page = await parse_page(request)
+        last = await check_last(
+            conn, page,
+            request.app.config.get('COMMENTS_PER_PAGE', cast=int, default=3),
+            '''SELECT count(*) FROM commentaries
+                 WHERE article_id IS NOT NULL
+                   AND admined = false
+                   AND author_id IS NOT NULL''')
+        if page > last:
+            res['message'] = f'всего страниц: {last}.'
+            await conn.close()
+            return JSONResponse(res)
+        res['pagination'] = dict()
+        await select_comments(
+            request, conn, res['pagination'], page,
+            request.app.config.get('COMMENTS_PER_PAGE', cast=int, default=3),
+            last)
+        if res['pagination']:
+            if res['pagination']['next'] or res['pagination']['prev']:
+                res['pv'] = True
+        await conn.close()
+        return JSONResponse(res)
 
 
 class Answer(HTTPEndpoint):
@@ -203,4 +243,35 @@ class Comment(HTTPEndpoint):
         res['done'] = True
         await set_flashed(request, 'Комментарий добавлен.')
         await conn.close()
+        return JSONResponse(res)
+
+    async def put(self, request):
+        res = {'done': None}
+        d = await request.form()
+        ses, brkey, message = await check_secure(request)
+        if message:
+            res['message'] = message
+            return JSONResponse(res)
+        conn = await get_conn(request.app.config)
+        cu = await checkcu(request, conn, d.get('auth'))
+        if message := await check_permissions(cu, 200):
+            res['message'] = message
+            await conn.close()
+            return JSONResponse(res)
+        if brkey != cu.get('brkey') or ses != cu.get('ses'):
+            res['message'] = await rem_session(conn, cu)
+            await conn.close()
+            return JSONResponse(res)
+        co = await conn.fetchrow(
+            '''SELECT id, admined FROM commentaries
+                 WHERE id = $1
+                   AND article_id IS NOT NULL
+                   AND admined = false''', int(d.get('id', '0')))
+        if co:
+            await conn.execute(
+                'UPDATE commentaries SET admined = true WHERE id = $1',
+                co.get('id'))
+        await conn.close()
+        res['done'] = True
+        await set_flashed(request, 'Комментарий проверен.')
         return JSONResponse(res)

@@ -1,4 +1,6 @@
 {% extends "base.html" %}
+{%- from "macros/_common.html" import show_empty -%}
+{%- from "macros/_common.html" import show_pv -%}
 
 {%- block title_part -%}Непроверенные комментарии{%- endblock title_part -%}
 
@@ -7,18 +9,115 @@
   {%- assets filters='cssmin', output='generic/css/comments/comments.css',
              'css/base.css',
              'css/menu.css',
+             'css/page-content.css',
+             'css/flashed-alert.css',
+             'css/flashed-error.css',
+             'css/today-field.css',
+             'css/empty-message.css',
+             'css/commentaries.css',
+             'css/avatar.css',
+             'css/entity-block.css',
+             'css/entity-attributes.css',
+             'css/entity-text-block.css',
+             'css/colors.css',
+             'vendor/pygments/css/pygments.css',
+             'css/next-block.css',
+             'css/form-control.css',
+             'vendor/bootstrap/css/glyphicons.css',
+             'css/entity-pagination.css',
              'css/footer.css' -%}
     <link rel="stylesheet" type="text/css" href="{{ ASSET_URL }}">
   {%- endassets -%}
 {%- endblock styles -%}
 
+{%- block templates -%}
+  {{- super() -}}
+  <script id="commentst" type="text/template">
+    <% #pagination.comments %>
+      <div class="entity-block">
+        <div class="commentary-head">
+          <div class="commentary-author-avatar avatar"
+               style="background: url(<% ava %>)"></div>
+          <div class="commentary-attributes">
+            <h4 class="commentary-author-name">
+              <a class="author-profile-link"
+                 href="/people/<% username %>"><% username %></a>
+            </h4>
+            <div class="commentary-info-line date-field">
+              <% created %>
+            </div>
+          </div>
+        </div>
+        <div class="commentary-body entity-text-block">
+          <%{ html }%>
+        </div>
+        <div class="commentary-options">
+          <button type="button"
+                  title="<% title %>"
+                  data-art="<% art %>"
+                  class="btn-sm btn-primary link-button">
+           <span class="glyphicon glyphicon-link"
+                 aria-hidden="true"></span>
+          </button>
+          <button type="button"
+                  title="отметить просмотренным"
+                  data-id="<% id %>"
+                  class="btn-sm btn-success checked-button">
+            <span class="glyphicon glyphicon-ok-sign"
+                  aria-hidden="true"></span>
+          </button>
+          <% #rem %>
+            <button type="button"
+                    title="удалить"
+                    class="btn-sm btn-default trash-button">
+              <span class="glyphicon glyphicon-trash"
+                    aria-hidden="true"></span>
+            </button>
+            <button type="button"
+                    title="удалить безвозвратно"
+                    data-id="<% id %>"
+                    class="btn-sm btn-danger hidden remove-button">
+             <span class="glyphicon glyphicon-trash"
+                   aria-hidden="true"></span>
+            </button>
+          <% /rem %>
+        </div>
+      </div>
+    <% /pagination.comments %>
+    <% ^pagination.comments %>
+      {{ show_empty('Новых комментариев пока нет.') }}
+    <% /pagination.comments %>
+    <% #pv %>
+      {{- show_pv() -}}
+    <% /pv %>
+  </script>
+{%- endblock templates -%}
+
 {%- block scripts -%}
   {{- super() -}}
+  <script>let page={{page}},ses="{{cu.ses}}";</script>
   {%- assets filters='rjsmin', output='generic/js/comments/comments.js',
              'js/render-menu.js',
              'js/render-footer.js',
              'js/check-incomming.js',
-             'js/temporary.js' -%}
+             'js/check-auth.js',
+             'js/ping.js',
+             'js/close-topflashed.js',
+             'js/slide-page.js',
+             'js/check-next.js',
+             'js/render-tf.js',
+             'js/format-datetime.js',
+             'js/render-pv.js',
+             'js/adjust-frame.js',
+             'js/set-margin.js',
+             'js/adjust-image.js',
+             'js/error-403.js',
+             'js/check-pc.js',
+             'js/hide-button.js',
+             'js/show-error.js',
+             'js/scroll-panel.js',
+             'js/check-br.js',
+             'js/comments/comments.js' -%}
     <script src="{{ ASSET_URL }}"></script>
   {%- endassets -%}
 {%- endblock scripts -%}
