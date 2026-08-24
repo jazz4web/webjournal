@@ -16,7 +16,7 @@ from ..common.pg import get_conn
 from .avas import check_img
 from .pg import (
     check_data, check_last, check_rel, filter_target_user,
-    rem_session, select_users)
+    get_user_statistic, rem_session, select_users)
 from .tasks import send_mail_mail
 from .tools import (
     check_g_secure, check_permissions, check_profile_permissions, check_secure)
@@ -352,6 +352,8 @@ class Profile(HTTPEndpoint):
             res['user'] = target
             rel = await check_rel(conn, cu.get('id'), target.get('uid'))
             await check_profile_permissions(cu, target, res, rel)
+            res['stat'] = await get_user_statistic(
+                conn, target, cu.get('weight'))
             if res['address']:
                 res['user']['address'] = await conn.fetchval(
                     'SELECT address FROM accounts WHERE user_id = $1',

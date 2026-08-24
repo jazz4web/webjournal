@@ -22,6 +22,52 @@ NOT_RECEIVED = '''SELECT id FROM messages
                       AND received IS NULL'''
 
 
+async def get_user_statistic(conn, user, cuweight):
+    res = dict()
+    if user.get('weight') >= 30:
+        res['rstat'] = {'likes': await conn.fetchval(
+            'SELECT count(*) FROM likes WHERE user_id = $1',
+            user.get('uid')),
+                        'dislikes': await conn.fetchval(
+            'SELECT count(*) FROM dislikes WHERE user_id = $1',
+            user.get('uid')),
+                        'comments': await conn.fetchval(
+            'SELECT count(*) FROM commentaries WHERE author_id = $1',
+            user.get('uid'))}
+    if user.get('weight') >= 100:
+        bstat = {'drafts': await conn.fetchval(
+            '''SELECT count(*) FROM articles
+                 WHERE state = $1 AND author_id = $2''',
+            status.draft, user.get('uid')),
+                 'public': await conn.fetchval(
+            '''SELECT count(*) FROM articles
+                 WHERE state = $1 AND author_id = $2''',
+            status.pub, user.get('uid')),
+                 'private': await conn.fetchval(
+            '''SELECT count(*) FROM articles
+                 WHERE state = $1 AND author_id = $2''',
+            status.priv, user.get('uid')),
+                 'ffo': await conn.fetchval(
+            '''SELECT count(*) FROM articles
+                 WHERE state = $1 AND author_id = $2''',
+            status.ffo, user.get('uid')),
+                 'follows': await conn.fetchval(
+            'SELECT count(*) FROM followers WHERE author_id = $1',
+            user.get('uid')),
+                 'likes': await conn.fetchval(
+            '''SELECT count(*) FROM articles, likes
+                 WHERE likes.article_id = articles.id
+                 AND articles.author_id = $1''', user.get('uid')),
+                 'dislikes': await conn.fetchval(
+            '''SELECT count(*) FROM articles, dislikes
+                 WHERE dislikes.article_id = articles.id
+                 AND articles.author_id = $1''', user.get('uid'))}
+        res['bstat'] = bstat
+    if user.get('weight') >= 150 and cuweight >= 200:
+        res['pstat'] = await get_user_stat(conn, user.get('uid'))
+    return res
+
+
 async def select_comments(request, conn, target, page, per_page, last):
     query = await conn.fetch(
         '''SELECT u.username AS username, u.weight,

@@ -23,7 +23,6 @@ $(function() {
       } else {
         let html = Mustache.render($('#profilet').html(), data);
         $('#mc').append(html);
-        checkPC(860);
         formatDateTime($('#profile .date-field'));
         renderLastSeen($('#profile .last-seen'));
         if ($('.today-field').length) {
@@ -38,6 +37,7 @@ $(function() {
         if ($('#select-group').length) {
           checkSelector('#select-group option', data.user.group);
         }
+        checkPC(860);
       }
     },
     error: error403,

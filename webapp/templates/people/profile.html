@@ -132,6 +132,73 @@
         </div>
       <% /user.last_published %>
     <% /user.description %>
+    <% #stat %>
+      <div id="statistics" class="entity-block next-block">
+        <div class="actions-header">
+          <h3>Статистика <% user.username %></h3>
+        </div>
+        <div class="actions-body">
+          <div class="statistic-table">
+            <% #stat.pstat %>
+              <div class="column-left bordered">Альбомов:</div>
+              <div class="column-right bordered">
+                <% stat.pstat.albums %>
+              </div>
+              <div class="column-left bordered">Файлов:</div>
+              <div class="column-right bordered">
+                <% stat.pstat.files %>
+              </div>
+              <div class="column-left bordered">Занимает всего:</div>
+              <div class="column-right bordered">
+                <% stat.pstat.volume %>
+              </div>
+            <% /stat.pstat %>
+            <% #stat.bstat %>
+              <div class="column-left bordered">Публичных:</div>
+              <div class="column-right bordered"><% stat.bstat.public %></div>
+              <div class="column-left bordered">Сообществу:</div>
+              <div class="column-right bordered"><% stat.bstat.private %></div>
+              <div class="column-left bordered">Для друзей:</div>
+              <div class="column-right bordered"><% stat.bstat.ffo %></div>
+              <div class="column-left bordered">Черновиков:</div>
+              <div class="column-right bordered"><% stat.bstat.drafts %></div>
+              <div class="column-left bordered">Подписчиков:</div>
+              <div class="column-right bordered"><% stat.bstat.follows %></div>
+              <div class="column-left bordered">
+                Получил <span class="glyphicon glyphicon-thumbs-up"
+                              aria-hidden="true"></span>:
+              </div>
+              <div class="column-right bordered"><% stat.bstat.likes %></div>
+              <div class="column-left bordered">
+                Получил <span class="glyphicon glyphicon-thumbs-down"
+                              aria-hidden="true"></span>:
+              </div>
+              <div class="column-right bordered">
+                <% stat.bstat.dislikes %>
+              </div>
+            <% /stat.bstat %>
+            <% #stat.rstat %>
+              <div class="column-left bordered">
+                Оставил <span class="glyphicon glyphicon-thumbs-up"
+                              aria-hidden="true"></span>:
+              </div>
+              <div class="column-right bordered"><% stat.rstat.likes %></div>
+              <div class="column-left bordered">
+                Оставил <span class="glyphicon glyphicon-thumbs-down"
+                              aria-hidden="true"></span>:
+              </div>
+              <div class="column-right bordered">
+                <% stat.rstat.dislikes %>
+              </div>
+              <div class="column-left">Написал комментариев:</div>
+              <div class="column-right">
+                <% stat.rstat.comments %>
+              </div>
+            <% /stat.rstat %>
+          </div>
+        </div>
+      </div>
+    <% /stat %>
     <% #chgroup %>
       <div id="permissions" class="entity-block next-block">
         <div class="actions-header">

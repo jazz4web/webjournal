@@ -87,3 +87,20 @@
   text-decoration: underline;
   text-shadow: 0 0 3px skyblue;
 }
+
+.statistic-table {
+  display: grid;
+  grid-template-columns: 3fr 20%;
+  font-style: italic;
+  text-shadow: 0 0 4px silver;
+}
+
+.column-left {
+  padding: 6px;
+  text-align: left;
+}
+
+.column-right {
+  padding: 6px;
+  text-align: right;
+}
