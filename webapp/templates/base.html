@@ -212,12 +212,16 @@
                 </div>
                 <div role="separator" class="divider"></div>
                 <div class="menu-list-item">
-                  <a href="" class="item-link">
+                  <a href="{{ url_for('admin:logs', log='access.log') }}"
+                     target="_blank"
+                     class="item-link">
                     Текущий лог
                   </a>
                 </div>
                 <div class="menu-list-item">
-                  <a href="" class="item-link">
+                  <a href="{{ url_for('admin:logs', log='previous.log') }}"
+                     target="_blank"
+                     class="item-link">
                     Предыдущий лог
                   </a>
                 </div>

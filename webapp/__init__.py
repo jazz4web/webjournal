@@ -16,7 +16,7 @@ from .errors import show_error
 
 from .admin.views import (
     admin_album, admin_aliases, admin_au_pic, admin_auth_aliases,
-    admin_pictures, show_tools)
+    admin_pictures, show_log, show_tools)
 from .announces.views import show_announce, show_announces
 from .aliases.views import show_aliases
 from .api.admin import (
@@ -46,7 +46,7 @@ from .drafts.views import show_draft, show_drafts, show_dlabeled
 from .main.views import (
         jump, show_avatar, show_favicon, show_humans,
         show_index, show_picture, show_public, show_robots,
-        show_sitemap)
+        show_sitemap, show_sitemap_t)
 from .people.views import show_people, show_profile
 from .pictures.views import show_album, show_albums
 from .pm.views import show_conversation, show_conversations
@@ -105,6 +105,7 @@ app = StApp(
         Route('/humans.txt', show_humans, name='humans.txt'),
         Route('/robots.txt', show_robots, name='robots.txt'),
         Route('/sitemap.xml', show_sitemap, name='sitemap'),
+        Route('/sitemap.txt', show_sitemap_t, name='sitemapt'),
         Route('/{suffix}', jump, name='jump'),
         Route('/ava/{username}/{size:int}', show_avatar, name='ava'),
         Route('/captcha/{suffix}', show_captcha, name='captcha'),
@@ -114,6 +115,7 @@ app = StApp(
             Route('/', show_tools, name='tools'),
             Route('/aliases', admin_aliases, name='admaliases'),
             Route('/aliases/{username}', admin_auth_aliases, name='adauthal'),
+            Route('/logs/{log}', show_log, name='logs'),
             Route('/pictures', admin_pictures, name='admpictures'),
             Route('/pictures/a/{album}', admin_album, name='admalbum'),
             Route('/pictures/au/{username}', admin_au_pic, name='aapic')]),

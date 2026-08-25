@@ -8,11 +8,12 @@ from starlette.responses import (
     FileResponse, PlainTextResponse, RedirectResponse, Response)
 
 from ..dirs import images
-from ..errors import E404
 
 from ..api.parse import LABELS
 from ..api.tasks import check_swapped
+from ..api.pg import check_last
 from ..auth.cu import getcu
+from ..common.aparsers import parse_page
 from ..common.flashed import get_flashed
 from ..common.pg import get_conn
 from ..common.random import randomize, samples
@@ -49,6 +50,32 @@ async def show_robots(request):
                 'main/robots.txt').render(request=request)
     await conn.close()
     return PlainTextResponse(text)
+
+
+async def show_sitemap_t(request):
+    conn = await get_conn(request.app.config)
+    cu = await getcu(request, conn)
+    if cu is None or cu.get('weight') < 250:
+        await conn.close()
+        raise HTTPException(404)
+    page = await parse_page(request)
+    last = await check_last(
+        conn, page,
+        request.app.config.get('UNDEFINED', cast=int, default=30),
+        'SELECT count(*) FROM articles WHERE state = $1',
+        statusd.pub)
+    if page > last:
+        page = last
+    per_page = request.app.config.get('UDEFINED', cast=int, default=30)
+    arts = [request.url_for('public', slug=art.get('slug'))._url for art
+            in await conn.fetch(
+                '''SELECT slug FROM articles
+                     WHERE state = $1 ORDER BY published DESC
+                     LIMIT $2 OFFSET $3''',
+                statusd.pub, per_page, per_page*(page-1))]
+    arts.append(f'page={page}, last page={last}')
+    await conn.close()
+    return PlainTextResponse('\n'.join(arts))
 
 
 async def show_sitemap(request):
@@ -140,20 +167,20 @@ async def jump(request):
             response.headers.append('Link', f'<{curl}>; rel="canonical"')
             return response
     await conn.close()
-    raise HTTPException(status_code=404, detail='Такой страницы у нас нет.')
+    raise HTTPException(404)
 
 
 async def show_avatar(request):
     size = request.path_params.get('size')
     if size < 22 or size > 160:
-        raise HTTPException(status_code=404, detail=E404)
+        raise HTTPException(404)
     conn = await get_conn(request.app.config)
     res = await conn.fetchrow(
         'SELECT id, username FROM users WHERE username = $1',
         request.path_params.get('username'))
     if res is None:
         await conn.close()
-        raise HTTPException(status_code=404, detail=E404)
+        raise HTTPException(404)
     ava = await conn.fetchval(
         'SELECT picture FROM avatars WHERE user_id = $1', res.get('id'))
     await conn.close()
