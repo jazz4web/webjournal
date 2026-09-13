@@ -62,17 +62,21 @@ async def show_sitemap_t(request):
     last = await check_last(
         conn, page,
         request.app.config.get('UNDEFINED', cast=int, default=30),
-        'SELECT count(*) FROM articles WHERE state = $1',
-        statusd.pub)
+        'SELECT count(*) FROM articles WHERE state = $1 AND slug != $2',
+        statusd.pub, "kontakty")
     if page > last:
         page = last
     per_page = request.app.config.get('UDEFINED', cast=int, default=30)
     arts = [request.url_for('public', slug=art.get('slug'))._url for art
             in await conn.fetch(
                 '''SELECT slug FROM articles
-                     WHERE state = $1 ORDER BY published DESC
-                     LIMIT $2 OFFSET $3''',
-                statusd.pub, per_page, per_page*(page-1))]
+                     WHERE state = $1
+                       AND slug != $2
+                     ORDER BY published DESC
+                     LIMIT $3 OFFSET $4''',
+                statusd.pub, "kontakty", per_page, per_page*(page-1))]
+    if not arts:
+        arts.append('Сайт в стадии разработки')
     arts.append(f'page={page}, last page={last}')
     await conn.close()
     return PlainTextResponse('\n'.join(arts))
@@ -82,8 +86,10 @@ async def show_sitemap(request):
     conn = await get_conn(request.app.config)
     arts = await conn.fetch(
         '''SELECT slug, published, edited FROM articles
-             WHERE state = $1 ORDER BY published DESC LIMIT 250''',
-        statusd.pub)
+             WHERE state = $1
+               AND slug != $2
+             ORDER BY published DESC LIMIT 250''',
+        statusd.pub, 'kontakty')
     await conn.close()
     response = request.app.jinja.TemplateResponse(
         request, 'main/sitemap.xml',

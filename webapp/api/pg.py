@@ -514,8 +514,9 @@ async def select_arts(request, conn, target, page, per_page, last):
              FROM articles AS a, users
              WHERE a.author_id = users.id
                AND a.state IN ($1, $2)
-             ORDER BY a.viewed DESC LIMIT $3 OFFSET $4''',
-        status.pub, status.priv, per_page, per_page*(page-1))
+               AND a.slug != $3
+             ORDER BY a.viewed DESC LIMIT $4 OFFSET $5''',
+        status.pub, status.priv, 'kontakty', per_page, per_page*(page-1))
     if query:
         await parse_arts_query(request, conn, query, target, page, last)
 

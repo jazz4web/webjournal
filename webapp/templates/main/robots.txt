@@ -17,6 +17,7 @@ Disallow: /drafts/
 Disallow: /people/
 Disallow: /pictures/
 Disallow: /pm/
+Disallow: /public/kontakty
 Disallow: /humans.txt
 
 Sitemap: {{ url_for('sitemap') }}

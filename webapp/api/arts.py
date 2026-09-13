@@ -178,8 +178,9 @@ class Arts(HTTPEndpoint):
         last = await check_last(
             conn, page,
             request.app.config.get('ARTS_PER_PAGE', cast=int, default=3),
-            'SELECT count(*) FROM articles WHERE state IN ($1, $2)',
-            status.pub, status.priv)
+            '''SELECT count(*) FROM articles
+                 WHERE state IN ($1, $2) AND slug != $3''',
+            status.pub, status.priv, 'kontakty')
         if page > last:
             res['message'] = f'Всего известно страниц: {last}.'
             await conn.close()
