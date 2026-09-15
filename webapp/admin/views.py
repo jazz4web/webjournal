@@ -22,7 +22,7 @@ async def show_log(request):
         else:
             l = '/var/log/nginx/access.log.1'
         if os.path.exists(l):
-            response = FileResoponse(l)
+            response = FileResponse(l)
         else:
             a = 'Файл не существует.\n'
             m = 'Убедитесь, что вы используете Nginx.'
