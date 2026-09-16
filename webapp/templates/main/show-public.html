@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 
 {%- block metas -%}
+  {{ super() }}
   <meta name="description" content="{{topic['meta']}}">
   <meta name="keywords" content="{%- for label in topic['labels'] -%}
         {{- label -}}{%- if not loop.last -%}{{", "}}
