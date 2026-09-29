@@ -21,7 +21,7 @@
 ```
 $ mkdir ~/workspace
 $ cd ~/workspace
-$ git clone git@github.com:jazz4web/webjournal.get
+$ git clone https://github.com/jazz4web/webjournal.git
 $ cd webjournal
 $ sudo apt install $(cat deployment/packages)
 $ createdb webjournal
@@ -31,8 +31,8 @@ $ source venv/bin/activate
 $ pip install -r requirements.txt
 $ tar xvaf deployment/vendor.tar.gz -C webapp/static
 $ tar xvaf deployment/images.tar.gz -C webapp/static
-$ cp env_template .env
 $ ln -s -T ~/workspace/webjournal/webapp/static/vendor/bootstrap/fonts/ webapp/static/fonts
+$ cp env_template .env
 $ python insert_captchas.py
 $ python create_root.py
 $ python runserver.py
