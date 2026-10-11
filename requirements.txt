@@ -1,6 +1,6 @@
 aiosmtplib==5.1.0
 anyio==4.12.1
-asyncpg==0.31.0
+asyncpg==0.32.0
 awesome-slugify==1.6.5
 bleach==6.4.0
 click==8.3.1
